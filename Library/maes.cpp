@@ -28,7 +28,7 @@ namespace MAES{
         Agent_Msg MsgObj;
 
         /*Mailbox init*/
-        msg_size=8;  //String: 4, Int: 4
+        msg_size=12;  //String: 4, Int: 4, String: 4
         msg_queue_size=5;
 
         /*Task init*/
@@ -47,6 +47,7 @@ namespace MAES{
  *           embedded in task's handle env variable.
 *********************************************************************************************/
     void Agent_Build::create_agent(){
+
 
         /*Creating mailbox*/
         Mailbox_Params_init(&mbxParams);
@@ -117,6 +118,7 @@ namespace MAES{
 **********************************************************************************************/
    Agent_Msg::Agent_Msg(){
       mailbox_handle=(Mailbox_Handle) Task_getEnv(Task_self());
+      MsgObj.sender=Task_Handle_name(Task_self());
       clear_all_receiver();
    }
 /*********************************************************************************************
@@ -203,16 +205,6 @@ namespace MAES{
         else return true;
     }
 
-    void Agent_Msg::print_list(){
-        int i=0;
-        while (i<RECEIVER_LIST_SIZE){
-
-            //   if(receivers[i]==NULL) break;
-                System_printf("handle %x \n",receivers[i]);
-                System_flush();
-                i++;
-        }
-    }
 /*********************************************************************************************
 * Class: Agent_Msg
 * Function: remove_receiver(Mailbox_Handle m)
@@ -293,6 +285,17 @@ namespace MAES{
     String Agent_Msg::get_msg_body(){
         return MsgObj.body;
     }
+
+/*********************************************************************************************
+* Class: Agent_Msg
+* Function: get_sender()
+* Return type: String
+* Comment: Get sender name
+**********************************************************************************************/
+    String Agent_Msg::get_sender(){
+        return MsgObj.sender;
+    }
+
 
 /*********************************************************************************************
 *

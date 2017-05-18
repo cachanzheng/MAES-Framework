@@ -60,12 +60,14 @@
 using namespace MAES;
 
 void writing(UArg arg0, UArg arg1);
+void writing2(UArg arg0, UArg arg1);
 void reading(UArg arg0, UArg arg1);
 void reading2(UArg arg0, UArg arg1);
 
 Agent_Build Reading("Reading Agent",5,reading);
-Agent_Build Reading2("Reading Agent 2",5,reading);
+Agent_Build Reading2("Reading Agent 2",5,reading2);
 Agent_Build Writing("Writing Agent",5,writing);
+Agent_Build Writing2("Writing Agent 2",5,writing2);
 
 /*
  *  ======== main ========
@@ -83,8 +85,9 @@ int main()
     System_flush();
 
     Reading.create_agent();
-    Reading2.create_agent();
+//    Reading2.create_agent();
     Writing.create_agent();
+    Writing2.create_agent();
 
 
     /* Start BIOS */
@@ -101,10 +104,10 @@ void reading(UArg arg0, UArg arg1)
             //Mailbox_pend(Reading.get_mailbox_handle(), (xdc_Ptr) &msg, BIOS_WAIT_FOREVER);
             msg.receive(BIOS_WAIT_FOREVER);
             GPIO_toggle(Board_LED0);
-            System_printf("Receiving agent: %s \n", f.get_AID(Task_self()));
+            System_printf("Receiving agent: %s, Sender: %s, Read: %d \n", f.get_AID(Task_self()),msg.get_sender(), msg.get_msg_type());
+
             System_flush();
-            System_printf("Read: %d \n", msg.get_msg_type());
-            System_flush();
+
 
         }
 }
@@ -117,17 +120,15 @@ void reading2(UArg arg0, UArg arg1)
             //Mailbox_pend(Reading.get_mailbox_handle(), (xdc_Ptr) &msg, BIOS_WAIT_FOREVER);
             msg.receive(BIOS_WAIT_FOREVER);
             GPIO_toggle(Board_LED1);
-            System_printf("Receiving agent: %s \n", f.get_AID(Task_self()));
+            System_printf("Receiving agent: %s, Sender: %s, Read: %d \n", f.get_AID(Task_self()),msg.get_sender(), msg.get_msg_type());
             System_flush();
-            System_printf("Read: %d \n", msg.get_msg_type());
-            System_flush();
+
 
         }
 }
 
 void writing(UArg arg0, UArg arg1)
 {
-    Agent_AMS f;
     Agent_Msg msg;
 
     int i=0;
@@ -139,8 +140,26 @@ void writing(UArg arg0, UArg arg1)
     while(1) {
 
         if (msg.send()){
-            System_printf("Sending agent: %s \n", f.get_AID(Task_self()));
-            System_flush();
+            msg.set_msg_type(i++);
+        }
+            Task_sleep(500);
+
+    }
+
+}
+
+void writing2(UArg arg0, UArg arg1)
+{
+    Agent_Msg msg;
+
+    int i=0;
+    msg.set_msg_type(0);
+    msg.set_msg_body(NULL);
+    msg.add_receiver(Reading.get_mailbox_handle());
+
+    while(1) {
+
+        if (msg.send()){
             msg.set_msg_type(i++);
         }
             Task_sleep(500);

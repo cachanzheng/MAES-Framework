@@ -79,6 +79,7 @@ namespace MAES
         int priority;
         int msg_size;
         int msg_queue_size;
+
     };
 
 /*********************************************************************************************
@@ -90,6 +91,7 @@ namespace MAES
 *            Struct MsgObj made by:
 *            int msg_type: contain type according to FIPA ACL specification
 *            String body: string containing body of message
+*            String sender: The sender name
 **********************************************************************************************/
     class Agent_Msg { //To do: Add for customized msg obj
 
@@ -104,12 +106,11 @@ namespace MAES
         bool add_receiver(Mailbox_Handle m);
         bool remove_receiver(Mailbox_Handle m);
         void clear_all_receiver();
-        void get_sender();
         void set_msg_type(int type);
         void set_msg_body(String body);
         int get_msg_type();
         String get_msg_body();
-        void print_list();
+        String get_sender();
 
     private:
 
@@ -118,6 +119,7 @@ namespace MAES
         struct{
             int type;
             String body;
+            String sender;
         }MsgObj;
    };
 
