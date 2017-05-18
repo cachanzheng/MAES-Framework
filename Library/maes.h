@@ -82,6 +82,8 @@ namespace MAES
                     int msgQueueSize);
         /*Methods*/
         void create_agent();
+        String get_name();
+        int get_prio();
 
     private:
         Task_Handle task_handle;

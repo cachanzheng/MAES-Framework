@@ -27,6 +27,7 @@ namespace MAES{
         mailbox_handle=m;
         msg_size=sizeof(MsgObj);
         msg_queue_size=5;
+    //    Mailbox_Params_init(&mbxParams);
 
         /*Task init*/
         task_handle=t;
@@ -35,12 +36,6 @@ namespace MAES{
         behaviour=b;
         task_stack_size=512;
         task_stack=new char[task_stack_size];
-        Task_Params_init(&taskParams);
-        taskParams.stack= &task_stack;
-        taskParams.stackSize =task_stack_size;
-        taskParams.priority = priority;
-        taskParams.instance->name=agent_name;
-        taskParams.env=(xdc_Ptr) mailbox_handle;//Check if this works
     }
 
     /*********************************************************************************************
@@ -60,8 +55,7 @@ namespace MAES{
         mailbox_handle=m;
         msg_size=msgSize;
         msg_queue_size=msgQueueSize;
-
-        //Mailbox_Params_init(&mbxParams);
+        Mailbox_Params_init(&mbxParams);
 
 
         /*Task init*/
@@ -79,7 +73,6 @@ namespace MAES{
         taskParams.env=(xdc_Ptr) mailbox_handle;//Check if this works
     }
 
-
     /*********************************************************************************************
      * Class: Agent_Build
      * Function: void create_agent()
@@ -89,11 +82,37 @@ namespace MAES{
     *********************************************************************************************/
     void Agent_Build::create_agent(){
 
-        System_printf("test");
+        Task_Params_init(&taskParams);
+        taskParams.stack=task_stack;
+        taskParams.stackSize =task_stack_size;
+        taskParams.priority = priority;
+        taskParams.instance->name=agent_name;
+        taskParams.env=(xdc_Ptr) mailbox_handle;//Check if this works
         /*Creating task*/
-      //   mailbox_handle= Mailbox_create(msg_size,msg_queue_size,&mbxParams,NULL);
+       //  mailbox_handle= Mailbox_create(msg_size,msg_queue_size,&mbxParams,NULL);
          task_handle = Task_create(behaviour, &taskParams, NULL);
     }
+
+    /*********************************************************************************************
+         * Class: Agent_Build
+         * Function: create_agent()
+         * Return type: String
+         * Comments: Returns agent's name
+    *********************************************************************************************/
+    String Agent_Build::get_name(){
+        return agent_name;
+    }
+
+    /*********************************************************************************************
+         * Class: Agent_Build
+         * Function: get_prio()
+         * Return type: int
+         * Comments: Returns agent's priority
+    *********************************************************************************************/
+    int Agent_Build::get_prio(){
+        return priority;
+    }
+
      /*********************************************************************************************
      * Class: Agent_AMS
      * Function: get_AID(Task_Handle t);

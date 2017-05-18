@@ -59,11 +59,10 @@
 #include "maes.h"
 using namespace MAES;
 
-#define TASKSTACKSIZE   512
 
-Task_Handle t;
-String name="Reading123";
-Mailbox_Handle m;
+
+Task_Handle w,r,n;
+Mailbox_Handle mw,mr,mn;
 int pri=5;
 
 
@@ -74,16 +73,43 @@ void reading(UArg arg0, UArg arg1)
 
     //        Mailbox_pend(mr, (xdc_Ptr) &msg, BIOS_WAIT_FOREVER);
             GPIO_toggle(Board_LED0);
-            GPIO_toggle(Board_LED1);
-            System_printf("Running agent 12355\n %s \n", f.get_AID(Task_self()));
+            System_printf("Running agent: %s \n", f.get_AID(Task_self()));
             System_flush();
             Task_sleep(500);
         }
 
 }
 
-Agent_Build Reading(t,name,m,5,reading);
+void writing(UArg arg0, UArg arg1)
+{
+    Agent_AMS f;
+    while(1) {
 
+    //        Mailbox_pend(mr, (xdc_Ptr) &msg, BIOS_WAIT_FOREVER);
+            GPIO_toggle(Board_LED1);
+            System_printf("Running agent: %s \n", f.get_AID(Task_self()));
+            System_flush();
+            Task_sleep(500);
+        }
+
+}
+
+void printing(UArg arg0, UArg arg1)
+{
+    Agent_AMS f;
+    while(1) {
+
+    //        Mailbox_pend(mr, (xdc_Ptr) &msg, BIOS_WAIT_FOREVER);
+            System_printf("Running agent: %s \n", f.get_AID(Task_self()));
+            System_flush();
+            Task_sleep(500);
+        }
+
+}
+
+Agent_Build Reading(r,"Reading Agent",mr,5,reading);
+Agent_Build Writing(w,"Writing Agent",mw,5,writing);
+Agent_Build Printing(n,"Nothing Agent",mn,5,printing);
 /*
  *  ======== main ========
  */
@@ -93,15 +119,16 @@ int main(void)
     Board_initGeneral();
     Board_initGPIO();
 
-    Reading.create_agent();
-   /* Turn on user LED  */
     GPIO_write(Board_LED0, Board_LED_ON);
 
     System_printf("Blinking Led Example with agents\n");
     /* SysMin will only print to the console when you call flush or exit */
     System_flush();
- //   Reading->init_agent(t, name, m, priority, reading);
-  //  Reading->create_agent();
+
+
+    Reading.create_agent();
+    Writing.create_agent();
+    Printing.create_agent();
 
     /* Start BIOS */
     BIOS_start();
