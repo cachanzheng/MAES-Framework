@@ -7,6 +7,8 @@
 
 namespace MAES
 {
+
+#define RECEIVER_LIST_SIZE  8
 /*********************************************************************************************
 *   Define msg type according to FIPA ACL Message Representation in Bit-Efficient Encoding
 *   Specification
@@ -34,18 +36,6 @@ namespace MAES
 #define REQUEST_WHENEVER 0x15
 #define SUBSCRIBE        0x16
 
-
-/*********************************************************************************************
-* Class: Agent_Msg
-* Comment: Predefined struct for msg object.
-* Variables: int msg_type: contain type according to FIPA ACL specification
-*            String body: string containing body of message
-**********************************************************************************************/
-    struct Agent_Msg{
-        int msg_type;
-        String body;
-    };
-
 /*********************************************************************************************
 * Class: Agent_Build
 * Comment: Agent construction class.
@@ -66,24 +56,16 @@ namespace MAES
     class Agent_Build{
     public:
         /*Constructor*/
-        Agent_Build(Task_Handle t,
-                    String name,
-                    Mailbox_Handle m,
+        Agent_Build(String name,
                     int pri,
                     Task_FuncPtr b);
 
-        Agent_Build(Task_Handle t,
-                    String name,
-                    Mailbox_Handle m,
-                    int pri,
-                    Task_FuncPtr b,
-                    int taskStackSize,
-                    int msgSize,
-                    int msgQueueSize);
         /*Methods*/
         void create_agent();
         String get_name();
         int get_prio();
+        Task_Handle get_task_handle();
+        Mailbox_Handle get_mailbox_handle();
 
     private:
         Task_Handle task_handle;
@@ -99,6 +81,45 @@ namespace MAES
         int msg_queue_size;
     };
 
+/*********************************************************************************************
+* Class: Agent_Msg
+* Comment: Predefined struct for msg object.
+* Variables: Mailbox_Handle mailbox_handle: Handle to the mailbox of the agent which created the
+*                                           msg obj
+*            Mailbox_Handle receivers: list of receivers. Set to 8.
+*            Struct MsgObj made by:
+*            int msg_type: contain type according to FIPA ACL specification
+*            String body: string containing body of message
+**********************************************************************************************/
+    class Agent_Msg { //To do: Add for customized msg obj
+
+    public:
+        /*Constructor*/
+        Agent_Msg(); //tO DO: Construct message with type directlt
+
+        /*Methods*/
+        bool send(Mailbox_Handle m);
+        bool send();
+        bool receive(Uint32 timeout);
+        bool add_receiver(Mailbox_Handle m);
+        bool remove_receiver(Mailbox_Handle m);
+        void clear_all_receiver();
+        void get_sender();
+        void set_msg_type(int type);
+        void set_msg_body(String body);
+        int get_msg_type();
+        String get_msg_body();
+        void print_list();
+
+    private:
+
+        Mailbox_Handle mailbox_handle;
+        Mailbox_Handle receivers[RECEIVER_LIST_SIZE];
+        struct{
+            int type;
+            String body;
+        }MsgObj;
+   };
 
 /*********************************************************************************************
 * Class: Agent_AMS
