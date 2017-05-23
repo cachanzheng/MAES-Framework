@@ -8,7 +8,17 @@
 namespace MAES
 {
 
-#define RECEIVER_LIST_SIZE  8
+#define AGENT_LIST_SIZE 3
+#define MAX_RECEIVERS   AGENT_LIST_SIZE-1
+/*********************************************************************************************
+*   Define Error handling
+**********************************************************************************************/
+#define NO_ERROR        0x00
+#define FOUND           0x00
+#define HANDLE_NULL     0x01
+#define LIST_FULL       0x02
+#define DUPLICATED      0x03
+#define NOT_FOUND       0x04
 /*********************************************************************************************
 *   Define msg type according to FIPA ACL Message Representation in Bit-Efficient Encoding
 *   Specification
@@ -59,13 +69,21 @@ namespace MAES
         Agent_Build(String name,
                     int pri,
                     Task_FuncPtr b);
+        Agent_Build(String name,
+                    Task_FuncPtr b);
+        Agent_Build(String name,
+                    int pri,
+                    Task_FuncPtr b,
+                    int taskstackSize);
 
         /*Methods*/
-        void create_agent();
+        Task_Handle create_agent();
+        void delete_agent(); //To do
         String get_name();
         int get_prio();
-        Task_Handle get_task_handle();
-        Mailbox_Handle get_mailbox_handle();
+        Task_Handle get_AID();
+        Mailbox_Handle get_mailbox();
+        void agent_sleep(Uint32 ticks);
 
     private:
         Task_Handle task_handle;
@@ -91,7 +109,8 @@ namespace MAES
 *            Struct MsgObj made by:
 *            int msg_type: contain type according to FIPA ACL specification
 *            String body: string containing body of message
-*            String sender: The sender name
+*            Task_Handle handle: to receive information from other agents or to send info
+*                                to other agents
 **********************************************************************************************/
     class Agent_Msg { //To do: Add for customized msg obj
 
@@ -100,53 +119,70 @@ namespace MAES
         Agent_Msg(); //tO DO: Construct message with type directlt
 
         /*Methods*/
+        int add_receiver(Task_Handle aid);
+        int remove_receiver(Task_Handle aid);
+        void clear_all_receiver();
+        bool receive(Uint32 timeout);
         bool send(Mailbox_Handle m);
         bool send();
-        bool receive(Uint32 timeout);
-        bool add_receiver(Mailbox_Handle m);
-        bool remove_receiver(Mailbox_Handle m);
-        void clear_all_receiver();
+        bool send_all(); //to do.
         void set_msg_type(int type);
         void set_msg_body(String body);
         int get_msg_type();
         String get_msg_body();
         String get_sender();
-
+        void print();
     private:
 
-        Mailbox_Handle mailbox_handle;
-        Mailbox_Handle receivers[RECEIVER_LIST_SIZE];
+
+        Mailbox_Handle receivers[MAX_RECEIVERS];
+        int next_available;
+        Task_Handle self_handle;
         struct{
+            Task_Handle handle;
             int type;
             String body;
-            String sender;
+
         }MsgObj;
    };
-
 /*********************************************************************************************
-* Class: Agent_AMS
-* Comment:
+* Class: Agent_Management_Services
+* Comment: API for Agent Management Services
+* Variables: static Task_Handle Agent_Handle[AGENT_LIST_SIZE]: Contains all the running agent in th
+*            the platform. Declared in static so only instance exist per platform
+*            Agent_Build AMS with highest priority
 **********************************************************************************************/
-    class Agent_AMS{
+    class Agent_Management_Services{
         public:
             /*Methods*/
-            String get_AID(Task_Handle t); /**/
+            Agent_Management_Services();
+           // void initAP();
+            int register_agent(Task_Handle t);
+            int deregister_agent(Task_Handle t);
+          //  int search(Task_Handle t);
+            void print();
+            //void modify()
 
-            //void get_List_agent();
-            //void delete_agent(Task_Handle t);
-            //void suspend_agent(Task_Handle t);
-            //void wait_agent(Task_Handle t); //Preemption
-            //void get_agent_state(Task_Handle t);
-            //void get_Arguments(Task_Handle t);
-            //void get_pending_msg(Task_Handle t);
-            //void get_msg_queue_size(Task_Handle t);
-               //        void receive();
-               //        void send();
-               //        void takeDown();
-               //        void setup();
-               //        void set_msg_queue_size(Task_Handle);
 
-        };
 
+            //Agent_Lifecycle
+            //get_name
+            //static Mailbox_Handle get_AMS_mailbox();
+             //static Task_Handle get_AMS_task();
+            //get_state
+            //set_name
+            //set_state
+            //suspend, terminate, create, resume, invoke, execute, resource management
+
+        private:
+            int next_available;
+            Task_Handle Agent_Handle[AGENT_LIST_SIZE];
+           //Agent_Build Agents[AGENT_LIST_SIZE];
+
+
+        //   static Task_Handle AMS_Agent;
+        //   static Mailbox_Handle AMS_Mailbox;
+
+      };
 
 }

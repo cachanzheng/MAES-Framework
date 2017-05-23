@@ -59,15 +59,21 @@
 #include "maes.h"
 using namespace MAES;
 
+/*Construction functions*/
 void writing(UArg arg0, UArg arg1);
 void writing2(UArg arg0, UArg arg1);
 void reading(UArg arg0, UArg arg1);
 void reading2(UArg arg0, UArg arg1);
 
-Agent_Build Reading("Reading Agent",5,reading);
-Agent_Build Reading2("Reading Agent 2",5,reading2);
-Agent_Build Writing("Writing Agent",5,writing);
-Agent_Build Writing2("Writing Agent 2",5,writing2);
+/*Constructing Agents*/
+Agent_Build Reading("Reading Agent",reading);
+Agent_Build Reading2("Reading Agent 2",reading2);
+Agent_Build Reading3("Reading Agent 3",reading2);
+Agent_Build Writing("Writing Agent",writing);
+Agent_Build Writing2("Writing Agent 2",writing2);
+
+/*Creating_Platform*/
+Agent_Management_Services AP;
 
 /*
  *  ======== main ========
@@ -81,46 +87,48 @@ int main()
     GPIO_write(Board_LED0, Board_LED_ON);
 
     /* SysMin will only print to the console when you call flush or exit */
-    System_printf("Blinking Led Example with agents\n");
+    System_printf("Blinking Led Example with agents \n");
     System_flush();
+//    AP.print();
+//    System_printf("--- \n");
+//        System_flush();
 
-    Reading.create_agent();
-//    Reading2.create_agent();
-    Writing.create_agent();
-    Writing2.create_agent();
+    AP.register_agent(Reading.create_agent());
+    AP.register_agent(Writing.create_agent());
+    AP.register_agent(Reading2.create_agent());
 
-
-    /* Start BIOS */
+//    AP.print();
+//    System_printf("--- \n");
+//    System_flush();
+//    AP.deregister_agent(Reading.get_AID());
+//    AP.print();
+            /* Start BIOS */
     BIOS_start();
-
+   // BIOS_exit(0);
     return (0);
 }
 
 void reading(UArg arg0, UArg arg1)
 {
-    Agent_AMS f;
+
     Agent_Msg msg;
     while(1) {
-            //Mailbox_pend(Reading.get_mailbox_handle(), (xdc_Ptr) &msg, BIOS_WAIT_FOREVER);
             msg.receive(BIOS_WAIT_FOREVER);
             GPIO_toggle(Board_LED0);
-            System_printf("Receiving agent: %s, Sender: %s, Read: %d \n", f.get_AID(Task_self()),msg.get_sender(), msg.get_msg_type());
-
+            System_printf("Receiver: %s, Sender: %s, Read: %d \n", Task_Handle_name(Task_self()),msg.get_sender(), msg.get_msg_type());
             System_flush();
-
-
         }
 }
 
 void reading2(UArg arg0, UArg arg1)
 {
-    Agent_AMS f;
+
     Agent_Msg msg;
     while(1) {
             //Mailbox_pend(Reading.get_mailbox_handle(), (xdc_Ptr) &msg, BIOS_WAIT_FOREVER);
             msg.receive(BIOS_WAIT_FOREVER);
             GPIO_toggle(Board_LED1);
-            System_printf("Receiving agent: %s, Sender: %s, Read: %d \n", f.get_AID(Task_self()),msg.get_sender(), msg.get_msg_type());
+            System_printf("Receiver: %s, Sender: %s, Read: %d \n", Task_Handle_name(Task_self()), msg.get_sender(), msg.get_msg_type());
             System_flush();
 
 
@@ -134,9 +142,10 @@ void writing(UArg arg0, UArg arg1)
     int i=0;
     msg.set_msg_type(0);
     msg.set_msg_body(NULL);
-    msg.add_receiver(Reading.get_mailbox_handle());
-    msg.add_receiver(Reading2.get_mailbox_handle());
-
+    msg.add_receiver(Reading.get_AID());
+    msg.add_receiver(Reading2.get_AID());
+    msg.add_receiver(Reading3.get_AID());
+    msg.print();
     while(1) {
 
         if (msg.send()){
@@ -155,7 +164,7 @@ void writing2(UArg arg0, UArg arg1)
     int i=0;
     msg.set_msg_type(0);
     msg.set_msg_body(NULL);
-    msg.add_receiver(Reading.get_mailbox_handle());
+ //   msg.add_receiver(Reading.get_mailbox());
 
     while(1) {
 
