@@ -64,6 +64,7 @@ void writing(UArg arg0, UArg arg1);
 void writing2(UArg arg0, UArg arg1);
 void reading(UArg arg0, UArg arg1);
 void reading2(UArg arg0, UArg arg1);
+void test(UArg arg0, UArg arg1);
 
 /*Constructing Agents*/
 Agent_Build Reading("Reading Agent",reading);
@@ -89,15 +90,14 @@ int main()
     /* SysMin will only print to the console when you call flush or exit */
     System_printf("Blinking Led Example with agents \n");
     System_flush();
-//    AP.print();
-//    System_printf("--- \n");
-//        System_flush();
 
-    AP.register_agent(Reading.create_agent());
-    AP.register_agent(Writing.create_agent());
-    AP.register_agent(Reading2.create_agent());
-    AP.register_agent(Reading3.create_agent());
+    Reading.create_agent();
+    Reading3.create_agent();
+    Writing.create_agent();
+    AP.init();
 
+
+//    BIOS_exit(0);
     BIOS_start();
     return (0);
 }
@@ -111,6 +111,15 @@ void reading(UArg arg0, UArg arg1)
             GPIO_toggle(Board_LED0);
             System_printf("Receiver: %s, Sender: %s, Read: %d \n", Task_Handle_name(Task_self()),msg.get_sender(), msg.get_msg_type());
             System_flush();
+        }
+}
+void test(UArg arg0, UArg arg1)
+{
+
+    Agent_Msg msg;
+    while(1) {
+            msg.receive(BIOS_WAIT_FOREVER);
+
         }
 }
 
@@ -132,21 +141,16 @@ void reading2(UArg arg0, UArg arg1)
 void writing(UArg arg0, UArg arg1)
 {
     Agent_Msg msg;
-
     int i=0;
     msg.set_msg_type(0);
     msg.set_msg_body(NULL);
-    msg.add_receiver(Reading.get_AID());
-    msg.add_receiver(Reading2.get_AID());
+//    msg.add_receiver(Reading.get_AID());
+//    msg.add_receiver(Reading2.get_AID());
     msg.add_receiver(Reading3.get_AID());
     //AP.print();
-      msg.print();
+//      msg.print();
 
-
-
-    System_printf("error: %s \n", Task_getEnv(Reading.get_AID()));
-    System_flush();
-    while(1) {
+      while(1) {
 
         if (msg.send()){
             msg.set_msg_type(i++);

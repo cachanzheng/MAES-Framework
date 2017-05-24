@@ -6,11 +6,14 @@
 #include <xdc/runtime/System.h>
 #include <string.h>
 
+
 namespace MAES
 {
 
 #define AGENT_LIST_SIZE 4
 #define MAX_RECEIVERS   AGENT_LIST_SIZE-1
+
+void behaviour(UArg arg0, UArg arg1);
 /*********************************************************************************************
 *   Define Error handling
 **********************************************************************************************/
@@ -73,13 +76,14 @@ namespace MAES
                     Task_FuncPtr b);
         Agent_Build(String name,
                     Task_FuncPtr b);
-        Agent_Build(String name,
-                    int pri,
-                    Task_FuncPtr b,
-                    int taskstackSize);
+     //   Agent_Build(String name,
+//                    int pri,
+//                    Task_FuncPtr b,
+//                    int taskstackSize);
 
         /*Methods*/
         Task_Handle create_agent();
+        Task_Handle create_agent(int taskstackSize);
         void delete_agent(); //To do
         String get_name();
         int get_prio();
@@ -95,7 +99,8 @@ namespace MAES
         Mailbox_Params mbxParams;
         String agent_name;
         int task_stack_size;
-        char *task_stack;
+        char *task_stack_dyn;
+        char task_stack[512];
         int priority;
         int msg_size;
         int msg_queue_size;
@@ -127,7 +132,7 @@ namespace MAES
         bool receive(Uint32 timeout);
         bool send(Mailbox_Handle m);
         bool send();
-        bool broadcast();
+      //  bool broadcast();//To do
         void set_msg_type(int type);
         void set_msg_body(String body);
         int get_msg_type();
@@ -158,7 +163,6 @@ namespace MAES
 **********************************************************************************************/
     struct AP_Description{
 
-      //  AP_Description(String n);
       Task_Handle *ptrAgent_Handle;
       Task_Handle AMS_aid;
       String name;
@@ -173,7 +177,10 @@ namespace MAES
     class Agent_Management_Services{
         public:
             /*Methods*/
+            Agent_Management_Services(String name, int taskstackSize);
             Agent_Management_Services(String name);
+            bool init();
+            bool init(int stackSize); //To test
             int register_agent(Task_Handle aid);
             int deregister_agent(Task_Handle aid);
             bool search(Task_Handle aid);
@@ -182,18 +189,9 @@ namespace MAES
             void print();
             void modify(Task_Handle aid,Mailbox_Handle new_AP);
             AP_Description* get_description();
-
-            // void initAP();
-
-
+            Task_Handle get_AMS_AID();
 
             //Agent_Lifecycle
-            //get_name
-            //static Mailbox_Handle get_AMS_mailbox();
-             //static Task_Handle get_AMS_task();
-            //get_state
-            //set_name
-            //set_state
             //suspend, terminate, create, resume, invoke, execute, resource management
 
         private:

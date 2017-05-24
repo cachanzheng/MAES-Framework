@@ -8,6 +8,14 @@
 #include "maes.h"
 
 namespace MAES{
+
+void behaviour(UArg arg0, UArg arg1){
+    Agent_Msg msg;
+      while(1) {
+              msg.receive(BIOS_WAIT_FOREVER);
+
+          }
+}
 /*********************************************************************************************
 *
 *                         Class: Agent_AMS: Agent Management Services
@@ -17,35 +25,119 @@ namespace MAES{
 * Class: Agent_Management_Services
 * Function: Agent_Management_Services Constructor
 * Comment: Initialize list of agents in null
+*          Initialize AMS task to size set by user
+*          Be aware that allocatting dynamically the heap size should be larger
 **********************************************************************************************/
-    Agent_Management_Services::Agent_Management_Services(String name){
+    Agent_Management_Services::Agent_Management_Services(String name, int taskstackSize){
         int i=0;
         next_available=0;
 
         while (i<AGENT_LIST_SIZE){
-            Agent_Handle[i]=(Task_Handle) 1;
+            Agent_Handle[i]=(Task_Handle) NULL;
             Task_setEnv(Agent_Handle[i],(xdc_Ptr)0);
             i++;
         }
         AP.ptrAgent_Handle=Agent_Handle;
         AP.name=name;
     }
-
-    void Agent_Management_Services::print(){
+/*********************************************************************************************
+* Class: Agent_Management_Services
+* Function: Agent_Management_Services Constructor
+* Comment: Initialize list of agents in null
+*          Initialize AMS task to default 1024
+**********************************************************************************************/
+    Agent_Management_Services::Agent_Management_Services(String name){
         int i=0;
-//        Mailbox_Handle m;
-//        while (i<AGENT_LIST_SIZE){
-//            m=(Mailbox_Handle) Task_getEnv(Agent_Handle[i]);
-//            System_printf("mail: %x, aid: %x\n",m,Agent_Handle[i]);
-//            System_flush();
-//            i++;
-//        }
+        next_available=0;
 
         while (i<AGENT_LIST_SIZE){
-            System_printf("aid: %x\n", AP.ptrAgent_Handle[i]);
+            Agent_Handle[i]=(Task_Handle) NULL;
+            Task_setEnv(Agent_Handle[i],(xdc_Ptr)0);
             i++;
         }
+        AP.ptrAgent_Handle=Agent_Handle;
+        AP.name=name;
     }
+ /*********************************************************************************************
+* Class: Agent_Management_Services
+* Function: init();
+* Comment: Create AMS task with default stack of 512
+**********************************************************************************************/
+    bool Agent_Management_Services::init(){
+
+            Task_Handle temp;
+            char task_stack[512];
+            Mailbox_Handle mailbox_handle;
+            Mailbox_Params mbxParams;
+            Task_Params taskParams;
+
+            /*Creating mailbox*/
+            Mailbox_Params_init(&mbxParams);
+            mailbox_handle= Mailbox_create(12,5,&mbxParams,NULL);
+
+            /*Creating task*/
+            Task_Params_init(&taskParams);
+            taskParams.stack=task_stack;
+            taskParams.stackSize = 512;
+            taskParams.priority = -1;
+            taskParams.instance->name=AP.name;
+            taskParams.arg0=(UArg)mailbox_handle;
+            AP.AMS_aid = Task_create(behaviour, &taskParams, NULL);
+
+            if (AP.AMS_aid!=NULL){
+            /*Initializing all the previously created task*/
+                temp=Task_Object_first();
+                while (temp!=NULL){
+                    if(temp==AP.AMS_aid) break; //Don't register AMS aid
+                    register_agent(temp);
+                    temp=Task_Object_next(temp);
+                }
+
+                return true;
+            }
+            else return false;
+   }
+
+/*********************************************************************************************
+* Class: Agent_Management_Services
+* Function: init();
+* Comment: Create AMS task with user custom stack size
+*          Be aware of heap size
+**********************************************************************************************/
+   bool Agent_Management_Services::init(int stackSize){
+
+           Task_Handle temp;
+           char* task_stack=new char[stackSize];
+           Mailbox_Handle mailbox_handle;
+           Mailbox_Params mbxParams;
+           Task_Params taskParams;
+
+           /*Creating mailbox*/
+           Mailbox_Params_init(&mbxParams);
+           mailbox_handle= Mailbox_create(12,5,&mbxParams,NULL);
+
+           /*Creating task*/
+           Task_Params_init(&taskParams);
+           taskParams.stack=task_stack;
+           taskParams.stackSize = stackSize;
+           taskParams.priority = -1;
+           taskParams.instance->name=AP.name;
+           taskParams.arg0=(UArg)mailbox_handle;
+           AP.AMS_aid = Task_create(behaviour, &taskParams, NULL);
+
+           if (AP.AMS_aid!=NULL){
+           /*Initializing all the previously created task*/
+               temp=Task_Object_first();
+               while (temp!=NULL){
+                   if(temp==AP.AMS_aid) break; //Don't register AMS aid
+                   register_agent(temp);
+                   temp=Task_Object_next(temp);
+               }
+
+               return true;
+           }
+           else return false;
+  }
 /*********************************************************************************************
 * Class: Agent_Management_Services
 * Function: int register_agent(Task_Handle aid)
@@ -170,37 +262,21 @@ namespace MAES{
     }
 
 /*********************************************************************************************
+* Class: Agent_Management_Services
+* Function: AP_Description* get_description();
+* Return: Task Handle of the AMS
+* Comment:
+**********************************************************************************************/
+    Task_Handle Agent_Management_Services::get_AMS_AID(){
+        return AP.AMS_aid;
+    }
+/*********************************************************************************************
 *
 *                                  Class: Agent_Build
 *
 **********************************************************************************************
+
 *********************************************************************************************
-* Class: Agent_Build
-* Function: Agent_Build constructor
-* Comments: msg_queue_size: set to default value 5
-*           msg_size: set to predefined MsgObj size
-**********************************************************************************************/
-    Agent_Build::Agent_Build(String name,
-                             int pri,
-                             Task_FuncPtr b, int taskstackSize){
-
-        Agent_Msg MsgObj;
-
-        /*Mailbox init*/
-        msg_size=12;  //String: 4, Int: 4, String: 4
-        msg_queue_size=5;
-
-        /*Task init*/
-        agent_name=name;
-        priority=pri;
-        behaviour=b;
-        task_stack_size=taskstackSize;
-        task_stack=new char[task_stack_size];
-        task_handle=NULL;
-        Task_setEnv(task_handle,NULL);
-        mailbox_handle=NULL;
-    }
-/*********************************************************************************************
 * Class: Agent_Build
 * Function: Agent_Build constructor
 * Comments: task_stack_size: set to default value 512
@@ -211,8 +287,6 @@ namespace MAES{
                              int pri,
                              Task_FuncPtr b){
 
-        Agent_Msg MsgObj;
-
         /*Mailbox init*/
         msg_size=12;  //String: 4, Int: 4, String: 4
         msg_queue_size=5;
@@ -222,7 +296,7 @@ namespace MAES{
         priority=pri;
         behaviour=b;
         task_stack_size=512;
-        task_stack=new char[task_stack_size];
+        //task_stack=new char[task_stack_size];
         task_handle=NULL;
         Task_setEnv(task_handle,NULL);
         mailbox_handle=NULL;
@@ -247,7 +321,6 @@ namespace MAES{
         priority=1;
         behaviour=b;
         task_stack_size=512;
-        task_stack=new char[task_stack_size];
         task_handle=NULL;
         Task_setEnv(task_handle,NULL);
         mailbox_handle=NULL;
@@ -272,11 +345,39 @@ namespace MAES{
             taskParams.instance->name=agent_name;
             taskParams.arg0=(UArg)mailbox_handle;
             task_handle = Task_create(behaviour, &taskParams, NULL);
-            //AP.register_agent(task_handle);
+
             return task_handle;
 
     }
 
+/*********************************************************************************************
+ * Class: Agent_Build
+ * Function: void create_agent(int taskstackSize)
+ * Return type: NULL
+ * Comments: Create the task and mailbox associated with the agent. The mailbox handle is
+ *           embedded in task's handle env variable.
+ *           With user custom taskstackSize. Be aware of heap size
+*********************************************************************************************/
+    Task_Handle Agent_Build::create_agent(int taskstackSize){
+
+            task_stack_size= taskstackSize;
+            task_stack_dyn=new char[task_stack_size];
+            /*Creating mailbox*/
+            Mailbox_Params_init(&mbxParams);
+            mailbox_handle= Mailbox_create(msg_size,msg_queue_size,&mbxParams,NULL);
+
+            /*Creating task*/
+            Task_Params_init(&taskParams);
+            taskParams.stack=task_stack_dyn;
+            taskParams.stackSize =task_stack_size;
+            taskParams.priority = priority;
+            taskParams.instance->name=agent_name;
+            taskParams.arg0=(UArg)mailbox_handle;
+            task_handle = Task_create(behaviour, &taskParams, NULL);
+            //AP.register_agent(task_handle);
+            return task_handle;
+
+    }
 /*********************************************************************************************
  * Class: Agent_Build
  * Function: create_agent()
@@ -385,15 +486,21 @@ namespace MAES{
 * Comments: Send msg to the AMS so it broadcast the msg to all agents
 *           Task_getEnv() contains info of mailbox of AID
 * **********************************************************************************************/
-    bool Agent_Msg::broadcast(){
-        Mailbox_Handle AMS_Mailbox;
-        MsgObj.handle=self_handle;
-        set_msg_type(BROADCAST);
-        AMS_Mailbox=(Mailbox_Handle)Task_getEnv(self_handle);
-
-        return Mailbox_post(AMS_Mailbox, (xdc_Ptr)&MsgObj, BIOS_NO_WAIT);
-
-    }
+//    bool Agent_Msg::broadcast(){
+//        Task_Handle AMS;
+//        UArg arg0,arg1;
+//        Task_getFunc(Task_self(),&arg0, &arg1);
+//        Mailbox_Handle m=(Mailbox_Handle) arg0;
+//        MsgObj.handle=self_handle;
+//        set_msg_type(BROADCAST);
+//        AMS=(Task_Handle)Task_getEnv(self_handle);
+//
+//
+//
+//        System_printf("aid: %x",AMS);
+//        return Mailbox_post(AMS_Mailbox, (xdc_Ptr)&MsgObj, BIOS_NO_WAIT);
+//        return true;
+//    }
 /*********************************************************************************************
 * Class: Agent_Msg
 * Function: receive_msg(Uint32 timeout)
@@ -530,6 +637,22 @@ namespace MAES{
         }
     }
 
-};
 
+    void Agent_Management_Services::print(){
+        int i=0;
+    //        Mailbox_Handle m;
+    //        while (i<AGENT_LIST_SIZE){
+    //            m=(Mailbox_Handle) Task_getEnv(Agent_Handle[i]);
+    //            System_printf("mail: %x, aid: %x\n",m,Agent_Handle[i]);
+    //            System_flush();
+    //            i++;
+    //        }
+
+        while (i<AGENT_LIST_SIZE){
+            System_printf("aid: %x\n", AP.ptrAgent_Handle[i]);
+            i++;
+        }
+    }
+
+};
 
