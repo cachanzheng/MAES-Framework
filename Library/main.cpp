@@ -73,7 +73,7 @@ Agent_Build Writing("Writing Agent",writing);
 Agent_Build Writing2("Writing Agent 2",writing2);
 
 /*Creating_Platform*/
-Agent_Management_Services AP;
+Agent_Management_Services AP("Texas Instruments");
 
 /*
  *  ======== main ========
@@ -96,15 +96,9 @@ int main()
     AP.register_agent(Reading.create_agent());
     AP.register_agent(Writing.create_agent());
     AP.register_agent(Reading2.create_agent());
+    AP.register_agent(Reading3.create_agent());
 
-//    AP.print();
-//    System_printf("--- \n");
-//    System_flush();
-//    AP.deregister_agent(Reading.get_AID());
-//    AP.print();
-            /* Start BIOS */
     BIOS_start();
-   // BIOS_exit(0);
     return (0);
 }
 
@@ -145,7 +139,13 @@ void writing(UArg arg0, UArg arg1)
     msg.add_receiver(Reading.get_AID());
     msg.add_receiver(Reading2.get_AID());
     msg.add_receiver(Reading3.get_AID());
-    msg.print();
+    //AP.print();
+      msg.print();
+
+
+
+    System_printf("error: %s \n", Task_getEnv(Reading.get_AID()));
+    System_flush();
     while(1) {
 
         if (msg.send()){

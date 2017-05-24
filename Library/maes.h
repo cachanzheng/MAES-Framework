@@ -4,11 +4,12 @@
 #include <ti/sysbios/knl/Mailbox.h>
 #include <xdc/std.h>
 #include <xdc/runtime/System.h>
+#include <string.h>
 
 namespace MAES
 {
 
-#define AGENT_LIST_SIZE 3
+#define AGENT_LIST_SIZE 4
 #define MAX_RECEIVERS   AGENT_LIST_SIZE-1
 /*********************************************************************************************
 *   Define Error handling
@@ -45,6 +46,7 @@ namespace MAES
 #define REQUEST_WHEN     0x14
 #define REQUEST_WHENEVER 0x15
 #define SUBSCRIBE        0x16
+#define BROADCAST        0x17
 
 /*********************************************************************************************
 * Class: Agent_Build
@@ -125,7 +127,7 @@ namespace MAES
         bool receive(Uint32 timeout);
         bool send(Mailbox_Handle m);
         bool send();
-        bool send_all(); //to do.
+        bool broadcast();
         void set_msg_type(int type);
         void set_msg_body(String body);
         int get_msg_type();
@@ -145,6 +147,22 @@ namespace MAES
 
         }MsgObj;
    };
+
+/*********************************************************************************************
+* Class: AP_Description
+* Comment: Contains information about the AP
+* Variables: String name: Name of the AP
+*            Task_Handle *ptrAgent_Handle: Pointer to the list of agents
+*            AMS_aid: Task_Handle of AMS
+*            AMS_mailbox: Mailbox of the AMS
+**********************************************************************************************/
+    struct AP_Description{
+
+      //  AP_Description(String n);
+      Task_Handle *ptrAgent_Handle;
+      Task_Handle AMS_aid;
+      String name;
+     };
 /*********************************************************************************************
 * Class: Agent_Management_Services
 * Comment: API for Agent Management Services
@@ -155,13 +173,17 @@ namespace MAES
     class Agent_Management_Services{
         public:
             /*Methods*/
-            Agent_Management_Services();
-           // void initAP();
-            int register_agent(Task_Handle t);
-            int deregister_agent(Task_Handle t);
-          //  int search(Task_Handle t);
+            Agent_Management_Services(String name);
+            int register_agent(Task_Handle aid);
+            int deregister_agent(Task_Handle aid);
+            bool search(Task_Handle aid);
+            bool search(String name);
+            Task_Handle* return_list();
             void print();
-            //void modify()
+            void modify(Task_Handle aid,Mailbox_Handle new_AP);
+            AP_Description* get_description();
+
+            // void initAP();
 
 
 
@@ -177,12 +199,7 @@ namespace MAES
         private:
             int next_available;
             Task_Handle Agent_Handle[AGENT_LIST_SIZE];
-           //Agent_Build Agents[AGENT_LIST_SIZE];
-
-
-        //   static Task_Handle AMS_Agent;
-        //   static Mailbox_Handle AMS_Mailbox;
-
+            AP_Description AP;
       };
 
 }

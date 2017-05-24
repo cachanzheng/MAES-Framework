@@ -8,7 +8,6 @@
 #include "maes.h"
 
 namespace MAES{
-
 /*********************************************************************************************
 *
 *                         Class: Agent_AMS: Agent Management Services
@@ -19,7 +18,7 @@ namespace MAES{
 * Function: Agent_Management_Services Constructor
 * Comment: Initialize list of agents in null
 **********************************************************************************************/
-    Agent_Management_Services::Agent_Management_Services(){
+    Agent_Management_Services::Agent_Management_Services(String name){
         int i=0;
         next_available=0;
 
@@ -28,53 +27,65 @@ namespace MAES{
             Task_setEnv(Agent_Handle[i],(xdc_Ptr)0);
             i++;
         }
+        AP.ptrAgent_Handle=Agent_Handle;
+        AP.name=name;
     }
 
     void Agent_Management_Services::print(){
         int i=0;
-        Mailbox_Handle m;
+//        Mailbox_Handle m;
+//        while (i<AGENT_LIST_SIZE){
+//            m=(Mailbox_Handle) Task_getEnv(Agent_Handle[i]);
+//            System_printf("mail: %x, aid: %x\n",m,Agent_Handle[i]);
+//            System_flush();
+//            i++;
+//        }
+
         while (i<AGENT_LIST_SIZE){
-            m=(Mailbox_Handle) Task_getEnv(Agent_Handle[i]);
-            System_printf("mail: %x, aid: %x\n",m,Agent_Handle[i]);
-            System_flush();
+            System_printf("aid: %x\n", AP.ptrAgent_Handle[i]);
             i++;
         }
     }
 /*********************************************************************************************
 * Class: Agent_Management_Services
-* Function: int register_agent(Task_Handle t)
+* Function: int register_agent(Task_Handle aid)
 * Comment: register agent to the platform. If list is full, delete agent and mailbox
 **********************************************************************************************/
-    int Agent_Management_Services::register_agent(Task_Handle t){
-        if (t==NULL) return HANDLE_NULL;
+    int Agent_Management_Services::register_agent(Task_Handle aid){
+        if (aid==NULL) return HANDLE_NULL;
         if(next_available<AGENT_LIST_SIZE){
-            Agent_Handle[next_available]=t;
+            Task_setEnv(aid,(xdc_Ptr)AP.AMS_aid);
+            Agent_Handle[next_available]=aid;
             next_available++;
             return NO_ERROR;
         }
 
         else{
-            Mailbox_Handle m=(Mailbox_Handle) Task_getEnv(t);
+            UArg arg0,arg1;
+            Task_getFunc(aid,&arg0,&arg1);
+            Mailbox_Handle m=(Mailbox_Handle) arg0;
             Mailbox_delete(&m);
-            Task_delete(&t);
+            Task_delete(&aid);
             return LIST_FULL;
         }
 
     }
 /*********************************************************************************************
 * Class: Agent_Management_Services
-* Function:  int deregister_agent(Task_Handle t);
+* Function:  int deregister_agent(Task_Handle aid);
 * Comment: deregister agent o the platform. It searches inside of the list, when found,
 * the rest of the list is shifted to the right and the agent is removed.
 **********************************************************************************************/
-    int Agent_Management_Services::deregister_agent(Task_Handle t){
+    int Agent_Management_Services::deregister_agent(Task_Handle aid){
         int i=0;
+        UArg arg0,arg1;
 
           while(i<AGENT_LIST_SIZE){
-              if(Agent_Handle[i]==t){
-                  Mailbox_Handle m=(Mailbox_Handle) Task_getEnv(t);
+              if(Agent_Handle[i]==aid){
+                  Task_getFunc(aid,&arg0,&arg1);
+                  Mailbox_Handle m=(Mailbox_Handle) arg0;
                   Mailbox_delete(&m);
-                  Task_delete(&t);
+                  Task_delete(&aid);
                   while(i<AGENT_LIST_SIZE-1){
                       Agent_Handle[i]=Agent_Handle[i+1];
                       i++;
@@ -89,23 +100,74 @@ namespace MAES{
           if (i==AGENT_LIST_SIZE) return NOT_FOUND;
           else return NO_ERROR;
    }
+/*********************************************************************************************
+* Class: Agent_Management_Services
+* Function:  bool search();
+* Return: Bool
+* Comment: Search AID within list and return true if found.
+*          next_available is used instead of AGENT_LIST_SIZE since it will optimize
+*          search
+**********************************************************************************************/
+    bool Agent_Management_Services::search(Task_Handle aid){
+        int i=0;
+
+          while(i<next_available){
+              if (Agent_Handle[i]==aid) break;
+              i++;
+          }
+
+          if (i==next_available) return false;
+          else return true;
+   }
 
 /*********************************************************************************************
 * Class: Agent_Management_Services
-* Function:  int search(Task_Handle t);
-* Comment: Search AID within AMS
+* Function:  bool search();
+* Return: Bool
+* Comment: Search AID within list and return true if found.
+*          next_available is used instead of AGENT_LIST_SIZE since it will optimize
+*          search
 **********************************************************************************************/
-//    int Agent_Management_Services::search(Task_Handle t){
-//        int i=0;
-//
-//          while(i<AGENT_LIST_SIZE){
-//              if (Agent_Handle[i]==t)break;
-//              i++;
-//          }
-//
-//          if (i==AGENT_LIST_SIZE-1) return NOT_FOUND;
-//          else return FOUND;
-//   }
+    bool Agent_Management_Services::search(String name){
+        int i=0;
+
+          while(i<next_available){
+              if (!strcmp(Task_Handle_name(Agent_Handle[i]),name)) break;
+              i++;
+          }
+
+          if (i==next_available) return false;
+          else return true;
+   }
+/*********************************************************************************************
+* Class: Agent_Management_Services
+* Function:  Task_Handle* list()
+* Return: Pointer to the of the agents in the platform.
+* Comment:
+**********************************************************************************************/
+    Task_Handle* Agent_Management_Services::return_list(){
+        return AP.ptrAgent_Handle;
+    }
+
+/*********************************************************************************************
+* Class: Agent_Management_Services
+* Function: void modify(Task_Handle aid,Mailbox_Handle new_AP);
+* Return: void
+* Comment: modify AP mailbox_handle (in case to migrate another AP)
+**********************************************************************************************/
+    void Agent_Management_Services::modify(Task_Handle aid, Mailbox_Handle new_AP){
+        Task_setEnv(aid,(xdc_Ptr)new_AP);
+    }
+
+/*********************************************************************************************
+* Class: Agent_Management_Services
+* Function: AP_Description* get_description();
+* Return: AP_Description
+* Comment: Returns description of the platform
+**********************************************************************************************/
+    AP_Description* Agent_Management_Services::get_description(){
+        return &AP;
+    }
 
 /*********************************************************************************************
 *
@@ -208,7 +270,7 @@ namespace MAES{
             taskParams.stackSize =task_stack_size;
             taskParams.priority = priority;
             taskParams.instance->name=agent_name;
-            taskParams.env=(xdc_Ptr)mailbox_handle;
+            taskParams.arg0=(UArg)mailbox_handle;
             task_handle = Task_create(behaviour, &taskParams, NULL);
             //AP.register_agent(task_handle);
             return task_handle;
@@ -280,8 +342,6 @@ namespace MAES{
 **********************************************************************************************/
    Agent_Msg::Agent_Msg(){
       self_handle=Task_self();
-//      MsgObj.mailbox_handle=(Mailbox_Handle) Task_getEnv(Task_self());
-//      MsgObj.sender=Task_Handle_name(Task_self());
       clear_all_receiver();
       next_available=0;
    }
@@ -292,7 +352,7 @@ namespace MAES{
 * Comment: Send msg to specific mailbox.
 *          Set the MsgObj handle to sender's handle.
 **********************************************************************************************/
-    bool Agent_Msg::send(Mailbox_Handle m){ //To do: list of senders
+    bool Agent_Msg::send(Mailbox_Handle m){
         MsgObj.handle=self_handle;
         return Mailbox_post(m, (xdc_Ptr)&MsgObj, BIOS_NO_WAIT);
 
@@ -306,7 +366,7 @@ namespace MAES{
 * Comment: Iterate over the list. If there is an error for any receiver, will return false
 *          if there is any error.
 **********************************************************************************************/
-    bool Agent_Msg::send(){ //To do: checkthis
+    bool Agent_Msg::send(){
         int i=0;
         bool no_error=true;
         MsgObj.handle=self_handle;
@@ -320,12 +380,30 @@ namespace MAES{
     }
 /*********************************************************************************************
 * Class: Agent_Msg
+* Function: broadcast();
+* Return type: Bool
+* Comments: Send msg to the AMS so it broadcast the msg to all agents
+*           Task_getEnv() contains info of mailbox of AID
+* **********************************************************************************************/
+    bool Agent_Msg::broadcast(){
+        Mailbox_Handle AMS_Mailbox;
+        MsgObj.handle=self_handle;
+        set_msg_type(BROADCAST);
+        AMS_Mailbox=(Mailbox_Handle)Task_getEnv(self_handle);
+
+        return Mailbox_post(AMS_Mailbox, (xdc_Ptr)&MsgObj, BIOS_NO_WAIT);
+
+    }
+/*********************************************************************************************
+* Class: Agent_Msg
 * Function: receive_msg(Uint32 timeout)
 * Return type: Boolean. TRUE if successful, FALSE if timeout
 * Comment: Receiving msg in its queue. Block call
 **********************************************************************************************/
     bool Agent_Msg::receive(Uint32 timeout){
-        Mailbox_Handle m=(Mailbox_Handle) Task_getEnv(self_handle);
+        UArg arg0,arg1;
+        Task_getFunc(Task_self(),&arg0, &arg1);
+        Mailbox_Handle m=(Mailbox_Handle) arg0;
         return Mailbox_pend(m, (xdc_Ptr) &MsgObj, timeout);
     }
 
@@ -335,14 +413,16 @@ namespace MAES{
 * Return type: Boolean. True if receiver is added successfully.
 * Comment: Add receiver to list of receivers
 **********************************************************************************************/
-   int Agent_Msg::add_receiver(Task_Handle aid){ //To do: Add receivers only in AMS
-       Mailbox_Handle m=(Mailbox_Handle) Task_getEnv(aid);
-        if (m==NULL) return HANDLE_NULL;
-        if(next_available<MAX_RECEIVERS){
+   int Agent_Msg::add_receiver(Task_Handle aid){
+       UArg arg0,arg1;
+       Task_getFunc(aid,&arg0, &arg1);
+       Mailbox_Handle m=(Mailbox_Handle) arg0;
+       if (m==NULL) return HANDLE_NULL;
+       if(next_available<MAX_RECEIVERS){
            receivers[next_available]=m;
            next_available++;
            return NO_ERROR;
-        }
+       }
 
         else return LIST_FULL;
     }
@@ -355,7 +435,9 @@ namespace MAES{
 * the rest of the list is shifted to the right and the receiver is removed.
 **********************************************************************************************/
    int Agent_Msg::remove_receiver(Task_Handle aid){
-       Mailbox_Handle m=(Mailbox_Handle) Task_getEnv(aid);
+       UArg arg0,arg1;
+       Task_getFunc(aid,&arg0, &arg1);
+       Mailbox_Handle m=(Mailbox_Handle) arg0;
         int i=0;
 
         while(i<MAX_RECEIVERS){
