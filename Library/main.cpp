@@ -92,12 +92,11 @@ int main()
     System_flush();
 
     Reading.create_agent();
-    Reading3.create_agent();
+    Reading2.create_agent();
+  //  Reading3.create_agent();
     Writing.create_agent();
     AP.init();
-
-
-//    BIOS_exit(0);
+  //  BIOS_exit(0);
     BIOS_start();
     return (0);
 }
@@ -111,15 +110,6 @@ void reading(UArg arg0, UArg arg1)
             GPIO_toggle(Board_LED0);
             System_printf("Receiver: %s, Sender: %s, Read: %d \n", Task_Handle_name(Task_self()),msg.get_sender(), msg.get_msg_type());
             System_flush();
-        }
-}
-void test(UArg arg0, UArg arg1)
-{
-
-    Agent_Msg msg;
-    while(1) {
-            msg.receive(BIOS_WAIT_FOREVER);
-
         }
 }
 
@@ -144,15 +134,12 @@ void writing(UArg arg0, UArg arg1)
     int i=0;
     msg.set_msg_type(0);
     msg.set_msg_body(NULL);
-//    msg.add_receiver(Reading.get_AID());
-//    msg.add_receiver(Reading2.get_AID());
-    msg.add_receiver(Reading3.get_AID());
-    //AP.print();
-//      msg.print();
-
+   // AP.print();
+//    msg.print();
+ //   msg.broadcast_AP(AP);
       while(1) {
 
-        if (msg.send()){
+        if (msg.broadcast_AP(AP)){
             msg.set_msg_type(i++);
         }
             Task_sleep(500);

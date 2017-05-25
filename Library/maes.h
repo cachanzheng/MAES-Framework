@@ -49,7 +49,55 @@ void behaviour(UArg arg0, UArg arg1);
 #define REQUEST_WHEN     0x14
 #define REQUEST_WHENEVER 0x15
 #define SUBSCRIBE        0x16
-#define BROADCAST        0x17
+/*********************************************************************************************
+* Class: AP_Description
+* Comment: Contains information about the AP
+* Variables: String name: Name of the AP
+*            Task_Handle *ptrAgent_Handle: Pointer to the list of agents
+*            AMS_aid: Task_Handle of AMS
+*            AMS_mailbox: Mailbox of the AMS
+**********************************************************************************************/
+    struct AP_Description{
+
+      Task_Handle *ptrAgent_Handle;
+      Task_Handle AMS_aid;
+      String name;
+     };
+/*********************************************************************************************
+* Class: Agent_Management_Services
+* Comment: API for Agent Management Services
+* Variables: static Task_Handle Agent_Handle[AGENT_LIST_SIZE]: Contains all the running agent in th
+*            the platform. Declared in static so only instance exist per platform
+*            Agent_Build AMS with highest priority
+**********************************************************************************************/
+    class Agent_Management_Services{
+        public:
+            /*Methods*/
+            Agent_Management_Services(String name, int taskstackSize);
+            Agent_Management_Services(String name);
+            bool init();
+            bool init(int stackSize); //To test
+            int register_agent(Task_Handle aid);
+            int deregister_agent(Task_Handle aid);
+            bool search(Task_Handle aid);
+            bool search(String name);
+            Task_Handle* return_list();
+            int return_list_size();
+            void modify(Task_Handle aid,Mailbox_Handle new_AP);
+            AP_Description* get_description();
+            Task_Handle get_AMS_AID();
+
+            //-------
+
+            void print();
+            //Agent_Lifecycle
+            //suspend, terminate, create, resume, invoke, execute, resource management
+
+        private:
+            int next_available;
+            Task_Handle Agent_Handle[AGENT_LIST_SIZE];
+            AP_Description AP;
+      };
 
 /*********************************************************************************************
 * Class: Agent_Build
@@ -126,22 +174,25 @@ void behaviour(UArg arg0, UArg arg1);
         Agent_Msg(); //tO DO: Construct message with type directlt
 
         /*Methods*/
+        int add_receiver(Agent_Build agent);
         int add_receiver(Task_Handle aid);
+        int add_receiver (Mailbox_Handle m);
+        int remove_receiver(Agent_Build agent);
         int remove_receiver(Task_Handle aid);
+        int remove_receiver(Mailbox_Handle m);
         void clear_all_receiver();
         bool receive(Uint32 timeout);
         bool send(Mailbox_Handle m);
         bool send();
-      //  bool broadcast();//To do
+        bool broadcast_AP(Agent_Management_Services AP);
         void set_msg_type(int type);
         void set_msg_body(String body);
         int get_msg_type();
         String get_msg_body();
         String get_sender();
         void print();
+
     private:
-
-
         Mailbox_Handle receivers[MAX_RECEIVERS];
         int next_available;
         Task_Handle self_handle;
@@ -153,51 +204,6 @@ void behaviour(UArg arg0, UArg arg1);
         }MsgObj;
    };
 
-/*********************************************************************************************
-* Class: AP_Description
-* Comment: Contains information about the AP
-* Variables: String name: Name of the AP
-*            Task_Handle *ptrAgent_Handle: Pointer to the list of agents
-*            AMS_aid: Task_Handle of AMS
-*            AMS_mailbox: Mailbox of the AMS
-**********************************************************************************************/
-    struct AP_Description{
 
-      Task_Handle *ptrAgent_Handle;
-      Task_Handle AMS_aid;
-      String name;
-     };
-/*********************************************************************************************
-* Class: Agent_Management_Services
-* Comment: API for Agent Management Services
-* Variables: static Task_Handle Agent_Handle[AGENT_LIST_SIZE]: Contains all the running agent in th
-*            the platform. Declared in static so only instance exist per platform
-*            Agent_Build AMS with highest priority
-**********************************************************************************************/
-    class Agent_Management_Services{
-        public:
-            /*Methods*/
-            Agent_Management_Services(String name, int taskstackSize);
-            Agent_Management_Services(String name);
-            bool init();
-            bool init(int stackSize); //To test
-            int register_agent(Task_Handle aid);
-            int deregister_agent(Task_Handle aid);
-            bool search(Task_Handle aid);
-            bool search(String name);
-            Task_Handle* return_list();
-            void print();
-            void modify(Task_Handle aid,Mailbox_Handle new_AP);
-            AP_Description* get_description();
-            Task_Handle get_AMS_AID();
-
-            //Agent_Lifecycle
-            //suspend, terminate, create, resume, invoke, execute, resource management
-
-        private:
-            int next_available;
-            Task_Handle Agent_Handle[AGENT_LIST_SIZE];
-            AP_Description AP;
-      };
 
 }
