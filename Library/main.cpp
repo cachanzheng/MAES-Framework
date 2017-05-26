@@ -64,7 +64,8 @@ void writing(UArg arg0, UArg arg1);
 void writing2(UArg arg0, UArg arg1);
 void reading(UArg arg0, UArg arg1);
 void reading2(UArg arg0, UArg arg1);
-void test(UArg arg0, UArg arg1);
+void print();
+
 
 /*Constructing Agents*/
 Agent_Build Reading("Reading Agent",reading);
@@ -81,6 +82,7 @@ Agent_Management_Services AP("Texas Instruments");
  */
 int main()
 {
+
     /* Call board init functions */
     Board_initGeneral();
     Board_initGPIO();
@@ -93,14 +95,31 @@ int main()
 
     Reading.create_agent();
     Reading2.create_agent();
-  //  Reading3.create_agent();
+    Reading3.create_agent();
     Writing.create_agent();
     AP.init();
-  //  BIOS_exit(0);
+ //  AP.print();
     BIOS_start();
     return (0);
 }
 
+void print(){
+    Task_Handle temp;
+    Mailbox_Handle m;
+    UArg arg0,arg1;
+    temp=Task_Object_first();
+
+    while (temp!=NULL){
+      Task_getFunc(temp,&arg0, &arg1);
+      m=(Mailbox_Handle)arg0;
+      System_printf("name: %s aid: %x mailbox: %x \n", Task_Handle_name(temp),temp,m);
+      System_flush();
+      temp=Task_Object_next(temp);
+    }
+
+
+
+}
 void reading(UArg arg0, UArg arg1)
 {
 
@@ -134,12 +153,14 @@ void writing(UArg arg0, UArg arg1)
     int i=0;
     msg.set_msg_type(0);
     msg.set_msg_body(NULL);
+  //  Reading.set_priority(3);
    // AP.print();
 //    msg.print();
  //   msg.broadcast_AP(AP);
       while(1) {
 
         if (msg.broadcast_AP(AP)){
+
             msg.set_msg_type(i++);
         }
             Task_sleep(500);

@@ -10,10 +10,17 @@
 namespace MAES
 {
 
-#define AGENT_LIST_SIZE 4
+#define AGENT_LIST_SIZE 32
 #define MAX_RECEIVERS   AGENT_LIST_SIZE-1
 
-void behaviour(UArg arg0, UArg arg1);
+/*********************************************************************************************
+*   Define Agent Mode
+**********************************************************************************************/
+#define ACTIVE          0x00
+#define SUSPENDED       0x01
+#define WAITING         0x02
+#define TERMINATED      0x03
+
 /*********************************************************************************************
 *   Define Error handling
 **********************************************************************************************/
@@ -50,56 +57,6 @@ void behaviour(UArg arg0, UArg arg1);
 #define REQUEST_WHENEVER 0x15
 #define SUBSCRIBE        0x16
 /*********************************************************************************************
-* Class: AP_Description
-* Comment: Contains information about the AP
-* Variables: String name: Name of the AP
-*            Task_Handle *ptrAgent_Handle: Pointer to the list of agents
-*            AMS_aid: Task_Handle of AMS
-*            AMS_mailbox: Mailbox of the AMS
-**********************************************************************************************/
-    struct AP_Description{
-
-      Task_Handle *ptrAgent_Handle;
-      Task_Handle AMS_aid;
-      String name;
-     };
-/*********************************************************************************************
-* Class: Agent_Management_Services
-* Comment: API for Agent Management Services
-* Variables: static Task_Handle Agent_Handle[AGENT_LIST_SIZE]: Contains all the running agent in th
-*            the platform. Declared in static so only instance exist per platform
-*            Agent_Build AMS with highest priority
-**********************************************************************************************/
-    class Agent_Management_Services{
-        public:
-            /*Methods*/
-            Agent_Management_Services(String name, int taskstackSize);
-            Agent_Management_Services(String name);
-            bool init();
-            bool init(int stackSize); //To test
-            int register_agent(Task_Handle aid);
-            int deregister_agent(Task_Handle aid);
-            bool search(Task_Handle aid);
-            bool search(String name);
-            Task_Handle* return_list();
-            int return_list_size();
-            void modify(Task_Handle aid,Mailbox_Handle new_AP);
-            AP_Description* get_description();
-            Task_Handle get_AMS_AID();
-
-            //-------
-
-            void print();
-            //Agent_Lifecycle
-            //suspend, terminate, create, resume, invoke, execute, resource management
-
-        private:
-            int next_available;
-            Task_Handle Agent_Handle[AGENT_LIST_SIZE];
-            AP_Description AP;
-      };
-
-/*********************************************************************************************
 * Class: Agent_Build
 * Comment: Agent construction class.
 *          Add lines in cfg file to use Mailbox module:
@@ -124,36 +81,90 @@ void behaviour(UArg arg0, UArg arg1);
                     Task_FuncPtr b);
         Agent_Build(String name,
                     Task_FuncPtr b);
-     //   Agent_Build(String name,
-//                    int pri,
-//                    Task_FuncPtr b,
-//                    int taskstackSize);
+
 
         /*Methods*/
         Task_Handle create_agent();
         Task_Handle create_agent(int taskstackSize);
-        void delete_agent(); //To do
         String get_name();
-        int get_prio();
+        String get_AP();
+        int get_priority();
+        //void set_priority(int new_prio);
         Task_Handle get_AID();
         Mailbox_Handle get_mailbox();
         void agent_sleep(Uint32 ticks);
 
     private:
-        Task_Handle task_handle;
+        Task_Handle aid;
         Task_FuncPtr behaviour;
-        Task_Params taskParams;
-        Mailbox_Handle mailbox_handle;
-        Mailbox_Params mbxParams;
         String agent_name;
         int task_stack_size;
         char *task_stack_dyn;
-        char task_stack[512];
+        char task_stack[1024];
         int priority;
         int msg_size;
         int msg_queue_size;
 
     };
+
+/*********************************************************************************************
+* Class: AP_Description
+* Comment: Contains information about the AP
+* Variables: String name: Name of the AP
+*            Task_Handle *ptrAgent_Handle: Pointer to the list of agents
+*            AMS_aid: Task_Handle of AMS
+*            AMS_mailbox: Mailbox of the AMS
+**********************************************************************************************/
+    struct AP_Description{
+
+      Task_Handle *ptrAgent_Handle;
+      Task_Handle AMS_aid;
+      String name;
+     };
+
+/*********************************************************************************************
+* Class: Agent_Management_Services
+* Comment: API for Agent Management Services
+* Variables: static Task_Handle Agent_Handle[AGENT_LIST_SIZE]: Contains all the running agent in th
+*            the platform. Declared in static so only instance exist per platform
+*            Agent_Build AMS with highest priority
+**********************************************************************************************/
+    class Agent_Management_Services{
+        public:
+            /*Methods*/
+            Agent_Management_Services(String name);
+            void init();
+            bool init(Task_FuncPtr action);
+            bool init(int stackSize,Task_FuncPtr action); //To do: test
+            int register_agent(Task_Handle aid);
+            int register_agent(Agent_Build agent);
+            int deregister_agent(Task_Handle aid);
+            int deregister_agent(Agent_Build agent);
+            bool search(Agent_Build agent);
+            bool search(Task_Handle aid);
+            bool search(String name);
+            void suspend(Agent_Build agent);
+            void suspend(Task_Handle aid);
+            void resume(Agent_Build agent);
+            int get_mode(Agent_Build agent);
+
+            Task_Handle* return_list();
+            int return_list_size();
+            AP_Description* get_description();
+            Task_Handle get_AMS_AID();
+
+//            void get_mode();
+            //void execute();//raise priority? yield?
+            // void modify(Task_Handle aid,Task_Handle new_AP);??
+void print();
+
+        private:
+            char task_stack[1024];
+            int next_available;
+            Task_Handle Agent_Handle[AGENT_LIST_SIZE];
+            AP_Description AP;
+
+      };
 
 /*********************************************************************************************
 * Class: Agent_Msg
@@ -200,7 +211,6 @@ void behaviour(UArg arg0, UArg arg1);
             Task_Handle handle;
             int type;
             String body;
-
         }MsgObj;
    };
 
