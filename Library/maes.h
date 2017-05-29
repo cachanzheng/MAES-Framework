@@ -88,7 +88,7 @@ namespace MAES
 
         /*Methods*/
         Task_Handle create_agent();
-        Task_Handle create_agent(int taskstackSize);
+        Task_Handle create_agent(int taskstackSize,int queueSize);
         void destroy_agent();
         String get_name();
         String get_AP();
@@ -102,11 +102,7 @@ namespace MAES
         String agent_name;
         char task_stack[1024];
         int priority;
-        int msg_size;
-        int msg_queue_size;
-        Mailbox_Handle mailbox_handle;
-
-    };
+      };
 
 /*********************************************************************************************
 * Class: AP_Description
@@ -158,7 +154,7 @@ namespace MAES
             int number_of_subscribers();
             AP_Description* get_description();
             Task_Handle get_AMS_AID();
-            void print();
+
         private:
             char task_stack[1024];
             int next_available;
@@ -202,7 +198,7 @@ namespace MAES
         int get_msg_type();
         String get_msg_body();
         Task_Handle get_sender();
-        void print();
+
 
     private:
         Task_Handle receivers[MAX_RECEIVERS];

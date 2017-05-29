@@ -136,15 +136,18 @@ namespace MAES{
 **********************************************************************************************/
     int Agent_Management_Services::register_agent(Task_Handle aid){
         if (aid==NULL) return HANDLE_NULL;
-        if(next_available<AGENT_LIST_SIZE){
-            Task_setEnv(aid,AP.name);
-            Agent_Handle[next_available]=aid;
-            next_available++;
-            return NO_ERROR;
+
+        if (!search(aid)){ //If it is not found then register
+            if(next_available<AGENT_LIST_SIZE){
+                Task_setEnv(aid,AP.name);
+                Agent_Handle[next_available]=aid;
+                next_available++;
+                return NO_ERROR;
+            }
+
+            else return LIST_FULL;
         }
-
-        else return LIST_FULL;
-
+        else return DUPLICATED;
 
     }
 /*********************************************************************************************
@@ -156,15 +159,18 @@ namespace MAES{
         Task_Handle aid;
         aid=agent.get_AID();
 
-        if (aid==NULL) return HANDLE_NULL;
-        if(next_available<AGENT_LIST_SIZE){
-            Task_setEnv(aid,AP.name);
-            Agent_Handle[next_available]=aid;
-            next_available++;
-            return NO_ERROR;
-        }
+        if(!search(aid)){
+            if (aid==NULL) return HANDLE_NULL;
+            if(next_available<AGENT_LIST_SIZE){
+                Task_setEnv(aid,AP.name);
+                Agent_Handle[next_available]=aid;
+                next_available++;
+                return NO_ERROR;
+            }
 
-        else return LIST_FULL;
+            else return LIST_FULL;
+        }
+        else return DUPLICATED;
 
     }
 /*********************************************************************************************
@@ -511,10 +517,6 @@ namespace MAES{
                              int pri){
 
 
-        /*Mailbox init*/
-        msg_size=12;  //Task_Handle: 4, Int: 4, String: 4, Int 4
-        msg_queue_size=5;
-
         /*Task init*/
         agent_name=name;
         priority=pri;
@@ -534,10 +536,6 @@ namespace MAES{
     Agent_Build::Agent_Build(String name,
                              Task_FuncPtr b){
 
-        /*Mailbox init*/
-        msg_size=12;  //Task_Handle: 4, Int: 4, String: 4, Int 4
-        msg_queue_size=5;
-
         /*Task init*/
         agent_name=name;
         priority=1;
@@ -556,12 +554,13 @@ namespace MAES{
     Task_Handle Agent_Build::create_agent(){
 
             Task_Params taskParams;
-         //   Mailbox_Handle mailbox_handle;
+            Mailbox_Handle mailbox_handle;
             Mailbox_Params mbxParams;
 
-            /*Creating mailbox*/
+            /*Creating mailbox
+             * Msg size is 12 and default queue size is 3*/
             Mailbox_Params_init(&mbxParams);
-            mailbox_handle= Mailbox_create(msg_size,msg_queue_size,&mbxParams,NULL);
+            mailbox_handle= Mailbox_create(12,5,&mbxParams,NULL);
 
             /*Creating task*/
             Task_Params_init(&taskParams);
@@ -583,16 +582,16 @@ namespace MAES{
  *           embedded in task's handle env variable.
  *           With user custom taskstackSize. Be aware of heap size
 *********************************************************************************************/
-    Task_Handle Agent_Build::create_agent(int taskstackSize){
+    Task_Handle Agent_Build::create_agent(int taskstackSize, int queueSize){
 //
             Task_Params taskParams;
-      //      Mailbox_Handle mailbox_handle;
+            Mailbox_Handle mailbox_handle;
             Mailbox_Params mbxParams;
 
-
-            /*Creating mailbox*/
+            /*Creating mailbox
+            * Msg size is 12 and default queue size is 5*/
             Mailbox_Params_init(&mbxParams);
-            mailbox_handle= Mailbox_create(msg_size,msg_queue_size,&mbxParams,NULL);
+            mailbox_handle= Mailbox_create(12,queueSize,&mbxParams,NULL);
 
             /*Creating task*/
             Task_Params_init(&taskParams);
@@ -676,20 +675,8 @@ namespace MAES{
 *
 *                                  Class: Agent_Msg
 *
-*********************************************************************************************/
- void Agent_Msg::print(){
-     int i=0;
-
-     while(i<next_available){
-         if(isRegistered(receivers[i])){
-         System_printf("receivers %x\n",receivers[i]);
-         System_flush();
-         }
-         i++;
-     }
- }
-
-/*********************************************************************************************
+********************************************************************************************
+*********************************************************************************************
 * Class: Agent_Msg
 * Function: Agent_Msg Constructor
 * Comment: Construct Agent_Msg Object.
@@ -916,20 +903,5 @@ namespace MAES{
     Task_Handle Agent_Msg::get_sender(){
         return MsgObj.handle;
     }
-
-
-
-    void Agent_Management_Services::print(){
-        UArg arg0,arg1;
-        int i=0;
-        while(i<next_available){
-            Task_getFunc(Agent_Handle[i],&arg0,&arg1);
-                          Mailbox_Handle m=(Mailbox_Handle) arg0;
-            System_printf("name: %s agent %x mailbox: %x \n",Task_Handle_name(Agent_Handle[i]),Agent_Handle[i],m);
-            System_flush();
-            i++;
-        }
-     }
-
 };
 

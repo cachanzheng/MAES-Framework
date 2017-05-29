@@ -99,11 +99,6 @@ int main()
     return (0);
 }
 
-struct MSG{
-   Task_Handle handle;
-   int type;
-   String body;
-}MsgObj;
 
 
 void reading(UArg arg0, UArg arg1)
@@ -139,7 +134,8 @@ void writing(UArg arg0, UArg arg1)
     msg.set_msg_body(NULL);
 
     list=AP.get_all_subscribers();
-
+    System_printf("regis %d\n",AP.register_agent(Reading.get_AID()));
+    System_flush();
     while(1) {
       if(msg.broadcast_AP(list))msg.set_msg_type(i);
       AP.wait(500);
