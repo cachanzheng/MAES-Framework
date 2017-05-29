@@ -150,60 +150,7 @@ namespace MAES{
         else return DUPLICATED;
 
     }
-/*********************************************************************************************
-* Class: Agent_Management_Services
-* Function: int register_agent(Agent_Build agent)
-* Comment: register agent to the platform. If list is full, delete agent and mailbox
-**********************************************************************************************/
-    int Agent_Management_Services::register_agent(Agent_Build agent){
-        Task_Handle aid;
-        aid=agent.get_AID();
 
-        if(!search(aid)){
-            if (aid==NULL) return HANDLE_NULL;
-            if(next_available<AGENT_LIST_SIZE){
-                Task_setEnv(aid,AP.name);
-                Agent_Handle[next_available]=aid;
-                next_available++;
-                return NO_ERROR;
-            }
-
-            else return LIST_FULL;
-        }
-        else return DUPLICATED;
-
-    }
-/*********************************************************************************************
-* Class: Agent_Management_Services
-* Function:  int kill_agent(Agent_Build agent);
-* Comment: Kill agent on the platform. It searches inside of the list, when found,
-* the rest of the list is shifted to the right and the agent is removed.
-**********************************************************************************************/
-    int Agent_Management_Services::kill_agent(Agent_Build agent){
-        Task_Handle aid=agent.get_AID();
-        int i=0;
-        UArg arg0,arg1;
-
-        while(i<AGENT_LIST_SIZE){
-          if(Agent_Handle[i]==aid){
-              Task_getFunc(aid,&arg0,&arg1);
-              Mailbox_Handle m=(Mailbox_Handle) arg0;
-              Mailbox_delete(&m);
-              Task_delete(&aid);
-              while(i<AGENT_LIST_SIZE-1){
-                  Agent_Handle[i]=Agent_Handle[i+1];
-                  i++;
-              }
-              Agent_Handle[AGENT_LIST_SIZE-1]=NULL;
-              next_available--;
-              break;
-          }
-          i++;
-        }
-
-        if (i==AGENT_LIST_SIZE) return NOT_FOUND;
-        else return NO_ERROR;
-   }
 /*********************************************************************************************
 * Class: Agent_Management_Services
 * Function:  int kill_agent(Task_Handle aid);
@@ -234,34 +181,7 @@ namespace MAES{
        if (i==AGENT_LIST_SIZE) return NOT_FOUND;
        else return NO_ERROR;
    }
-/*********************************************************************************************
-* Class: Agent_Management_Services
-* Function:  int deregister_agent(Agent_Build agent);
-* Comment: Kill agent on the platform. It searches inside of the list, when found,
-* the rest of the list is shifted to the right and the agent is removed.
-**********************************************************************************************/
-    int Agent_Management_Services::deregister_agent(Agent_Build agent){
-        Task_Handle aid=agent.get_AID();
-        int i=0;
 
-        while(i<AGENT_LIST_SIZE){
-              if(Agent_Handle[i]==aid){
-                  suspend(aid);
-                  Task_setEnv(aid,NULL);
-                   while(i<AGENT_LIST_SIZE-1){
-                      Agent_Handle[i]=Agent_Handle[i+1];
-                      i++;
-                  }
-                  Agent_Handle[AGENT_LIST_SIZE-1]=NULL;
-                  next_available--;
-                  break;
-              }
-              i++;
-          }
-
-          if (i==AGENT_LIST_SIZE) return NOT_FOUND;
-          else return NO_ERROR;
-   }
 /*********************************************************************************************
 * Class: Agent_Management_Services
 * Function:  int deregister_agent(Task_Handle aid);
@@ -308,43 +228,6 @@ namespace MAES{
 
 /*********************************************************************************************
 * Class: Agent_Management_Services
-* Function: bool modify_agent(Agent build agent, String new_AP);
-* Return:
-* Comment: Modifies Agent Platform name of the agent (Used if needed to migrate)
-*          Search AID within list and return true if modified correctly
-**********************************************************************************************/
-    bool Agent_Management_Services::modify_agent(Agent_Build agent,String new_AP){
-
-        if(search(agent)){
-            Task_setEnv(agent.get_AID(), new_AP);
-            return true;
-        }
-
-        else return false;
-    }
-
-/*********************************************************************************************
-* Class: Agent_Management_Services
-* Function:  bool search();
-* Return: Bool
-* Comment: Search AID within list and return true if found.
-*          next_available is used instead of AGENT_LIST_SIZE since it will optimize
-*          search
-**********************************************************************************************/
-    bool Agent_Management_Services::search(Agent_Build agent){
-        int i=0;
-
-          while(i<next_available){
-              if (Agent_Handle[i]==agent.get_AID()) break;
-              i++;
-          }
-
-          if (i==next_available) return false;
-          else return true;
-   }
-
-/*********************************************************************************************
-* Class: Agent_Management_Services
 * Function:  bool search();
 * Return: Bool
 * Comment: Search AID within list and return true if found.
@@ -385,22 +268,12 @@ namespace MAES{
 
 /*********************************************************************************************
 * Class: Agent_Management_Services
-* Function:void suspend(Agent_Build agent)
-* Return:  NULL
-* Comment: Suspend Agent. Set it to inactive by setting priority to -1
-**********************************************************************************************/
-    void Agent_Management_Services::suspend(Agent_Build agent){
-        Task_setPri(agent.get_AID(), -1);
-   }
-
-/*********************************************************************************************
-* Class: Agent_Management_Services
 * Function:void suspend(Task_Handle aid)
 * Return:  NULL
 * Comment: Suspend Agent. Set it to inactive by setting priority to -1
 **********************************************************************************************/
     void Agent_Management_Services::suspend(Task_Handle aid){
-        Task_setPri(aid, -1);
+        if(search(aid)) Task_setPri(aid, -1);
    }
 /*********************************************************************************************
 * Class: Agent_Management_Services
@@ -408,8 +281,14 @@ namespace MAES{
 * Return:  NULL
 * Comment: Restore Agent.
 **********************************************************************************************/
-    void Agent_Management_Services::resume(Agent_Build agent){
-        Task_setPri(agent.get_AID(), agent.get_priority());
+    void Agent_Management_Services::resume(Task_Handle aid){
+        if(search(aid)) {
+            int priority;
+            UArg arg0,arg1;
+            Task_getFunc(aid,&arg0, &arg1);
+            priority=(int) arg1;
+            Task_setPri(aid,priority);
+        }
    }
 
 /*********************************************************************************************
@@ -438,9 +317,9 @@ namespace MAES{
 * Return:  NULL
 * Comment: get running mode of agent
 **********************************************************************************************/
-    int Agent_Management_Services:: get_mode(Agent_Build agent){
+    int Agent_Management_Services:: get_mode(Task_Handle aid){
         Task_Mode mode;
-        mode=Task_getMode(agent.get_AID());
+        mode=Task_getMode(aid);
 
         switch(mode){
         case Task_Mode_READY:
@@ -504,29 +383,7 @@ namespace MAES{
 *                                  Class: Agent_Build
 *
 **********************************************************************************************
-
-*********************************************************************************************
-* Class: Agent_Build
-* Function: Agent_Build constructor
-* Comments: task_stack_size: set to default value 512
-*           msg_queue_size: set to default value 5
-*           msg_size: set to predefined MsgObj size
-**********************************************************************************************/
-    Agent_Build::Agent_Build(String name,
-                             Task_FuncPtr b,
-                             int pri){
-
-
-        /*Task init*/
-        agent_name=name;
-        priority=pri;
-        behaviour=b;
-        aid=NULL;
-        Task_setEnv(aid,NULL);
-
-    }
-
-/*********************************************************************************************
+**********************************************************************************************
 * Class: Agent_Build
 * Function: Agent_Build constructor
 * Comments: task_stack_size: set to default value 512
@@ -538,7 +395,7 @@ namespace MAES{
 
         /*Task init*/
         agent_name=name;
-        priority=1;
+
         behaviour=b;
         aid=NULL;
         Task_setEnv(aid,NULL);
@@ -566,9 +423,10 @@ namespace MAES{
             Task_Params_init(&taskParams);
             taskParams.stack=task_stack;
             taskParams.stackSize =1024;
-            taskParams.priority = priority;
+            taskParams.priority = 1;
             taskParams.instance->name=agent_name;
             taskParams.arg0=(UArg)mailbox_handle;
+            taskParams.arg1=(UArg)1;
             aid = Task_create(behaviour, &taskParams, NULL);
             return aid;
 
@@ -582,7 +440,7 @@ namespace MAES{
  *           embedded in task's handle env variable.
  *           With user custom taskstackSize. Be aware of heap size
 *********************************************************************************************/
-    Task_Handle Agent_Build::create_agent(int taskstackSize, int queueSize){
+    Task_Handle Agent_Build::create_agent(int taskstackSize, int queueSize, int priority){
 //
             Task_Params taskParams;
             Mailbox_Handle mailbox_handle;
@@ -600,6 +458,7 @@ namespace MAES{
             taskParams.priority = priority;
             taskParams.instance->name=agent_name;
             taskParams.arg0=(UArg)mailbox_handle;
+            taskParams.arg1=(UArg)priority;
             aid = Task_create(behaviour, &taskParams, NULL);
 
 
@@ -648,7 +507,9 @@ namespace MAES{
  * Comments: Returns Agent's priority
 *********************************************************************************************/
     int Agent_Build::get_priority(){
-        return priority;
+        UArg arg0,arg1;
+        Task_getFunc(aid,&arg0, &arg1);
+        return (int) arg1;
     }
 
 /*********************************************************************************************

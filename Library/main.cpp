@@ -65,9 +65,9 @@ void reading(UArg arg0, UArg arg1);
 void reading2(UArg arg0, UArg arg1);
 
 /*Constructing Agents*/
-Agent_Build Reading("Reading Agent",reading,2);
-Agent_Build Reading2("Reading2 Agent",reading2,2);
-Agent_Build Writing("Writing Agent",writing,1);
+Agent_Build Reading("Reading Agent",reading);
+Agent_Build Reading2("Reading2 Agent",reading2);
+Agent_Build Writing("Writing Agent",writing);
 
 /*Creating_Platform*/
 Agent_Management_Services AP("Texas Instruments");
@@ -78,7 +78,7 @@ Agent_Management_Services AP("Texas Instruments");
 int main()
 {
 
-   // p=b.task;
+
     /* Call board init functions */
     Board_initGeneral();
     Board_initGPIO();
@@ -128,18 +128,16 @@ void reading2(UArg arg0, UArg arg1)
 void writing(UArg arg0, UArg arg1)
 {
     Agent_Msg msg;
-    Task_Handle *list;
     int i=0;
     msg.set_msg_type(0);
     msg.set_msg_body(NULL);
 
-    list=AP.get_all_subscribers();
-    System_printf("regis %d\n",AP.register_agent(Reading.get_AID()));
-    System_flush();
+
     while(1) {
-      if(msg.broadcast_AP(list))msg.set_msg_type(i);
+      if(msg.broadcast_AP(AP.get_all_subscribers()))msg.set_msg_type(i);
       AP.wait(500);
       i++;
+
 
 
     }

@@ -80,15 +80,12 @@ namespace MAES
     public:
         /*Constructor*/
         Agent_Build(String name,
-                    Task_FuncPtr b,
-                    int pri);
-        Agent_Build(String name,
                     Task_FuncPtr b);
 
 
         /*Methods*/
         Task_Handle create_agent();
-        Task_Handle create_agent(int taskstackSize,int queueSize);
+        Task_Handle create_agent(int taskstackSize,int queueSize, int priority);
         void destroy_agent();
         String get_name();
         String get_AP();
@@ -101,7 +98,6 @@ namespace MAES
         Task_FuncPtr behaviour;
         String agent_name;
         char task_stack[1024];
-        int priority;
       };
 
 /*********************************************************************************************
@@ -134,22 +130,16 @@ namespace MAES
             bool init(Task_FuncPtr action);
             bool init(Task_FuncPtr action,int taskstackSize);
             int register_agent(Task_Handle aid);
-            int register_agent(Agent_Build agent);
             int kill_agent(Task_Handle aid);
-            int kill_agent(Agent_Build agent);
             int deregister_agent(Task_Handle aid);
-            int deregister_agent(Agent_Build agent);
             bool modify_agent(Task_Handle aid,String new_AP);
-            bool modify_agent(Agent_Build agent,String new_AP);
-            bool search(Agent_Build agent);
             bool search(Task_Handle aid);
             bool search(String name);
-            void suspend(Agent_Build agent);
             void suspend(Task_Handle aid);
-            void resume(Agent_Build agent);
+            void resume(Task_Handle aid);
             void wait(Uint32 ticks);
             void agent_yield();
-            int get_mode(Agent_Build agent);
+            int get_mode(Task_Handle aid);
             Task_Handle* get_all_subscribers();
             int number_of_subscribers();
             AP_Description* get_description();
