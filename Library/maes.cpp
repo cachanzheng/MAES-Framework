@@ -9,9 +9,6 @@
 
 namespace MAES{
 
-Behaviour::Behaviour(){
-
-}
 /*********************************************************************************************
 *
 *                         Class: Agent_AMS: Agent Management Services
@@ -49,7 +46,6 @@ Behaviour::Behaviour(){
     temp=Task_Object_first();
 
     while (temp!=NULL){
-        if(temp==AP.AMS_aid) break;
         register_agent(temp);
         temp=Task_Object_next(temp);
     }
@@ -147,14 +143,8 @@ Behaviour::Behaviour(){
             return NO_ERROR;
         }
 
-        else{
-            UArg arg0,arg1;
-            Task_getFunc(aid,&arg0,&arg1);
-            Mailbox_Handle m=(Mailbox_Handle) arg0;
-            Mailbox_delete(&m);
-            Task_delete(&aid);
-            return LIST_FULL;
-        }
+        else return LIST_FULL;
+
 
     }
 /*********************************************************************************************
@@ -165,6 +155,7 @@ Behaviour::Behaviour(){
     int Agent_Management_Services::register_agent(Agent_Build agent){
         Task_Handle aid;
         aid=agent.get_AID();
+
         if (aid==NULL) return HANDLE_NULL;
         if(next_available<AGENT_LIST_SIZE){
             Task_setEnv(aid,AP.name);
@@ -173,34 +164,85 @@ Behaviour::Behaviour(){
             return NO_ERROR;
         }
 
-        else{
-            UArg arg0,arg1;
-            Task_getFunc(aid,&arg0,&arg1);
-            Mailbox_Handle m=(Mailbox_Handle) arg0;
-            Mailbox_delete(&m);
-            Task_delete(&aid);
-            return LIST_FULL;
-        }
+        else return LIST_FULL;
 
     }
 /*********************************************************************************************
 * Class: Agent_Management_Services
+* Function:  int kill_agent(Agent_Build agent);
+* Comment: Kill agent on the platform. It searches inside of the list, when found,
+* the rest of the list is shifted to the right and the agent is removed.
+**********************************************************************************************/
+    int Agent_Management_Services::kill_agent(Agent_Build agent){
+        Task_Handle aid=agent.get_AID();
+        int i=0;
+        UArg arg0,arg1;
+
+        while(i<AGENT_LIST_SIZE){
+          if(Agent_Handle[i]==aid){
+              Task_getFunc(aid,&arg0,&arg1);
+              Mailbox_Handle m=(Mailbox_Handle) arg0;
+              Mailbox_delete(&m);
+              Task_delete(&aid);
+              while(i<AGENT_LIST_SIZE-1){
+                  Agent_Handle[i]=Agent_Handle[i+1];
+                  i++;
+              }
+              Agent_Handle[AGENT_LIST_SIZE-1]=NULL;
+              next_available--;
+              break;
+          }
+          i++;
+        }
+
+        if (i==AGENT_LIST_SIZE) return NOT_FOUND;
+        else return NO_ERROR;
+   }
+/*********************************************************************************************
+* Class: Agent_Management_Services
+* Function:  int kill_agent(Task_Handle aid);
+* Comment: Kill agent on the platform. It searches inside of the list, when found,
+* the rest of the list is shifted to the right and the agent is removed.
+**********************************************************************************************/
+    int Agent_Management_Services::kill_agent(Task_Handle aid){
+        int i=0;
+        UArg arg0,arg1;
+
+        while(i<AGENT_LIST_SIZE){
+          if(Agent_Handle[i]==aid){
+              Task_getFunc(aid,&arg0,&arg1);
+              Mailbox_Handle m=(Mailbox_Handle) arg0;
+              Mailbox_delete(&m);
+              Task_delete(&aid);
+              while(i<AGENT_LIST_SIZE-1){
+                  Agent_Handle[i]=Agent_Handle[i+1];
+                  i++;
+              }
+              Agent_Handle[AGENT_LIST_SIZE-1]=NULL;
+              next_available--;
+              break;
+          }
+          i++;
+       }
+
+       if (i==AGENT_LIST_SIZE) return NOT_FOUND;
+       else return NO_ERROR;
+   }
+/*********************************************************************************************
+* Class: Agent_Management_Services
 * Function:  int deregister_agent(Agent_Build agent);
-* Comment: deregister agent o the platform. It searches inside of the list, when found,
+* Comment: Kill agent on the platform. It searches inside of the list, when found,
 * the rest of the list is shifted to the right and the agent is removed.
 **********************************************************************************************/
     int Agent_Management_Services::deregister_agent(Agent_Build agent){
         Task_Handle aid=agent.get_AID();
         int i=0;
-        UArg arg0,arg1;
 
-          while(i<AGENT_LIST_SIZE){
+        while(i<AGENT_LIST_SIZE){
               if(Agent_Handle[i]==aid){
-                  Task_getFunc(aid,&arg0,&arg1);
-                  Mailbox_Handle m=(Mailbox_Handle) arg0;
-                  Mailbox_delete(&m);
-                  Task_delete(&aid);
-                  while(i<AGENT_LIST_SIZE-1){
+                  suspend(aid);
+                  Task_setEnv(aid,NULL);
+                   while(i<AGENT_LIST_SIZE-1){
                       Agent_Handle[i]=Agent_Handle[i+1];
                       i++;
                   }
@@ -217,20 +259,17 @@ Behaviour::Behaviour(){
 /*********************************************************************************************
 * Class: Agent_Management_Services
 * Function:  int deregister_agent(Task_Handle aid);
-* Comment: deregister agent o the platform. It searches inside of the list, when found,
+* Comment: Kill agent on the platform. It searches inside of the list, when found,
 * the rest of the list is shifted to the right and the agent is removed.
 **********************************************************************************************/
     int Agent_Management_Services::deregister_agent(Task_Handle aid){
         int i=0;
-        UArg arg0,arg1;
 
-          while(i<AGENT_LIST_SIZE){
+        while(i<AGENT_LIST_SIZE){
               if(Agent_Handle[i]==aid){
-                  Task_getFunc(aid,&arg0,&arg1);
-                  Mailbox_Handle m=(Mailbox_Handle) arg0;
-                  Mailbox_delete(&m);
-                  Task_delete(&aid);
-                  while(i<AGENT_LIST_SIZE-1){
+                      Task_setEnv(aid,NULL);
+                      suspend(aid);
+                      while(i<AGENT_LIST_SIZE-1){
                       Agent_Handle[i]=Agent_Handle[i+1];
                       i++;
                   }
@@ -244,7 +283,6 @@ Behaviour::Behaviour(){
           if (i==AGENT_LIST_SIZE) return NOT_FOUND;
           else return NO_ERROR;
    }
-
 /*********************************************************************************************
 * Class: Agent_Management_Services
 * Function: bool (Task_Handle aid,String new_AP)
@@ -422,17 +460,17 @@ Behaviour::Behaviour(){
 * Return: Pointer to the of the agents in the platform.
 * Comment:
 **********************************************************************************************/
-    Task_Handle* Agent_Management_Services::return_list(){
+    Task_Handle* Agent_Management_Services::get_all_subscribers(){
         return AP.ptrAgent_Handle;
     }
 
 /*********************************************************************************************
 * Class: Agent_Management_Services
-* Function:  int return_list_size();
+* Function:  int number_of_subscribers()
 * Return: Int
 * Comment: Returns size of the list of agents registered in the AP
 **********************************************************************************************/
-    int Agent_Management_Services::return_list_size(){
+    int Agent_Management_Services::number_of_subscribers(){
         return next_available;
     }
 
@@ -469,8 +507,9 @@ Behaviour::Behaviour(){
 *           msg_size: set to predefined MsgObj size
 **********************************************************************************************/
     Agent_Build::Agent_Build(String name,
-                             int pri,
-                             Task_FuncPtr b){
+                             Task_FuncPtr b,
+                             int pri){
+
 
         /*Mailbox init*/
         msg_size=12;  //Task_Handle: 4, Int: 4, String: 4, Int 4
@@ -517,7 +556,7 @@ Behaviour::Behaviour(){
     Task_Handle Agent_Build::create_agent(){
 
             Task_Params taskParams;
-            Mailbox_Handle mailbox_handle;
+         //   Mailbox_Handle mailbox_handle;
             Mailbox_Params mbxParams;
 
             /*Creating mailbox*/
@@ -532,7 +571,6 @@ Behaviour::Behaviour(){
             taskParams.instance->name=agent_name;
             taskParams.arg0=(UArg)mailbox_handle;
             aid = Task_create(behaviour, &taskParams, NULL);
-
             return aid;
 
     }
@@ -548,7 +586,7 @@ Behaviour::Behaviour(){
     Task_Handle Agent_Build::create_agent(int taskstackSize){
 //
             Task_Params taskParams;
-            Mailbox_Handle mailbox_handle;
+      //      Mailbox_Handle mailbox_handle;
             Mailbox_Params mbxParams;
 
 
@@ -565,8 +603,24 @@ Behaviour::Behaviour(){
             taskParams.arg0=(UArg)mailbox_handle;
             aid = Task_create(behaviour, &taskParams, NULL);
 
+
             return aid;
 
+    }
+/*********************************************************************************************
+* Class: Agent_Build
+* Function: void destroy_agent
+* Return type: NULL
+* Comment: Auto destroy, Make sure is de-registered first in AP
+*********************************************************************************************/
+    void Agent_Build::destroy_agent(){
+
+        UArg arg0,arg1;
+        Task_getFunc(aid,&arg0, &arg1);
+
+        Task_delete(&aid);
+        Mailbox_Handle m=(Mailbox_Handle) arg0;
+        Mailbox_delete(&m);
     }
 
 /*********************************************************************************************
@@ -610,23 +664,32 @@ Behaviour::Behaviour(){
 
 /*********************************************************************************************
 * Class: Agent_Build
-* Function: get_mailbox_handle()
-* Return type: Mailbox Handle
-* Comments: Returns agent's mailbox handle
+* Function:  bool isRegistered()
+* Return type: NULL
+* Comments: Returns true if agent is registered to any platform
 *********************************************************************************************/
-    Mailbox_Handle Agent_Build::get_mailbox(){
-        UArg arg0,arg1;
-        Task_getFunc(aid,&arg0,&arg1);
-        return (Mailbox_Handle) arg0;
+    bool Agent_Build::isRegistered(){
+        if ((String) Task_getEnv(aid)!=NULL) return true;
+        else return false;
     }
-
 /*********************************************************************************************
 *
 *                                  Class: Agent_Msg
 *
-*********************************************************************************************
+*********************************************************************************************/
+ void Agent_Msg::print(){
+     int i=0;
 
-*********************************************************************************************
+     while(i<next_available){
+         if(isRegistered(receivers[i])){
+         System_printf("receivers %x\n",receivers[i]);
+         System_flush();
+         }
+         i++;
+     }
+ }
+
+/*********************************************************************************************
 * Class: Agent_Msg
 * Function: Agent_Msg Constructor
 * Comment: Construct Agent_Msg Object.
@@ -638,26 +701,31 @@ Behaviour::Behaviour(){
       self_handle=Task_self();
       clear_all_receiver();
       next_available=0;
+
    }
+/*********************************************************************************************
+* Class: Agent_Msg
+* Function: Mailbox_Handle get_mailbox_from_aid(Agent_Build agent); Private
+* Return type: Mailbox_Handle
+* Comment: Obtain mailbox information from agent aid
+**********************************************************************************************/
+  Mailbox_Handle Agent_Msg::get_mailbox(Task_Handle aid){
+      UArg arg0,arg1;
+      Task_getFunc(aid,&arg0, &arg1);
+      return (Mailbox_Handle) arg0;
+
+  }
 
 /*********************************************************************************************
 * Class: Agent_Msg
-* Function: add_receiver(Agent_Build agent)
-* Return type: Boolean. True if receiver is added successfully.
-* Comment: Add receiver to list of receivers by using the agent build
+* Function: bool isRegistered(Task_Handle aid); Private
+* Return type: Boolean
+* Comment: if returns false, sender or receiver is not registered in the same platform
 **********************************************************************************************/
-  int Agent_Msg::add_receiver(Agent_Build agent){
-
-      Mailbox_Handle m=agent.get_mailbox();
-      if (m==NULL) return HANDLE_NULL;
-      if(next_available<MAX_RECEIVERS){
-          receivers[next_available]=m;
-          next_available++;
-          return NO_ERROR;
-      }
-
-       else return LIST_FULL;
-   }
+  bool Agent_Msg::isRegistered(Task_Handle aid){
+      if(Task_getEnv(aid)==Task_getEnv(self_handle)) return true;
+      else return false;
+}
 /*********************************************************************************************
 * Class: Agent_Msg
 * Function: add_receiver(Task_Handle aid)
@@ -665,62 +733,22 @@ Behaviour::Behaviour(){
 * Comment: Add receiver to list of receivers by using the agent's aid
 **********************************************************************************************/
    int Agent_Msg::add_receiver(Task_Handle aid){
-       UArg arg0,arg1;
-       Task_getFunc(aid,&arg0, &arg1);
-       Mailbox_Handle m=(Mailbox_Handle) arg0;
-       if (m==NULL) return HANDLE_NULL;
-       if(next_available<MAX_RECEIVERS){
-           receivers[next_available]=m;
-           next_available++;
-           return NO_ERROR;
+
+        if(isRegistered(aid)){
+           if (aid==NULL) return HANDLE_NULL;
+
+           if(next_available<MAX_RECEIVERS){
+               receivers[next_available]=aid;
+               next_available++;
+               return NO_ERROR;
+           }
+
+           else return LIST_FULL;
+
        }
+       else return NOT_FOUND;
+   }
 
-        else return LIST_FULL;
-    }
-/*********************************************************************************************
-* Class: Agent_Msg
-* Function: add_receiver(Agent_Build agent)
-* Return type: Boolean. True if receiver is added successfully.
-* Comment: Add receiver to list of receivers by using the agent's mailbox
-**********************************************************************************************/
-    int Agent_Msg::add_receiver(Mailbox_Handle m){
-
-     if (m==NULL) return HANDLE_NULL;
-     if(next_available<MAX_RECEIVERS){
-         receivers[next_available]=m;
-         next_available++;
-         return NO_ERROR;
-     }
-
-      else return LIST_FULL;
-    }
-/*********************************************************************************************
-* Class: Agent_Msg
-* Function: remove_receiver(Agent_Build agent)
- Return type: Boolean. True if receiver is removed successfully. False if it is not encountered
-* Comment: Remove receiver in list of receivers. It searches inside of the list, when found,
-* the rest of the list is shifted to the right and the receiver is removed.
- **********************************************************************************************/
-    int Agent_Msg::remove_receiver(Agent_Build agent){
-
-        Mailbox_Handle m=agent.get_mailbox();
-        int i=0;
-        while(i<MAX_RECEIVERS){
-            if(receivers[i]==m){
-                while(i<MAX_RECEIVERS-1){
-                    receivers[i]=receivers[i+1];
-                    i++;
-                }
-                receivers[MAX_RECEIVERS-1]=NULL;
-                next_available--;
-                break;
-            }
-            i++;
-        }
-
-        if (i==MAX_RECEIVERS) return NOT_FOUND;
-        else return NO_ERROR;
-    }
 
 /*********************************************************************************************
 * Class: Agent_Msg
@@ -730,13 +758,10 @@ Behaviour::Behaviour(){
 * the rest of the list is shifted to the right and the receiver is removed.
 **********************************************************************************************/
    int Agent_Msg::remove_receiver(Task_Handle aid){
-       UArg arg0,arg1;
-       Task_getFunc(aid,&arg0, &arg1);
-       Mailbox_Handle m=(Mailbox_Handle) arg0;
-        int i=0;
 
+        int i=0;
         while(i<MAX_RECEIVERS){
-            if(receivers[i]==m){
+            if(receivers[i]==aid){
                 while(i<MAX_RECEIVERS-1){
                     receivers[i]=receivers[i+1];
                     i++;
@@ -750,31 +775,6 @@ Behaviour::Behaviour(){
         if (i==MAX_RECEIVERS) return NOT_FOUND;
         else return NO_ERROR;
     }
-/*********************************************************************************************
-* Class: Agent_Msg
-* Function: remove_receiver(Mailbox_Handle m)
-* Return type: Boolean. True if receiver is removed successfully. False if it is not encountered
-* Comment: Remove receiver in list of receivers. It searches inside of the list, when found,
-* the rest of the list is shifted to the right and the receiver is removed.
-**********************************************************************************************/
-  int Agent_Msg::remove_receiver(Mailbox_Handle m){
-
-      int i=0;
-      while(i<MAX_RECEIVERS){
-           if(receivers[i]==m){
-               while(i<MAX_RECEIVERS-1){
-                   receivers[i]=receivers[i+1];
-                   i++;
-               }
-               receivers[MAX_RECEIVERS-1]=NULL;
-               next_available--;
-               break;
-           }
-           i++;
-       }
-       if (i==MAX_RECEIVERS) return NOT_FOUND;
-       else return NO_ERROR;
-   }
 /*********************************************************************************************
 * Class: Agent_Msg
 * Function: clear_all_receiver();
@@ -797,11 +797,9 @@ Behaviour::Behaviour(){
 *          task handle of the calling function of this object.
 **********************************************************************************************/
     bool Agent_Msg::receive(Uint32 timeout){
-        UArg arg0,arg1;
-        Task_getFunc(self_handle,&arg0, &arg1);
-        Mailbox_Handle m=(Mailbox_Handle) arg0;
-        return Mailbox_pend(m, (xdc_Ptr) &MsgObj, timeout);
+        return Mailbox_pend(get_mailbox(self_handle), (xdc_Ptr) &MsgObj, timeout);
     }
+
 /*********************************************************************************************
 * Class: Agent_Msg
 * Function: send()
@@ -809,12 +807,20 @@ Behaviour::Behaviour(){
 * Comment: Send msg to specific mailbox.
 *          Set the MsgObj handle to sender's handle.
 **********************************************************************************************/
-    bool Agent_Msg::send(Mailbox_Handle m){
-        MsgObj.handle=self_handle;
-        return Mailbox_post(m, (xdc_Ptr)&MsgObj, BIOS_NO_WAIT);
+    int Agent_Msg::send(Task_Handle aid){
+
+        if(isRegistered(aid)){
+            Mailbox_Handle m;
+            UArg arg0,arg1;
+            Task_getFunc(aid,&arg0, &arg1);
+            m= (Mailbox_Handle) arg0;
+            MsgObj.handle=self_handle;
+            if(Mailbox_post(m, (xdc_Ptr)&MsgObj, BIOS_NO_WAIT)) return NO_ERROR;
+            else return TIMEOUT;
+        }
+        else return NOT_FOUND;
 
     }
-
 /*********************************************************************************************
 * Class: Agent_Msg
 * Function: send()
@@ -823,19 +829,44 @@ Behaviour::Behaviour(){
 * Comment: Iterate over the list. If there is an error for any receiver, will return false
 *          if there is any error.
 **********************************************************************************************/
-    bool Agent_Msg::send(){
+     bool Agent_Msg::send(){
         int i=0;
         bool no_error=true;
         MsgObj.handle=self_handle;
 
         while (i<next_available){
-            if(!Mailbox_post(receivers[i], (xdc_Ptr)&MsgObj, BIOS_NO_WAIT)) no_error=false;
+            if(isRegistered(receivers[i])){
+                if(!Mailbox_post(get_mailbox(receivers[i]), (xdc_Ptr)&MsgObj, BIOS_NO_WAIT))
+                    no_error=false;
+            }
             i++;
         }
 
         return no_error;
     }
+ /*********************************************************************************************
+ * Class: Agent_Msg
+ * Function: broadcast_AP(Task_Handle *AP_list)
+ * Return type: bool. Returns True if was sent correctly to all
+ * Comment: broadcast message to all agents of the platform
+ **********************************************************************************************/
+     bool Agent_Msg::broadcast_AP(Task_Handle* list){
+         int i=0;
+         MsgObj.handle=self_handle;
+         UArg arg0,arg1;
+         Mailbox_Handle m;
+         bool no_error=true;
 
+
+         while(list[i]!=NULL){
+             Task_getFunc(list[i],&arg0, &arg1);
+             m=(Mailbox_Handle) arg0;
+             if(!Mailbox_post(m, (xdc_Ptr)&MsgObj, BIOS_NO_WAIT))no_error=false;
+             i++;
+         }
+         return no_error;
+
+     }
 /*********************************************************************************************
 * Class: Agent_Msg
 * Function: set_msg_type(int type)
@@ -882,51 +913,23 @@ Behaviour::Behaviour(){
 * Return type: String
 * Comment: Get sender name
 **********************************************************************************************/
-    String Agent_Msg::get_sender(){
-        return Task_Handle_name(MsgObj.handle);
+    Task_Handle Agent_Msg::get_sender(){
+        return MsgObj.handle;
     }
 
-/*********************************************************************************************
-* Class: Agent_Msg
-* Function: broadcast_AP(Agent_Management_Services AP)
-* Return type: bool. Returns True if was sent correctly to all
-* Comment: broadcast message to all agents of the platform
-**********************************************************************************************/
-    bool Agent_Msg::broadcast_AP(Agent_Management_Services AP){
-        int size=AP.return_list_size();
-        int i=0;
-        MsgObj.handle=self_handle;
-        UArg arg0,arg1;
-        Mailbox_Handle m;
-        bool no_error=true;
 
-        while(i<size){
-            //System_printf("test %x\n",AP.return_list()[i]);
-            //System_flush();
-            Task_getFunc(AP.return_list()[i],&arg0, &arg1);
-            m=(Mailbox_Handle) arg0;
-            if(!Mailbox_post(m, (xdc_Ptr)&MsgObj, BIOS_NO_WAIT))no_error=false;
-            i++;
-        }
-        return no_error;
-
-    }
 
     void Agent_Management_Services::print(){
-        int i=0;
         UArg arg0,arg1;
-        Mailbox_Handle m;
-
-        while (i<next_available){
-            Task_getFunc(return_list()[i],&arg0, &arg1);
-            m=(Mailbox_Handle) arg0;
-            System_printf("aid: %x mailbox: %x \n", return_list()[i],m);
-
+        int i=0;
+        while(i<next_available){
+            Task_getFunc(Agent_Handle[i],&arg0,&arg1);
+                          Mailbox_Handle m=(Mailbox_Handle) arg0;
+            System_printf("name: %s agent %x mailbox: %x \n",Task_Handle_name(Agent_Handle[i]),Agent_Handle[i],m);
             System_flush();
-
             i++;
         }
-    }
+     }
 
 };
 

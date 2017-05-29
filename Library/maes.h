@@ -30,6 +30,7 @@ namespace MAES
 #define LIST_FULL       0x02
 #define DUPLICATED      0x03
 #define NOT_FOUND       0x04
+#define TIMEOUT         0x05
 /*********************************************************************************************
 *   Define msg type according to FIPA ACL Message Representation in Bit-Efficient Encoding
 *   Specification
@@ -57,12 +58,7 @@ namespace MAES
 #define REQUEST_WHENEVER 0x15
 #define SUBSCRIBE        0x16
 
-    class Behaviour{
-        public:
-        Behaviour();
-        void task(UArg arg0, UArg arg1);
-        //Override task
-    };
+
 /*********************************************************************************************
 * Class: Agent_Build
 * Comment: Agent construction class.
@@ -84,8 +80,8 @@ namespace MAES
     public:
         /*Constructor*/
         Agent_Build(String name,
-                    int pri,
-                    Task_FuncPtr b);
+                    Task_FuncPtr b,
+                    int pri);
         Agent_Build(String name,
                     Task_FuncPtr b);
 
@@ -93,12 +89,12 @@ namespace MAES
         /*Methods*/
         Task_Handle create_agent();
         Task_Handle create_agent(int taskstackSize);
+        void destroy_agent();
         String get_name();
         String get_AP();
         int get_priority();
         Task_Handle get_AID();
-        Mailbox_Handle get_mailbox();
-
+        bool isRegistered();
 
     private:
         Task_Handle aid;
@@ -108,6 +104,7 @@ namespace MAES
         int priority;
         int msg_size;
         int msg_queue_size;
+        Mailbox_Handle mailbox_handle;
 
     };
 
@@ -139,9 +136,11 @@ namespace MAES
             Agent_Management_Services(String name);
             void init();
             bool init(Task_FuncPtr action);
-            bool init(Task_FuncPtr action,int taskstackSize); //To do: test
+            bool init(Task_FuncPtr action,int taskstackSize);
             int register_agent(Task_Handle aid);
             int register_agent(Agent_Build agent);
+            int kill_agent(Task_Handle aid);
+            int kill_agent(Agent_Build agent);
             int deregister_agent(Task_Handle aid);
             int deregister_agent(Agent_Build agent);
             bool modify_agent(Task_Handle aid,String new_AP);
@@ -155,19 +154,22 @@ namespace MAES
             void wait(Uint32 ticks);
             void agent_yield();
             int get_mode(Agent_Build agent);
-            Task_Handle* return_list();
-            int return_list_size();
+            Task_Handle* get_all_subscribers();
+            int number_of_subscribers();
             AP_Description* get_description();
             Task_Handle get_AMS_AID();
-
-
             void print();
-
         private:
             char task_stack[1024];
             int next_available;
             Task_Handle Agent_Handle[AGENT_LIST_SIZE];
             AP_Description AP;
+
+            struct MsgObj{
+                Task_Handle handle;
+                int type;
+                String body;
+            };
       };
 
 /*********************************************************************************************
@@ -188,28 +190,27 @@ namespace MAES
         Agent_Msg();
 
         /*Methods*/
-        int add_receiver(Agent_Build agent);
         int add_receiver(Task_Handle aid);
-        int add_receiver (Mailbox_Handle m);
-        int remove_receiver(Agent_Build agent);
         int remove_receiver(Task_Handle aid);
-        int remove_receiver(Mailbox_Handle m);
         void clear_all_receiver();
         bool receive(Uint32 timeout);
-        bool send(Mailbox_Handle m);
+        int send(Task_Handle aid);
         bool send();
-        bool broadcast_AP(Agent_Management_Services AP);
+        bool broadcast_AP(Task_Handle* list);
         void set_msg_type(int type);
         void set_msg_body(String body);
         int get_msg_type();
         String get_msg_body();
-        String get_sender();
+        Task_Handle get_sender();
         void print();
 
     private:
-        Mailbox_Handle receivers[MAX_RECEIVERS];
+        Task_Handle receivers[MAX_RECEIVERS];
         int next_available;
         Task_Handle self_handle;
+        Mailbox_Handle get_mailbox(Task_Handle aid);
+        bool isRegistered(Task_Handle aid);
+
         struct{
             Task_Handle handle;
             int type;
