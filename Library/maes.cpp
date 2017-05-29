@@ -8,6 +8,10 @@
 #include "maes.h"
 
 namespace MAES{
+
+Behaviour::Behaviour(){
+
+}
 /*********************************************************************************************
 *
 *                         Class: Agent_AMS: Agent Management Services
@@ -22,7 +26,7 @@ namespace MAES{
     Agent_Management_Services::Agent_Management_Services(String name){
         int i=0;
         next_available=0;
-    //    Behaviour behaviour;
+
 
         while (i<AGENT_LIST_SIZE){
             Agent_Handle[i]=(Task_Handle) NULL;
@@ -95,10 +99,10 @@ namespace MAES{
 * Comment: Create AMS task with user custom stack size
 *          Be aware of heap size
 **********************************************************************************************/
-   bool Agent_Management_Services::init(int stackSize,Task_FuncPtr action){
+   bool Agent_Management_Services::init(Task_FuncPtr action,int taskstackSize){
 
            Task_Handle temp;
-           char* task_stack=new char[stackSize];
+        //   char* task_stack=new char[stackSize];
            Mailbox_Handle mailbox_handle;
            Mailbox_Params mbxParams;
            Task_Params taskParams;
@@ -109,9 +113,9 @@ namespace MAES{
 
            /*Creating task*/
            Task_Params_init(&taskParams);
-           taskParams.stack=task_stack;
-           taskParams.stackSize = stackSize;
-           taskParams.priority = -1;
+           taskParams.stack=new char[taskstackSize];
+           taskParams.stackSize = taskstackSize;
+           taskParams.priority = Task_numPriorities-1;
            taskParams.instance->name=AP.name;
            taskParams.arg0=(UArg)mailbox_handle;
            AP.AMS_aid = Task_create(action, &taskParams, NULL);
@@ -160,7 +164,6 @@ namespace MAES{
 **********************************************************************************************/
     int Agent_Management_Services::register_agent(Agent_Build agent){
         Task_Handle aid;
-
         aid=agent.get_AID();
         if (aid==NULL) return HANDLE_NULL;
         if(next_available<AGENT_LIST_SIZE){
@@ -241,6 +244,41 @@ namespace MAES{
           if (i==AGENT_LIST_SIZE) return NOT_FOUND;
           else return NO_ERROR;
    }
+
+/*********************************************************************************************
+* Class: Agent_Management_Services
+* Function: bool (Task_Handle aid,String new_AP)
+* Return:
+* Comment: Modifies Agent Platform name of the agent (Used if needed to migrate)
+*          Search AID within list and return true if modified correctly
+**********************************************************************************************/
+    bool Agent_Management_Services::modify_agent(Task_Handle aid,String new_AP){
+
+        if(search(aid)){
+            Task_setEnv(aid, new_AP);
+            return true;
+        }
+
+        else return false;
+    }
+
+/*********************************************************************************************
+* Class: Agent_Management_Services
+* Function: bool modify_agent(Agent build agent, String new_AP);
+* Return:
+* Comment: Modifies Agent Platform name of the agent (Used if needed to migrate)
+*          Search AID within list and return true if modified correctly
+**********************************************************************************************/
+    bool Agent_Management_Services::modify_agent(Agent_Build agent,String new_AP){
+
+        if(search(agent)){
+            Task_setEnv(agent.get_AID(), new_AP);
+            return true;
+        }
+
+        else return false;
+    }
+
 /*********************************************************************************************
 * Class: Agent_Management_Services
 * Function:  bool search();
@@ -331,6 +369,26 @@ namespace MAES{
    }
 
 /*********************************************************************************************
+* Class: Agent_Management Services
+* Function: void wait (uint32 ticks)
+* Return type: NULL
+* Comments: When called within agent's function it will make agent sleeps defined ticks
+*********************************************************************************************/
+   void Agent_Management_Services::wait(Uint32 ticks){
+        Task_sleep(ticks);
+    }
+/*********************************************************************************************
+* Class: Agent_Management Services
+* Function: void yield()
+* Return type: NULL
+* Comments: It yields the processor to another readied agent of equal priority.
+*           It lower priorities are on readied, the current task won't be preempted
+*********************************************************************************************/
+  void Agent_Management_Services::agent_yield(){
+       Task_yield();
+   }
+
+/*********************************************************************************************
 * Class: Agent_Management_Services
 * Function:void get_mode
 * Return:  NULL
@@ -397,7 +455,6 @@ namespace MAES{
     Task_Handle Agent_Management_Services::get_AMS_AID(){
         return AP.AMS_aid;
     }
-
 /*********************************************************************************************
 *
 *                                  Class: Agent_Build
@@ -423,7 +480,6 @@ namespace MAES{
         agent_name=name;
         priority=pri;
         behaviour=b;
-        task_stack_size=1024;
         aid=NULL;
         Task_setEnv(aid,NULL);
 
@@ -447,7 +503,6 @@ namespace MAES{
         agent_name=name;
         priority=1;
         behaviour=b;
-        task_stack_size=1024;
         aid=NULL;
         Task_setEnv(aid,NULL);
 
@@ -472,7 +527,7 @@ namespace MAES{
             /*Creating task*/
             Task_Params_init(&taskParams);
             taskParams.stack=task_stack;
-            taskParams.stackSize =task_stack_size;
+            taskParams.stackSize =1024;
             taskParams.priority = priority;
             taskParams.instance->name=agent_name;
             taskParams.arg0=(UArg)mailbox_handle;
@@ -491,21 +546,20 @@ namespace MAES{
  *           With user custom taskstackSize. Be aware of heap size
 *********************************************************************************************/
     Task_Handle Agent_Build::create_agent(int taskstackSize){
-
+//
             Task_Params taskParams;
             Mailbox_Handle mailbox_handle;
             Mailbox_Params mbxParams;
 
-            task_stack_size= taskstackSize;
-            task_stack_dyn=new char[task_stack_size];
+
             /*Creating mailbox*/
             Mailbox_Params_init(&mbxParams);
             mailbox_handle= Mailbox_create(msg_size,msg_queue_size,&mbxParams,NULL);
 
             /*Creating task*/
             Task_Params_init(&taskParams);
-            taskParams.stack=task_stack_dyn;
-            taskParams.stackSize =task_stack_size;
+            taskParams.stack=new char[taskstackSize];
+            taskParams.stackSize =taskstackSize;
             taskParams.priority = priority;
             taskParams.instance->name=agent_name;
             taskParams.arg0=(UArg)mailbox_handle;
@@ -566,15 +620,6 @@ namespace MAES{
         return (Mailbox_Handle) arg0;
     }
 
-/*********************************************************************************************
-* Class: Agent_Build
-* Function: agent_sleep(uint32 ticks)
-* Return type: NULL
-* Comments: Agent sleep in ticks
-*********************************************************************************************/
-   void Agent_Build::agent_sleep(Uint32 ticks){
-        Task_sleep(ticks);
-    }
 /*********************************************************************************************
 *
 *                                  Class: Agent_Msg

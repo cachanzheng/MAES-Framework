@@ -56,6 +56,13 @@ namespace MAES
 #define REQUEST_WHEN     0x14
 #define REQUEST_WHENEVER 0x15
 #define SUBSCRIBE        0x16
+
+    class Behaviour{
+        public:
+        Behaviour();
+        void task(UArg arg0, UArg arg1);
+        //Override task
+    };
 /*********************************************************************************************
 * Class: Agent_Build
 * Comment: Agent construction class.
@@ -89,17 +96,14 @@ namespace MAES
         String get_name();
         String get_AP();
         int get_priority();
-        //void set_priority(int new_prio);
         Task_Handle get_AID();
         Mailbox_Handle get_mailbox();
-        void agent_sleep(Uint32 ticks);
+
 
     private:
         Task_Handle aid;
         Task_FuncPtr behaviour;
         String agent_name;
-        int task_stack_size;
-        char *task_stack_dyn;
         char task_stack[1024];
         int priority;
         int msg_size;
@@ -135,35 +139,35 @@ namespace MAES
             Agent_Management_Services(String name);
             void init();
             bool init(Task_FuncPtr action);
-            bool init(int stackSize,Task_FuncPtr action); //To do: test
+            bool init(Task_FuncPtr action,int taskstackSize); //To do: test
             int register_agent(Task_Handle aid);
             int register_agent(Agent_Build agent);
             int deregister_agent(Task_Handle aid);
             int deregister_agent(Agent_Build agent);
+            bool modify_agent(Task_Handle aid,String new_AP);
+            bool modify_agent(Agent_Build agent,String new_AP);
             bool search(Agent_Build agent);
             bool search(Task_Handle aid);
             bool search(String name);
             void suspend(Agent_Build agent);
             void suspend(Task_Handle aid);
             void resume(Agent_Build agent);
+            void wait(Uint32 ticks);
+            void agent_yield();
             int get_mode(Agent_Build agent);
-
             Task_Handle* return_list();
             int return_list_size();
             AP_Description* get_description();
             Task_Handle get_AMS_AID();
 
-//            void get_mode();
-            //void execute();//raise priority? yield?
-            // void modify(Task_Handle aid,Task_Handle new_AP);??
-void print();
+
+            void print();
 
         private:
             char task_stack[1024];
             int next_available;
             Task_Handle Agent_Handle[AGENT_LIST_SIZE];
             AP_Description AP;
-
       };
 
 /*********************************************************************************************
@@ -178,11 +182,10 @@ void print();
 *            Task_Handle handle: to receive information from other agents or to send info
 *                                to other agents
 **********************************************************************************************/
-    class Agent_Msg { //To do: Add for customized msg obj
-
+    class Agent_Msg {
     public:
         /*Constructor*/
-        Agent_Msg(); //tO DO: Construct message with type directlt
+        Agent_Msg();
 
         /*Methods*/
         int add_receiver(Agent_Build agent);
