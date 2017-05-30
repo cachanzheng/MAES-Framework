@@ -65,9 +65,9 @@ void reading(UArg arg0, UArg arg1);
 void reading2(UArg arg0, UArg arg1);
 
 /*Constructing Agents*/
-Agent_Build Reading("Reading Agent",reading);
-Agent_Build Reading2("Reading2 Agent",reading2);
-Agent_Build Writing("Writing Agent",writing);
+Agent Reading("Reading Agent",reading);
+Agent Reading2("Reading2 Agent",reading2);
+Agent Writing("Writing Agent",writing);
 
 /*Creating_Platform*/
 Agent_Management_Services AP("Texas Instruments");
@@ -77,8 +77,6 @@ Agent_Management_Services AP("Texas Instruments");
  */
 int main()
 {
-
-
     /* Call board init functions */
     Board_initGeneral();
     Board_initGPIO();
@@ -89,28 +87,28 @@ int main()
     System_printf("Blinking Led Example with agents \n");
     System_flush();
 
-    Writing.create_agent();
-    Reading.create_agent();
-    Reading2.create_agent();
-
+    Writing.init_agent();
+    Reading.init_agent();
+    Reading2.init_agent();
 
     AP.init();
+
     BIOS_start();
     return (0);
+
 }
 
 
 
 void reading(UArg arg0, UArg arg1)
 {
-
     Agent_Msg msg;
     while(1) {
         msg.receive(BIOS_WAIT_FOREVER);
         System_printf("Receiver: %s Sender: %s Received: %d \n", Task_Handle_name(Task_self()),Task_Handle_name(msg.get_sender()),msg.get_msg_type());
         System_flush();
         GPIO_toggle(Board_LED0);
-     }
+    }
 }
 
 void reading2(UArg arg0, UArg arg1)
@@ -128,16 +126,15 @@ void reading2(UArg arg0, UArg arg1)
 void writing(UArg arg0, UArg arg1)
 {
     Agent_Msg msg;
-    int i=0;
-    msg.set_msg_type(0);
-    msg.set_msg_body(NULL);
-
-
+    int i;
+    msg.add_receiver(Reading.get_AID());
+    msg.add_receiver(Reading2.get_AID());
+    AP.print();
     while(1) {
-      if(msg.broadcast_AP(AP.get_all_subscribers()))msg.set_msg_type(i);
-      AP.wait(500);
+        AP.broadcast(msg.get_msg());
+        AP.wait(500);
       i++;
-
+      msg.set_msg_type(i);
 
 
     }
