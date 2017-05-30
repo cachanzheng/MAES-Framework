@@ -88,11 +88,12 @@ int main()
     System_flush();
 
     Writing.init_agent();
-    Reading.init_agent();
-    Reading2.init_agent();
+
+
 
     AP.init();
-
+    Reading2.init_agent();
+    Reading.init_agent();
     BIOS_start();
     return (0);
 
@@ -126,10 +127,15 @@ void reading2(UArg arg0, UArg arg1)
 void writing(UArg arg0, UArg arg1)
 {
     Agent_Msg msg;
-    int i;
+    AP.register_agent(&Reading);
+    AP.register_agent(&Reading2);
+    int i=0;
     msg.add_receiver(Reading.get_AID());
     msg.add_receiver(Reading2.get_AID());
-    AP.print();
+    AP.modify_agent(&Reading, "test");
+    Reading.print();
+    AP.suspend(&Reading2);
+
     while(1) {
         AP.broadcast(msg.get_msg());
         AP.wait(500);

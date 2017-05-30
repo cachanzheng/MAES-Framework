@@ -228,7 +228,7 @@ namespace MAES{
 /*********************************************************************************************
 * Class: Agent_Management_Services
 * Function: int register_agent(Task_Handle aid)
-* Comment: Register agent to the platform only if it is unique.
+* Comment: Register agent to the platform only if it is unique by agent's task
 **********************************************************************************************/
     int Agent_Management_Services::register_agent(Task_Handle aid){
         if (aid==NULL) return HANDLE_NULL;
@@ -248,7 +248,30 @@ namespace MAES{
         }
         else return DUPLICATED;
     }
+/*********************************************************************************************
+* Class: Agent_Management_Services
+* Function: int register_agent(Agent *agent)
+* Comment: Register agent to the platform only if it is unique by agent
+**********************************************************************************************/
+    int Agent_Management_Services::register_agent(Agent *agent){
+        Task_Handle aid=agent->get_AID();
+        if (aid==NULL) return HANDLE_NULL;
 
+        if (!search(aid)){
+            if(next_available<AGENT_LIST_SIZE){
+                Agent_info *description;
+                description=(Agent_info *)Task_getEnv(aid);
+                description->AP=AP.name;
+                AP.Agent_Handle[next_available]=aid;
+                next_available++;
+                Task_setPri(aid, description->priority);
+                return NO_ERROR;
+            }
+
+            else return LIST_FULL;
+        }
+        else return DUPLICATED;
+    }
 /*********************************************************************************************
 * Class: Agent_Management_Services
 * Function: void init()
@@ -359,7 +382,7 @@ namespace MAES{
 * Function:  int kill_agent(Task_Handle aid);
 * Return: int
 * Comment: Kill agent on the platform. It deregisters the agent first then it delete the
-*           handles
+*           handles by agent's handle
 **********************************************************************************************/
     int Agent_Management_Services::kill_agent(Task_Handle aid){
         int error;
@@ -376,23 +399,74 @@ namespace MAES{
 
         return error;
     }
+/*********************************************************************************************
+* Class: Agent_Management_Services
+* Function:  int kill_agent(Agent *agent)
+* Return: int
+* Comment: Kill agent on the platform. It deregisters the agent first then it delete the
+*           handles by agent
+**********************************************************************************************/
+    int Agent_Management_Services::kill_agent(Agent *agent){
+        Task_Handle aid=agent->get_AID();
+        int error;
+        error=deregister_agent(aid);
 
+        if(error==NO_ERROR){
+            Agent_info *description;
+            Mailbox_Handle m;
+            description=(Agent_info *)Task_getEnv(aid);
+            m=description->mailbox_handle;
+            Task_delete(&aid);
+            Mailbox_delete(&m);
+        }
+
+        return error;
+    }
 /*********************************************************************************************
 * Class: Agent_Management_Services
 * Function:  int deregister_agent(Task_Handle aid);
-* Comment: Deregister agent on the platform. It searches inside of the list, when found,
+* Comment: Deregister agent on the platform by handle. It searches inside of the list, when found,
 *          the rest of the list is shifted to the right and the agent is removed.
-*          Remove the receiver manually from all the msg list;
 **********************************************************************************************/
     int Agent_Management_Services::deregister_agent(Task_Handle aid){
         int i=0;
-
         while(i<AGENT_LIST_SIZE){
               if(AP.Agent_Handle[i]==aid){
                       Agent_info *description;
                       suspend(aid);
                       description=(Agent_info *)Task_getEnv(aid);
                       description->AP=NULL;
+
+                      while(i<AGENT_LIST_SIZE-1){
+                          AP.Agent_Handle[i]=AP.Agent_Handle[i+1];
+                      i++;
+                  }
+                  AP.Agent_Handle[AGENT_LIST_SIZE-1]=NULL;
+                  next_available--;
+                  break;
+              }
+              i++;
+          }
+
+          if (i==AGENT_LIST_SIZE) return NOT_FOUND;
+          else return NO_ERROR;
+   }
+/*********************************************************************************************
+* Class: Agent_Management_Services
+* Function:  int deregister_agent(Agent *agent);
+* Comment: Deregister agent on the platform by agent. It searches inside of the list, when found,
+*          the rest of the list is shifted to the right and the agent is removed.
+**********************************************************************************************/
+    int Agent_Management_Services::deregister_agent(Agent *agent){
+        Task_Handle aid=agent->get_AID();
+        int i=0;
+        while(i<AGENT_LIST_SIZE){
+              if(AP.Agent_Handle[i]==aid){
+                      Agent_info *description;
+                      suspend(aid);
+                      description=(Agent_info *)Task_getEnv(aid);
+                      description->AP=NULL;
+
                       while(i<AGENT_LIST_SIZE-1){
                           AP.Agent_Handle[i]=AP.Agent_Handle[i+1];
                       i++;
@@ -413,6 +487,7 @@ namespace MAES{
 * Return:
 * Comment: Modifies Agent Platform name of the agent (Used if needed to migrate)
 *          Search AID within list and return true if modified correctly
+*          Suspend agent when modified
 **********************************************************************************************/
     bool Agent_Management_Services::modify_agent(Task_Handle aid,String new_AP){
 
@@ -426,7 +501,25 @@ namespace MAES{
 
         else return false;
     }
+/*********************************************************************************************
+* Class: Agent_Management_Services
+* Function: bool modify_agent (Agent *agent,String new_AP)
+* Return:
+* Comment: Modifies Agent Platform name of the agent (Used if needed to migrate)
+*          Search AID within list and return true if modified correctly
+**********************************************************************************************/
+    bool Agent_Management_Services::modify_agent(Agent *agent,String new_AP){
+        Task_Handle aid=agent->get_AID();
+        Agent_info *description;
+        if(search(aid)){
+            suspend(aid);
+            description=(Agent_info *)Task_getEnv(aid);
+            description->AP=new_AP;
+            return true;
+        }
 
+        else return false;
+    }
 /*********************************************************************************************
 * Class: Agent_Management_Services
 * Function:  bool search();
@@ -446,20 +539,20 @@ namespace MAES{
           if (i==next_available) return false;
           else return true;
    }
-
 /*********************************************************************************************
 * Class: Agent_Management_Services
-* Function:  bool search();
+* Function:  bool search(Agent *agent);
 * Return: Bool
 * Comment: Search AID within list and return true if found.
 *          next_available is used instead of AGENT_LIST_SIZE since it will optimize
 *          search
 **********************************************************************************************/
-    bool Agent_Management_Services::search(String name){
+    bool Agent_Management_Services::search(Agent *agent){
+        Task_Handle aid=agent->get_AID();
         int i=0;
 
           while(i<next_available){
-              if (!strcmp(Task_Handle_name(AP.Agent_Handle[i]),name)) break;
+              if (AP.Agent_Handle[i]==aid) break;
               i++;
           }
 
@@ -476,6 +569,18 @@ namespace MAES{
     void Agent_Management_Services::suspend(Task_Handle aid){
         if(search(aid)) Task_setPri(aid, -1);
    }
+
+/*********************************************************************************************
+* Class: Agent_Management_Services
+* Function:void suspend(Agent *agent)
+* Return:  NULL
+* Comment: Suspend Agent. Set it to inactive by setting priority to -1
+**********************************************************************************************/
+    void Agent_Management_Services::suspend(Agent *agent){
+        Task_Handle aid=agent->get_AID();
+        if(search(aid)) Task_setPri(aid, -1);
+   }
+
 /*********************************************************************************************
 * Class: Agent_Management_Services
 * Function:void restore(Agent agent)
@@ -489,7 +594,20 @@ namespace MAES{
             Task_setPri(aid,description->priority);
         }
    }
-
+/*********************************************************************************************
+* Class: Agent_Management_Services
+* Function:void restore(Agent agent)
+* Return:  NULL
+* Comment: Restore Agent.
+**********************************************************************************************/
+    void Agent_Management_Services::resume(Agent *agent){
+        Task_Handle aid=agent->get_AID();
+        if(search(aid)) {
+            Agent_info *description;
+            description=(Agent_info *)Task_getEnv(aid);
+            Task_setPri(aid,description->priority);
+        }
+   }
 /*********************************************************************************************
 * Class: Agent_Management Services
 * Function: void wait (uint32 ticks)
@@ -543,7 +661,7 @@ namespace MAES{
 
 /*********************************************************************************************
 * Class: Agent_Management_Services
-* Function: AP_Description* get_Agent_description();
+* Function: AP_Description* get_Agent_description(Task_Handle aid);
 * Return: Agent_info
 * Comment: Returns description of an agent. Returns copy instead of pointer since pointer
 *          can override the information.
@@ -559,7 +677,25 @@ namespace MAES{
         agent.priority=description->priority;
         return agent;
     }
+/*********************************************************************************************
+* Class: Agent_Management_Services
+* Function: AP_Description* get_Agent_description(Agent *a);
+* Return: Agent_info
+* Comment: Returns description of an agent. Returns copy instead of pointer since pointer
+*          can override the information.
+**********************************************************************************************/
+    Agent_info Agent_Management_Services::get_Agent_description(Agent *a){
+        Task_Handle aid=a->get_AID();
+        Agent_info agent;
+        Agent_info *description;
+        description=(Agent_info *)Task_getEnv(aid);
 
+        agent.AP=description->AP;
+        agent.agent_name=description->agent_name;
+        agent.mailbox_handle=description->mailbox_handle;
+        agent.priority=description->priority;
+        return agent;
+    }
 /*********************************************************************************************
 * Class: Agent_Management_Services
 * Function: get_AMS_AID();
@@ -722,7 +858,19 @@ namespace MAES{
             i++;
         }
     }
-
+/*********************************************************************************************
+* Class: Agent_Msg
+* Function: refresh_list()
+* Return type: NULL
+* Comment: Refresh the list with all the registered agents. Remove agent if it is not registered
+**********************************************************************************************/
+    void Agent_Msg::refresh_list(){
+        int i=0;
+        while (i<next_available){
+            if(!isRegistered(receivers[i]))remove_receiver(receivers[i]);
+            i++;
+        }
+    }
 /*********************************************************************************************
 * Class: Agent_Msg
 * Function: receive_msg(Uint32 timeout)

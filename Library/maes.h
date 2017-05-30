@@ -149,21 +149,27 @@ namespace MAES
 
     /*Methods*/
         int register_agent(Task_Handle aid);
+        int register_agent(Agent *agent);
         void init();
         bool init(Task_FuncPtr action);
         bool init(Task_FuncPtr action,int taskstackSize);
         int kill_agent(Task_Handle aid);
+        int kill_agent(Agent *agent);
         int deregister_agent(Task_Handle aid);
+        int deregister_agent(Agent *agent);
         bool modify_agent(Task_Handle aid,String new_AP);
+        bool modify_agent(Agent *agent,String new_AP);
         bool search(Task_Handle aid);
-        bool search(String name);
+        bool search(Agent *agent);
         void suspend(Task_Handle aid);
+        void suspend(Agent *agent);
         void resume(Task_Handle aid);
+        void resume(Agent *agent);
         void wait(Uint32 ticks);
         int get_mode(Task_Handle aid);
-        void shut_down();
         AP_Description get_AP_description();
         Agent_info get_Agent_description(Task_Handle aid);
+        Agent_info get_Agent_description(Agent *a);
         Task_Handle get_AMS_AID();
 
 
@@ -202,6 +208,7 @@ namespace MAES
         int add_receiver(Task_Handle aid_receiver);
         int remove_receiver(Task_Handle aid_receiver);
         void clear_all_receiver();
+        void refresh_list();
         bool receive(Uint32 timeout);
         int send(Task_Handle aid_receiver);
         bool send();
