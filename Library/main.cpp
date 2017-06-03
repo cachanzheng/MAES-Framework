@@ -70,7 +70,7 @@ Agent Reading2("Reading2 Agent",reading2);
 Agent Writing("Writing Agent",writing);
 
 /*Creating_Platform*/
-Agent_Management_Services AP("Texas Instruments");
+Agent_Platform AP("Texas Instruments");
 
 /*
  *  ======== main ========
@@ -88,25 +88,22 @@ int main()
     System_flush();
 
     Writing.init_agent();
-
-
-
-    AP.init();
     Reading2.init_agent();
     Reading.init_agent();
+    AP.init();
+
     BIOS_start();
     return (0);
 
 }
 
-
-
 void reading(UArg arg0, UArg arg1)
 {
+
     Agent_Msg msg;
     while(1) {
         msg.receive(BIOS_WAIT_FOREVER);
-        System_printf("Receiver: %s Sender: %s Received: %d \n", Task_Handle_name(Task_self()),Task_Handle_name(msg.get_sender()),msg.get_msg_type());
+        System_printf("Receiver: %s Sender: %s Received: %d \n", Task_Handle_name(AP.get_running_agent_aid()),Task_Handle_name(msg.get_sender()),msg.get_msg_type());
         System_flush();
         GPIO_toggle(Board_LED0);
     }
@@ -118,7 +115,7 @@ void reading2(UArg arg0, UArg arg1)
     Agent_Msg msg;
     while(1) {
         msg.receive(BIOS_WAIT_FOREVER);
-        System_printf("Receiver: %s Sender: %s Received: %d \n", Task_Handle_name(Task_self()),Task_Handle_name(msg.get_sender()),msg.get_msg_type());
+        System_printf("Receiver: %s Sender: %s Received: %d \n", Task_Handle_name(AP.get_running_agent_aid()),Task_Handle_name(msg.get_sender()),msg.get_msg_type());
         System_flush();
         GPIO_toggle(Board_LED1);
      }
@@ -126,19 +123,17 @@ void reading2(UArg arg0, UArg arg1)
 
 void writing(UArg arg0, UArg arg1)
 {
+
     Agent_Msg msg;
-    AP.register_agent(&Reading);
-    AP.register_agent(&Reading2);
     int i=0;
     msg.add_receiver(Reading.get_AID());
-    msg.add_receiver(Reading2.get_AID());
-    AP.modify_agent(&Reading, "test");
-    Reading.print();
-    AP.suspend(&Reading2);
 
-    while(1) {
-        AP.broadcast(msg.get_msg());
-        AP.wait(500);
+    System_printf("%d\n",AP.number_of_subscribers());
+    System_flush();
+
+   while(1) {
+        msg.send();
+      AP.agent_wait(500);
       i++;
       msg.set_msg_type(i);
 

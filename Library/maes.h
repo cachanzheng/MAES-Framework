@@ -57,7 +57,6 @@ namespace MAES
 #define REQUEST_WHEN     0x14
 #define REQUEST_WHENEVER 0x15
 #define SUBSCRIBE        0x16
-
 /*********************************************************************************************
 * Class: Agent_info
 * Comment: Struct containing information about the Agent;
@@ -85,6 +84,7 @@ namespace MAES
         String name;
         Task_Handle Agent_Handle[AGENT_LIST_SIZE];
         Task_Handle AMS_aid;
+        int next_available;
     }AP_Description;
 /*********************************************************************************************
 * Class: AP_Description
@@ -93,11 +93,38 @@ namespace MAES
 *            Task_Handle handle: to receive information from other agents or to send info
 *                                to other agents
 **********************************************************************************************/
-  typedef struct MsgObj{
-        Task_Handle handle;
-        int type;
-        String body;
+    typedef struct MsgObj{
+          Task_Handle sender_agent;
+          Task_Handle target_agent;
+          int type;
+          String body;
     }MsgObj;
+/*********************************************************************************************
+*  Unnamed namespace for using within namespace
+**********************************************************************************************/
+  namespace{
+        class AMS_Services{
+        public:
+            AMS_Services();
+            AP_Description *get_AP();
+            bool search(Task_Handle aid);
+            int register_agent(Task_Handle aid);
+            int kill_agent(Task_Handle aid);
+            int deregister_agent(Task_Handle aid);
+            void suspend(Task_Handle aid);
+            bool modify_agent(Task_Handle aid,String new_AP);
+            void resume(Task_Handle aid);
+            bool set_agent_pri(Task_Handle aid,int pri);
+            int get_mode(Task_Handle aid);
+            void broadcast(MsgObj *msg);
+
+
+        private:
+            AP_Description AP;
+
+        };
+        void AMS_task(UArg arg0,UArg arg1);
+    }
 /*********************************************************************************************
 * Class: Agent
 * Variables: Agent_info description;
@@ -123,7 +150,6 @@ namespace MAES
         bool destroy_agent();
         Task_Handle get_AID();
         bool isRegistered();
-        void print();//for debug
 
     private:
         Agent_info description;
@@ -134,7 +160,7 @@ namespace MAES
 
 
 /*********************************************************************************************
-* Class:   Agent_Management_Services
+* Class:   Agent_Platform
 * Comment: API for Agent Management Services
 * Variables: char task_stack[1024]: default size if additional services of AMS is required
 *            int next_available: index of the Agent_Handle list where denotes the spot available
@@ -142,49 +168,31 @@ namespace MAES
 *            AP_Description AP: Struct where contains the AP information.
 *            Agent_info description: Description of AMS task.
 **********************************************************************************************/
-    class Agent_Management_Services{
+    class Agent_Platform{
     public:
         /*Constructor*/
-        Agent_Management_Services(String name);
+        Agent_Platform(String name);
 
     /*Methods*/
-        int register_agent(Task_Handle aid);
-        int register_agent(Agent *agent);
-        void init();
-        bool init(Task_FuncPtr action);
+        bool init();
         bool init(Task_FuncPtr action,int taskstackSize);
-        int kill_agent(Task_Handle aid);
-        int kill_agent(Agent *agent);
-        int deregister_agent(Task_Handle aid);
-        int deregister_agent(Agent *agent);
-        bool modify_agent(Task_Handle aid,String new_AP);
-        bool modify_agent(Agent *agent,String new_AP);
+
+        /*Services available for all agents*/
         bool search(Task_Handle aid);
-        bool search(Agent *agent);
-        void suspend(Task_Handle aid);
-        void suspend(Agent *agent);
-        void resume(Task_Handle aid);
-        void resume(Agent *agent);
-        void wait(Uint32 ticks);
-        int get_mode(Task_Handle aid);
-        AP_Description get_AP_description();
-        Agent_info get_Agent_description(Task_Handle aid);
-        Agent_info get_Agent_description(Agent *a);
-        Task_Handle get_AMS_AID();
-
-
-        /*Extra services*/
-        int number_of_subscribers();
+        bool search(Agent *a);
+        void agent_wait(Uint32 ticks);
         void agent_yield();
-        bool set_agent_pri(Task_Handle aid,int pri);
-        void broadcast(MsgObj *msg);
-
-        void print(); //for debug
+        Task_Handle get_running_agent_aid();
+        int get_mode(Task_Handle aid);
+        const Agent_info *get_Agent_description(Task_Handle aid);
+        const Agent_info *get_Agent_description(Agent *a);
+        const AP_Description *get_AP_description();
+        Task_Handle get_AMS_AID();
+        int number_of_subscribers();
 
     private:
+        AMS_Services services;
         char task_stack[1024];
-        int next_available;
-        AP_Description AP;
         Agent_info description;
 
     };
