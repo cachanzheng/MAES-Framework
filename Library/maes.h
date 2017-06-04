@@ -24,51 +24,62 @@ namespace MAES
 /*********************************************************************************************
 *   Define Error handling
 **********************************************************************************************/
-#define NO_ERROR        0x00
-#define FOUND           0x00
-#define HANDLE_NULL     0x01
-#define LIST_FULL       0x02
-#define DUPLICATED      0x03
-#define NOT_FOUND       0x04
-#define TIMEOUT         0x05
+#define NO_ERROR        0x04
+#define FOUND           0x05
+#define HANDLE_NULL     0x06
+#define LIST_FULL       0x07
+#define DUPLICATED      0x08
+#define NOT_FOUND       0x09
+#define TIMEOUT         0x0A
 /*********************************************************************************************
 *   Define msg type according to FIPA ACL Message Representation in Bit-Efficient Encoding
 *   Specification
 **********************************************************************************************/
+#define ACCEPT_PROPOSAL  0x0B
+#define AGREE            0x0C
+#define CANCEL           0x0D
+#define CFP              0x0E
+#define CONFIRM          0x0F
+#define DISCONFIRM       0x10
+#define FAILURE          0x11
+#define INFORM           0x12
+#define INFORM_IF        0x13
+#define INFORM_REF       0x14
+#define NOT_UNDERSTOOD   0x15
+#define PROPAGATE        0x16
+#define PROPOSE          0x17
+#define QUERY_IF         0x18
+#define QUERY_REF        0x19
+#define REFUSE           0x1A
+#define REJECT_PROPOSAL  0x1B
+#define REQUEST          0x1C
+#define REQUEST_WHEN     0x1D
+#define REQUEST_WHENEVER 0x1E
+#define SUBSCRIBE        0x1F
 
-#define ACCEPT_PROPOSAL  0x01
-#define AGREE            0x02
-#define CANCEL           0x03
-#define CFP              0x04
-#define CONFIRM          0x05
-#define DISCONFIRM       0x06
-#define FAILURE          0x07
-#define INFORM           0x08
-#define INFORM_IF        0x09
-#define INFORM_REF       0x0a
-#define NOT_UNDERSTOOD   0x0b
-#define PROPAGATE        0x0c
-#define PROPOSE          0x0d
-#define QUERY_IF         0x0f
-#define QUERY_REF        0x10
-#define REFUSE           0x11
-#define REJECT_PROPOSAL  0x12
-#define REQUEST          0x13
-#define REQUEST_WHEN     0x14
-#define REQUEST_WHENEVER 0x15
-#define SUBSCRIBE        0x16
+/*********************************************************************************************
+*   Define Request Action
+**********************************************************************************************/
+#define REGISTER        0x2A
+#define DEREGISTER      0x2B
+#define KILL            0x2C
+#define MODIFY          0x2D
+#define RESUME          0x2E
+#define SUSPEND         0x2F
+#define MODIFY_PRI      0x30
+#define BROADCAST       0x31
 /*********************************************************************************************
 * Class: Agent_info
 * Comment: Struct containing information about the Agent;
-* Variables: String AP: AP where the agent is registered;
-*            String agent_name: Agent's name;
+* Variables: String agent_name: Agent's name;
 *            Mailbox_Handle m: Agent associated mailbox
+*            Task_Handle AP: AP handle where the agent is registered;
 *            int priority: Priority set by the user.
 **********************************************************************************************/
     typedef struct Agent_info{
-        String AP;
         String agent_name;
         Mailbox_Handle mailbox_handle;
+        Task_Handle AP;
         int priority;
     }Agent_info;
 
@@ -97,7 +108,8 @@ namespace MAES
           Task_Handle sender_agent;
           Task_Handle target_agent;
           int type;
-          String body;
+          String content_string;
+          int content_int;
     }MsgObj;
 /*********************************************************************************************
 *  Unnamed namespace for using within namespace
@@ -111,13 +123,12 @@ namespace MAES
             int register_agent(Task_Handle aid);
             int kill_agent(Task_Handle aid);
             int deregister_agent(Task_Handle aid);
-            void suspend(Task_Handle aid);
-            bool modify_agent(Task_Handle aid,String new_AP);
-            void resume(Task_Handle aid);
+            bool suspend_agent(Task_Handle aid);
+            bool modify_agent(Task_Handle aid,Task_Handle new_AP);
+            bool resume_agent(Task_Handle aid);
             bool set_agent_pri(Task_Handle aid,int pri);
             int get_mode(Task_Handle aid);
             void broadcast(MsgObj *msg);
-
 
         private:
             AP_Description AP;
@@ -214,19 +225,31 @@ namespace MAES
 
         /*Methods*/
         int add_receiver(Task_Handle aid_receiver);
+        int add_receiver(Agent *a);
         int remove_receiver(Task_Handle aid_receiver);
+        int remove_receiver(Agent *a);
         void clear_all_receiver();
         void refresh_list();
         bool receive(Uint32 timeout);
         int send(Task_Handle aid_receiver);
+        int send(Agent *a);
         bool send();
         void set_msg_type(int type);
-        void set_msg_body(String body);
+        void set_msg_string(String body);
+        void set_msg_int(int content);
         MsgObj *get_msg();
         int get_msg_type();
-        String get_msg_body();
+        String get_msg_string();
+        int get_msg_int();
         Task_Handle get_sender();
-        void print();//for debug
+        Task_Handle get_target_agent();
+        int request_AP(int request, Task_Handle target_agent,int timeout);
+        int request_AP(int request, Agent *a,int timeout);
+        int request_AP(int request, Task_Handle target_agent,int timeout, Task_Handle content);//Modify
+        int request_AP(int request, Task_Handle target_agent,int timeout, int content);
+        int request_AP(int request, Agent *a,int timeout, int content);
+        int broadcast(int timeout);
+
 
     private:
         Task_Handle receivers[MAX_RECEIVERS];

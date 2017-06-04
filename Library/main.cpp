@@ -89,7 +89,8 @@ int main()
 
     Writing.init_agent();
     Reading2.init_agent();
-    Reading.init_agent();
+     Reading.init_agent();
+
     AP.init();
 
     BIOS_start();
@@ -126,16 +127,23 @@ void writing(UArg arg0, UArg arg1)
 
     Agent_Msg msg;
     int i=0;
-    msg.add_receiver(Reading.get_AID());
+    const Agent_info *a;
 
-    System_printf("%d\n",AP.number_of_subscribers());
-    System_flush();
+//    System_printf("response: %x \n", msg.request_AP(REGISTER, Reading.get_AID(), BIOS_WAIT_FOREVER));
+//    msg.request_AP(REGISTER, Reading2.get_AID(), BIOS_WAIT_FOREVER);
+    msg.add_receiver(&Reading);
+    msg.add_receiver(Reading2.get_AID());
+  //  System_printf("response: %x \n",msg.request_AP(DEREGISTER, Reading2.get_AID(), BIOS_WAIT_FOREVER));
 
    while(1) {
-        msg.send();
+
+      System_printf("response: %x \n",msg.request_AP(MODIFY, Reading.get_AID(), BIOS_WAIT_FOREVER, Writing.get_AID()));
+      System_flush();
       AP.agent_wait(500);
       i++;
       msg.set_msg_type(i);
+      a=AP.get_Agent_description(&Reading);
+      System_printf("name: %x \n", a->AP);
 
 
     }

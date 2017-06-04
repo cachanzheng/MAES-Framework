@@ -68,15 +68,14 @@ namespace MAES{
             if (aid==NULL) return HANDLE_NULL;
 
             if (!search(aid)){
-
                 if(AP.next_available<AGENT_LIST_SIZE){
-                Agent_info *description;
-                description=(Agent_info *)Task_getEnv(aid);
-                description->AP=AP.name;
-                AP.Agent_Handle[AP.next_available]=aid;
-                AP.next_available++;
-                Task_setPri(aid, description->priority);
-                return NO_ERROR;
+                    Agent_info *description;
+                    description=(Agent_info *)Task_getEnv(aid);
+                    description->AP=AP.AMS_aid;
+                    AP.Agent_Handle[AP.next_available]=aid;
+                    AP.next_available++;
+                    Task_setPri(aid, description->priority);
+                    return NO_ERROR;
                 }
                 else return LIST_FULL;
             }
@@ -93,7 +92,7 @@ namespace MAES{
             while(i<AGENT_LIST_SIZE){
                   if(AP.Agent_Handle[i]==aid){
                           Agent_info *description;
-                          suspend(aid);
+                          suspend_agent(aid);
                           description=(Agent_info *)Task_getEnv(aid);
                           description->AP=NULL;
 
@@ -136,12 +135,16 @@ namespace MAES{
 
 /*********************************************************************************************
 * Class: AMS_Services
-* Function:void suspend(Task_Handle aid)
+* Function:void suspend_agent(Task_Handle aid)
 * Return:  NULL
-* Comment: Suspend Agent. Set it to inactive by setting priority to -1
+* Comment: suspend_agent Agent. Set it to inactive by setting priority to -1
 **********************************************************************************************/
-        void AMS_Services::suspend(Task_Handle aid){
-            if(search(aid)) Task_setPri(aid, -1);
+        bool AMS_Services::suspend_agent(Task_Handle aid){
+            if(search(aid)) {
+                Task_setPri(aid, -1);
+                return true;
+            }
+            else return false;
        }
 /*********************************************************************************************
 * Class: AMS_Services
@@ -151,11 +154,11 @@ namespace MAES{
 *          Search AID within list and return true if modified correctly
 *          Suspend agent when modified
 **********************************************************************************************/
-        bool AMS_Services::modify_agent(Task_Handle aid,String new_AP){
+        bool AMS_Services::modify_agent(Task_Handle aid,Task_Handle new_AP){
 
             if(search(aid)){
                 Agent_info *description;
-                suspend(aid);
+                suspend_agent(aid);
                 description=(Agent_info *)Task_getEnv(aid);
                 description->AP=new_AP;
                 return true;
@@ -169,12 +172,14 @@ namespace MAES{
 * Return:  NULL
 * Comment: Restore Agent.
 **********************************************************************************************/
-       void AMS_Services::resume(Task_Handle aid){
+       bool AMS_Services::resume_agent(Task_Handle aid){
             if(search(aid)) {
                 Agent_info *description;
                 description=(Agent_info *)Task_getEnv(aid);
                 Task_setPri(aid,description->priority);
+                return true;
             }
+            else return false;
        }
 /*********************************************************************************************
 * Class: AMS_Services
@@ -224,15 +229,12 @@ namespace MAES{
 /*********************************************************************************************
 * Class: AMS_Services
 * Function: broadcast(MsgObj &msg)
-* Return: NULL
-* Comment: broadcast the msg to all subscribers
+* Return: int
+* Comment: broadcast the msg to all subscribers as REQUEST type
 **********************************************************************************************/
       void AMS_Services::broadcast(MsgObj *msg){
           Agent_info * description;
-
-       //   msg->handle=Task_self(); //Set sender
           int i=0;
-
           while(i<AP.next_available){
               if(msg->sender_agent!=AP.Agent_Handle[i]){
                   description=(Agent_info*)Task_getEnv(AP.Agent_Handle[i]);
@@ -240,6 +242,7 @@ namespace MAES{
               }
               i++;
           }
+
       }
 
 /*********************************************************************************************
@@ -249,17 +252,103 @@ namespace MAES{
 * Comment: AMS task description. No visible outside of namespace. For internal use only
 **********************************************************************************************/
         void AMS_task(UArg arg0, UArg arg1){
-            Agent_info *agent;
-            Mailbox_Handle m;
-            Agent_Msg msg;
-            agent=(Agent_info *)Task_getEnv(Task_self());
-            m=agent->mailbox_handle;
             AMS_Services *services=(AMS_Services*)arg0;
-
+            Agent_Msg msg;
+            int error_msg=0;
 
             while(1){
-                Mailbox_pend(m, (xdc_Ptr) &msg,BIOS_WAIT_FOREVER);
-            }
+                msg.receive(BIOS_WAIT_FOREVER);
+                if (msg.get_msg_type()==REQUEST){
+                  switch(msg.get_msg_int()){
+                        case REGISTER:
+                            error_msg=services->register_agent(msg.get_target_agent());
+
+                            if(error_msg==NO_ERROR){ //To do: extra condition
+                                msg.set_msg_type(CONFIRM);
+                            }
+                            else msg.set_msg_type(REFUSE);
+
+                            /*Respond*/
+                            msg.send(msg.get_sender());
+                            break;
+
+                        case DEREGISTER:
+                            error_msg=services->deregister_agent(msg.get_target_agent());
+                            if(error_msg==NO_ERROR){ //To do: extra condition
+                                msg.set_msg_type(CONFIRM);
+                            }
+                            else msg.set_msg_type(REFUSE);
+
+                            /*Respond*/
+                            msg.send(msg.get_sender());
+                            break;
+
+                        case KILL:
+                            error_msg=services->kill_agent(msg.get_target_agent());
+                            if(error_msg==NO_ERROR){ //To do: extra condition
+                               msg.set_msg_type(CONFIRM);
+                            }
+                            else msg.set_msg_type(REFUSE);
+
+                            /*Respond*/
+                            msg.send(msg.get_sender());
+                            break;
+
+                        case MODIFY:
+                            error_msg=services->modify_agent(msg.get_target_agent(), (Task_Handle)msg.get_msg_string());
+                            if(error_msg==1){ //To do: extra condition
+                                msg.set_msg_type(CONFIRM);
+                            }
+                            else msg.set_msg_type(REFUSE);
+                            /*Respond*/
+                            msg.send(msg.get_sender());
+                            break;
+
+                        case RESUME:
+                            error_msg=services->resume_agent(msg.get_target_agent());
+                            if(error_msg==1){ //To do: extra condition
+                               msg.set_msg_type(CONFIRM);
+                            }
+                            else msg.set_msg_type(REFUSE);
+
+                            /*Respond*/
+                            msg.send(msg.get_sender());
+                            break;
+
+                        case SUSPEND:
+                            error_msg=services->suspend_agent(msg.get_target_agent());
+                            if(error_msg==1){ //To do: extra condition
+                               msg.set_msg_type(CONFIRM);
+                            }
+                            else msg.set_msg_type(REFUSE);
+
+                            /*Respond*/
+                            msg.send(msg.get_sender());
+                            break;
+
+                        case MODIFY_PRI:
+                            error_msg=services->set_agent_pri(msg.get_target_agent(),(int)msg.get_msg_string());
+                            if(error_msg==1){ //To do: extra condition
+                              msg.set_msg_type(CONFIRM);
+                            }
+                            else msg.set_msg_type(REFUSE);
+                            /*Respond*/
+                            msg.send(msg.get_sender());
+                            break;
+
+                        case BROADCAST:
+                            services->broadcast(msg.get_msg());
+                            msg.set_msg_type(CONFIRM);
+                            msg.send(msg.get_sender());
+                            break;
+                    }
+                }//End if
+
+                        else{
+                            msg.set_msg_type(NOT_UNDERSTOOD);
+                            //To do sent back message
+                        }
+            }//finish while
         }
     }
 /*********************************************************************************************
@@ -289,32 +378,31 @@ namespace MAES{
         Task_Params taskParams;
         AP_Description *ptr=services.get_AP();
 
-        /*Initializing Agent_info*/
-        description.AP=ptr->name;
-        description.agent_name=ptr->name;
-        description.priority=Task_numPriorities-1;
-
         /*Creating mailbox*/
         Mailbox_Params_init(&mbxParams);
-        description.mailbox_handle= Mailbox_create(16,5,&mbxParams,NULL);
+        description.mailbox_handle= Mailbox_create(20,8,&mbxParams,NULL);
 
         /*Creating task*/
         Task_Params_init(&taskParams);
         taskParams.stack=task_stack;
         taskParams.stackSize = 1024;
-        taskParams.priority = description.priority;//Assigning max priority
-        taskParams.instance->name=description.AP;
+        taskParams.priority = Task_numPriorities-1;//Assigning max priority
+        taskParams.instance->name=ptr->name;
         taskParams.env=&description;
         taskParams.arg0=(UArg)&services;
         ptr->AMS_aid = Task_create(AMS_task, &taskParams, NULL);
 
-        if (ptr->AMS_aid!=NULL){
+        /*Initializing Agent_info*/
+        description.AP= ptr->AMS_aid;
+        description.agent_name=ptr->name;
+        description.priority=Task_numPriorities-1;
+
         /*Initializing all the previously created task*/
+        if (ptr->AMS_aid!=NULL){
             temp=Task_Object_first();
             while (temp!=NULL){
                 if(temp==ptr->AMS_aid) break;
                 services.register_agent(temp);
-                //register_agent(temp);
                 temp=Task_Object_next(temp);
             }
 
@@ -336,31 +424,31 @@ namespace MAES{
         Task_Params taskParams;
         AP_Description *ptr=services.get_AP();
 
-        /*Initializing Agent_info*/
-        description.AP=ptr->name;
-        description.agent_name=ptr->name;
-        description.priority=Task_numPriorities-1;
-
         /*Creating mailbox*/
         Mailbox_Params_init(&mbxParams);
-        description.mailbox_handle= Mailbox_create(16,5,&mbxParams,NULL);
+        description.mailbox_handle= Mailbox_create(20,8,&mbxParams,NULL);
 
         /*Creating task*/
         Task_Params_init(&taskParams);
         taskParams.stack=new char[taskstackSize];
         taskParams.stackSize = taskstackSize;
-        taskParams.priority = description.priority;//Assigning max priority
-        taskParams.instance->name=description.AP;
+        taskParams.priority = Task_numPriorities-1;//Assigning max priority
+        taskParams.instance->name=ptr->name;
         taskParams.env=&description;
         ptr->AMS_aid = Task_create(AMS_task, &taskParams, NULL);
 
+        /*Initializing Agent_info*/
+        description.AP= ptr->AMS_aid;
+        description.agent_name=ptr->name;
+        description.priority=Task_numPriorities-1;
+
+        /*Registering all created agents*/
         if (ptr->AMS_aid!=NULL){
         /*Initializing all the previously created task*/
             temp=Task_Object_first();
             while (temp!=NULL){
                 if(temp==ptr->AMS_aid) break;
                 services.register_agent(temp);
-                //register_agent(temp);
                 temp=Task_Object_next(temp);
             }
 
@@ -377,17 +465,11 @@ namespace MAES{
 **********************************************************************************************/
     bool Agent_Platform::search(Task_Handle aid){
         return services.search(aid);
-   }
+    }
 
-/*********************************************************************************************
-* Class: Agent_Platform
-* Function:  bool search(Agent *a);
-* Return: Bool
-* Comment: search agent in Platform by Agent object
-**********************************************************************************************/
-   bool Agent_Platform::search(Agent *a){
+    bool Agent_Platform::search(Agent *a){
         return services.search(a->get_AID());
-   }
+    }
 
 /*********************************************************************************************
 * Class:Agent_Platform
@@ -438,18 +520,9 @@ namespace MAES{
         description=(Agent_info *)Task_getEnv(aid);
         return description;
     }
-/*********************************************************************************************
-* Class: Agent_Platform
-* Function: AP_Description* get_Agent_description(Agent *a);
-* Return: Agent_info
-* Comment: Returns description of an agent. Returns copy instead of pointer since pointer
-*          can override the information.
-**********************************************************************************************/
-    const Agent_info *Agent_Platform::get_Agent_description(Agent *a){
-        Agent_info *description;
-        description=(Agent_info *)Task_getEnv(a->get_AID());
-        return description;
 
+    const Agent_info *Agent_Platform::get_Agent_description(Agent *a){
+       return get_Agent_description(a->get_AID());
     }
 /*********************************************************************************************
 * Class: Agent_Platform
@@ -514,9 +587,9 @@ namespace MAES{
         description.AP=NULL;
         description.priority= 1;
 
-        /*Creating mailbox: Msg size is 16 and default queue size is set to 3*/
+        /*Creating mailbox: Msg size is 20 and default queue size is set to 3*/
         Mailbox_Params_init(&mbxParams);
-        description.mailbox_handle= Mailbox_create(16,5,&mbxParams,NULL);
+        description.mailbox_handle= Mailbox_create(20,8,&mbxParams,NULL);
 
         /*Creating task*/
         Task_Params_init(&taskParams);
@@ -550,9 +623,9 @@ namespace MAES{
         description.priority=priority;
 
         /*Creating mailbox
-        * Msg size is 16*/
+        * Msg size is 20*/
         Mailbox_Params_init(&mbxParams);
-        description.mailbox_handle=Mailbox_create(16,queueSize,&mbxParams,NULL);
+        description.mailbox_handle=Mailbox_create(20,queueSize,&mbxParams,NULL);
 
         /*Creating task*/
         Task_Params_init(&taskParams);
@@ -583,9 +656,9 @@ namespace MAES{
         description.AP=NULL;
         description.priority=1;
 
-        /*Creating mailbox: Msg size is 16 and default queue size is set to 3*/
+        /*Creating mailbox: Msg size is 20 and default queue size is set to 3*/
         Mailbox_Params_init(&mbxParams);
-        description.mailbox_handle= Mailbox_create(16,5,&mbxParams,NULL);
+        description.mailbox_handle= Mailbox_create(20,8,&mbxParams,NULL);
 
         /*Creating task*/
         Task_Params_init(&taskParams);
@@ -621,9 +694,9 @@ namespace MAES{
         description.priority=priority;
 
         /*Creating mailbox
-        * Msg size is 16*/
+        * Msg size is 20*/
         Mailbox_Params_init(&mbxParams);
-        description.mailbox_handle=Mailbox_create(16,queueSize,&mbxParams,NULL);
+        description.mailbox_handle=Mailbox_create(20,queueSize,&mbxParams,NULL);
 
         /*Creating task*/
         Task_Params_init(&taskParams);
@@ -735,6 +808,9 @@ namespace MAES{
        else return NOT_FOUND;
    }
 
+   int Agent_Msg::add_receiver(Agent *a){
+      return add_receiver(a->get_AID());
+   }
 
 /*********************************************************************************************
 * Class: Agent_Msg
@@ -761,6 +837,10 @@ namespace MAES{
         if (i==MAX_RECEIVERS) return NOT_FOUND;
         else return NO_ERROR;
     }
+
+  int Agent_Msg::remove_receiver(Agent *a){
+      return remove_receiver(a->get_AID());
+   }
 /*********************************************************************************************
 * Class: Agent_Msg
 * Function: clear_all_receiver();
@@ -801,7 +881,7 @@ namespace MAES{
 
 /*********************************************************************************************
 * Class: Agent_Msg
-* Function: send()
+* Function: send(Task_Handle aid)
 * Return type: Boolean. TRUE if successful, FALSE if timeout
 * Comment: Send msg to specific mailbox.
 *          Set the MsgObj handle to sender's handle.
@@ -820,6 +900,10 @@ namespace MAES{
 
     }
 
+    int Agent_Msg::send(Agent *a){
+        return send(a->get_AID());
+
+    }
 /*********************************************************************************************
 * Class: Agent_Msg
 * Function: send()
@@ -834,13 +918,15 @@ namespace MAES{
         msg.sender_agent=self_handle;
         Agent_info * description;
 
-        while (i<next_available){
+        while (receivers[i]!=NULL){
             if(isRegistered(receivers[i])){
                 description=(Agent_info*)Task_getEnv(receivers[i]);
                 if(!Mailbox_post(description->mailbox_handle, (xdc_Ptr)&msg, BIOS_NO_WAIT))
                     no_error=false;
+                i++;
+
             }
-            i++;
+            else remove_receiver(receivers[next_available]);
         }
         return no_error;
     }
@@ -856,12 +942,21 @@ namespace MAES{
 
 /*********************************************************************************************
 * Class: Agent_Msg
-* Function: set_msg_body(String body)
+* Function: set_msg_string(String content)
 * Return type: NULL
 * Comment: Set message body according to FIPA ACL
 **********************************************************************************************/
-    void Agent_Msg::set_msg_body(String msg_body){
-        msg.body=msg_body;
+    void Agent_Msg::set_msg_string(String msg_body){
+        msg.content_string=msg_body;
+    }
+/*********************************************************************************************
+* Class: Agent_Msg
+* Function: set_msg_int(int content)
+* Return type: NULL
+* Comment: Set message body according to FIPA ACL
+**********************************************************************************************/
+    void Agent_Msg::set_msg_int(int content){
+        msg.content_int=content;
     }
 /*********************************************************************************************
 * Class: Agent_Msg
@@ -885,24 +980,178 @@ namespace MAES{
 
 /*********************************************************************************************
 * Class: Agent_Msg
-* Function: get_msg_body()
+* Function: get_msg_string()
 * Return type: String
-* Comment: Get message body
+* Comment: Get string content
 **********************************************************************************************/
-    String Agent_Msg::get_msg_body(){
-        return msg.body;
+    String Agent_Msg::get_msg_string(){
+        return msg.content_string;
     }
-
+/*********************************************************************************************
+* Class: Agent_Msg
+* Function: get_msg_int()
+* Return type: int
+* Comment: Get int content
+**********************************************************************************************/
+    int Agent_Msg::get_msg_int(){
+        return msg.content_int;
+    }
 /*********************************************************************************************
 * Class: Agent_Msg
 * Function: get_sender()
-* Return type: String
-* Comment: Get sender name
+* Return type: Task_Handle
+* Comment: Get sender
 **********************************************************************************************/
     Task_Handle Agent_Msg::get_sender(){
         return msg.sender_agent;
     }
+/*********************************************************************************************
+* Class: Agent_Msg
+* Function: get_target_agent()
+* Return type: Task_Handle
+* Comment: Get target aid
+**********************************************************************************************/
+    Task_Handle Agent_Msg::get_target_agent(){
+        return msg.target_agent;
+    }
+/*********************************************************************************************
+* Class: Agent_Msg
+* Function: int request_AP(int request, Task_Handle target_agent,int timeout)
+* Return type: Int
+* Comment: request the Agent Platform to perform a service and wait for response during
+*          a time specified by the user
+**********************************************************************************************/
+    int Agent_Msg::request_AP(int request, Task_Handle target_agent,int timeout){
+        Task_Handle AMS;
+        Agent_info *temp;
 
+        if (request != BROADCAST && request!=MODIFY && request!=MODIFY_PRI ){
+
+            /*Setting msg*/
+            msg.type=REQUEST;
+            msg.content_int=request;
+            msg.target_agent=target_agent;
+            msg.sender_agent=Task_self();
+
+            /*Getting AP address:
+             * 1. Get the Agent info
+             * 2. Get the AMS address*/
+            temp= (Agent_info*) Task_getEnv(self_handle);
+            AMS=temp->AP;
+            send(AMS);
+
+            /*Waiting for answer*/
+            receive(timeout);
+
+            return msg.type;
+        }
+
+        else return REFUSE;
+    }
+
+    int Agent_Msg::request_AP(int request, Agent *a,int timeout){
+        return request_AP(request, a->get_AID(),timeout);
+    }
+/*********************************************************************************************
+* Class: Agent_Msg
+* Function: int request_AP(int request, Task_Handle target_agent,int timeout,int content)
+* Return type: Int
+* Comment: request the agent to modify priority of target agent
+**********************************************************************************************/
+    int Agent_Msg::request_AP(int request, Task_Handle target_agent,int timeout, Task_Handle content){
+        Task_Handle AMS;
+        Agent_info *temp;
+
+        if(request==MODIFY){
+
+            /*Setting msg*/
+            msg.type=REQUEST;
+            msg.content_int=request;
+            msg.content_string=(String) content;
+            msg.target_agent=target_agent;
+            msg.sender_agent=Task_self();
+
+            /*Getting AP address:
+             * 1. Get the Agent info
+             * 2. Get the AMS address*/
+            temp= (Agent_info*) Task_getEnv(self_handle);
+            AMS=temp->AP;
+            send(AMS);
+
+            /*Waiting for answer*/
+            receive(timeout);
+
+            return msg.type;
+        }
+
+        else return REFUSE;
+    }
+
+/*********************************************************************************************
+* Class: Agent_Msg
+* Function: int request_AP(int request, Task_Handle target_agent,int timeout,int content)
+* Return type: Int
+* Comment: request the agent to modify priority of target agent
+**********************************************************************************************/
+    int Agent_Msg::request_AP(int request, Task_Handle target_agent,int timeout, int content){
+        Task_Handle AMS;
+        Agent_info *temp;
+
+        if(request==MODIFY_PRI){
+
+            /*Setting msg*/
+            msg.type=REQUEST;
+            msg.content_int=request;
+            msg.content_string=(String) content;
+            msg.target_agent=target_agent;
+            msg.sender_agent=Task_self();
+
+            /*Getting AP address:
+             * 1. Get the Agent info
+             * 2. Get the AMS address*/
+            temp= (Agent_info*) Task_getEnv(self_handle);
+            AMS=temp->AP;
+            send(AMS);
+
+            /*Waiting for answer*/
+            receive(timeout);
+
+            return msg.type;
+        }
+
+        else return REFUSE;
+    }
+
+    int Agent_Msg::request_AP(int request, Agent *a ,int timeout, int content){
+        return request_AP(request, a->get_AID(), timeout, content);
+    }
+/*********************************************************************************************
+* Class: Agent_Msg
+* Function: void Broadcast();
+* Return type: Int
+* Comment: request the agent to set
+**********************************************************************************************/
+    int Agent_Msg::broadcast(int timeout){
+        Task_Handle AMS;
+        Agent_info *temp;
+
+        msg.type=REQUEST;
+        msg.content_int=BROADCAST;
+        msg.target_agent=NULL;
+        msg.sender_agent=Task_self();
+
+        /*Getting AP address:
+         * 1. Get the Agent info
+         * 2. Get the AMS address*/
+        temp= (Agent_info*) Task_getEnv(self_handle);
+        AMS=temp->AP;
+        send(AMS);
+
+        /*Waiting for answer*/
+        receive(timeout);
+        return msg.type;
+
+    }
 
 };
 
