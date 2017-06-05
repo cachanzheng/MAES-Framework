@@ -9,8 +9,10 @@
 
 namespace MAES
 {
-
-#define AGENT_LIST_SIZE 32
+/*********************************************************************************************
+ *                                       DEFINITIONS                                         *
+*********************************************************************************************/
+#define AGENT_LIST_SIZE 64
 #define MAX_RECEIVERS   AGENT_LIST_SIZE-1
 
 /*********************************************************************************************
@@ -68,9 +70,13 @@ namespace MAES
 #define SUSPEND         0x2F
 #define MODIFY_PRI      0x30
 #define BROADCAST       0x31
+
 /*********************************************************************************************
+ *                                         TYPEDEF                                           *
+**********************************************************************************************
+*********************************************************************************************
 * Class: Agent_info
-* Comment: Struct containing information about the Agent;
+* Comment:  Struct containing information about the Agent;
 * Variables: String agent_name: Agent's name;
 *            Mailbox_Handle m: Agent associated mailbox
 *            Task_Handle AP: AP handle where the agent is registered;
@@ -90,6 +96,7 @@ namespace MAES
 *            Task_Handle Agent_Handle: List of all the agents contained in the AP. Limited
 *            by the number defined in AGENT_LIST_SIZE
 *            Task_handle AMS_aid: Handle of the AMS task
+*            int next_available: index of the available spot in the list
 **********************************************************************************************/
     typedef struct AP_Description{
         String name;
@@ -112,36 +119,55 @@ namespace MAES
           int content_int;
     }MsgObj;
 /*********************************************************************************************
-*  Unnamed namespace for using within namespace
+ *                                  Unnamed namespace                                        *
 **********************************************************************************************/
-  namespace{
+    namespace{
         class AMS_Services{
         public:
             AMS_Services();
-            AP_Description *get_AP();
-            bool search(Task_Handle aid);
+            /*Methods where user can override conditions*/
             int register_agent(Task_Handle aid);
-            int kill_agent(Task_Handle aid);
             int deregister_agent(Task_Handle aid);
+            int kill_agent(Task_Handle aid);
             bool suspend_agent(Task_Handle aid);
-            bool modify_agent(Task_Handle aid,Task_Handle new_AP);
             bool resume_agent(Task_Handle aid);
+            bool modify_agent(Task_Handle aid,Task_Handle new_AP);
             bool set_agent_pri(Task_Handle aid,int pri);
-            int get_mode(Task_Handle aid);
             void broadcast(MsgObj *msg);
 
-        private:
-            AP_Description AP;
+            /*Methods without user conditions*/
+            AP_Description *get_AP();
+            bool search(Task_Handle aid);
+            int get_mode(Task_Handle aid);
 
+        private:
+           AP_Description AP;
         };
-        void AMS_task(UArg arg0,UArg arg1);
+
+        void AMS_task(UArg arg0,UArg arg1);  //AMS_Task
     }
+/*********************************************************************************************
+* Class: USER_DEF_COND
+* Comment: Class to be overriden for user's own conditions for AMS.
+**********************************************************************************************/
+    class USER_DEF_COND{
+    public:
+        virtual bool register_cond();
+        virtual bool kill_cond();
+        virtual bool deregister_cond();
+        virtual bool suspend_cond();
+        virtual bool resume_cond();
+        virtual bool modify_cond();
+        virtual bool setpri_cond();
+        virtual bool broadcast_cond();
+    };
+
 /*********************************************************************************************
 * Class: Agent
 * Variables: Agent_info description;
 *            Task_handle aid: task handle to agent's task/behaviour. This is used as aid
 *            Task_FuncPtr: function of the agent's task/behaviour
-*             char task_stack[1024]: Default char task_stack
+*            char task_stack[1024]: Default char task_stack
 *
 * Comment: Agent construction class.
 *          Add lines in cfg file to use Mailbox module:
@@ -150,11 +176,11 @@ namespace MAES
     class Agent{
     public:
         /*Constructor*/
-        Agent(String name,
-              Task_FuncPtr b);
+        Agent(String name, Task_FuncPtr b);
 
         /*Methods*/
         bool init_agent();
+        bool init_agent(int priority);
         bool init_agent(int taskstackSize,int queueSize, int priority);
         bool init_agent(UArg arg0, UArg arg1);
         bool init_agent(int taskstackSize, int queueSize, int priority,UArg arg0,UArg arg1);
@@ -169,24 +195,28 @@ namespace MAES
         char task_stack[1024];
       };
 
-
 /*********************************************************************************************
+ *                                         CLASSES                                           *
+**********************************************************************************************
+*********************************************************************************************
 * Class:   Agent_Platform
 * Comment: API for Agent Management Services
-* Variables: char task_stack[1024]: default size if additional services of AMS is required
-*            int next_available: index of the Agent_Handle list where denotes the spot available
-*                                in the list
-*            AP_Description AP: Struct where contains the AP information.
+* Variables: AMS_Services: Contains all the private and public AMS services
+*            USER_DEF_COND cond: contains the default conditions for AMS private services.
+*            USER_DEF_cond ptr_cond: pointer to the USER_DEF_COND where contain the user
+*                                    defined functions.
+*            char task_stack[1024]: default size if additional services of AMS is required
 *            Agent_info description: Description of AMS task.
 **********************************************************************************************/
     class Agent_Platform{
     public:
         /*Constructor*/
         Agent_Platform(String name);
+        Agent_Platform(String name,USER_DEF_COND*user_cond);
 
     /*Methods*/
         bool init();
-        bool init(Task_FuncPtr action,int taskstackSize);
+        bool init(int taskstackSize);
 
         /*Services available for all agents*/
         bool search(Task_Handle aid);
@@ -195,23 +225,26 @@ namespace MAES
         void agent_yield();
         Task_Handle get_running_agent_aid();
         int get_mode(Task_Handle aid);
+        int get_mode(Agent *a);
         const Agent_info *get_Agent_description(Task_Handle aid);
         const Agent_info *get_Agent_description(Agent *a);
         const AP_Description *get_AP_description();
         Task_Handle get_AMS_AID();
-        int number_of_subscribers();
+        const Task_Handle* get_list_subscriber();
+        int get_number_subscribers();
 
     private:
         AMS_Services services;
+        USER_DEF_COND cond;
+        USER_DEF_COND *ptr_cond;
         char task_stack[1024];
         Agent_info description;
 
     };
-
 /*********************************************************************************************
 * Class: Agent_Msg
 * Comment: Predefined struct for msg object.
-* Variables: Task_Handle receivers: list of receivers
+* Variables: Task_Handle receivers[MAX_Receivers]: list of receivers
 *            int next_available: index of the receiver list where denotes the spot available
 *                                in the list
 *            Task_Handle self_handle: Contains info about the calling agent.
