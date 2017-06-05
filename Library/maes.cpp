@@ -363,10 +363,10 @@ namespace MAES{
                     }
                 }//End if
 
-                        else{
-                            msg.set_msg_type(NOT_UNDERSTOOD);
-                            //To do sent back message
-                        }
+                else{
+                    msg.set_msg_type(NOT_UNDERSTOOD);
+                    msg.send(msg.get_sender());
+                }
             }//finish while
         }
     }
