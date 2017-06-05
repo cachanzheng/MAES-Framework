@@ -635,7 +635,7 @@ namespace MAES{
 *                                  Class: Agent_Platform
 *
 **********************************************************************************************
-/*********************************************************************************************
+**********************************************************************************************
 * Class: Agent_Platform
 * Function: Agent_Platform Constructor
 * Comment: Initialize list of agents task handle and its environment to NULL.
@@ -804,6 +804,19 @@ namespace MAES{
     }
     int Agent_Platform:: get_mode(Agent *a){
         return get_mode(a->get_AID());
+    }
+/*********************************************************************************************
+* Class: Agent_Platform
+* Function: String get_agent_name
+* Return:  String
+* Comment: get agent's name
+**********************************************************************************************/
+    String Agent_Platform::get_agent_name(Task_Handle aid){
+        return Task_Handle_name(aid);
+    }
+
+    String Agent_Platform::get_agent_name(Agent *a){
+        return Task_Handle_name(a->get_AID());
     }
 /*********************************************************************************************
 * Class: Agent_Platform
@@ -1238,7 +1251,7 @@ namespace MAES{
 * Return type: Int
 * Comment: request the agent to set
 **********************************************************************************************/
-    int Agent_Msg::broadcast(int timeout){
+    int Agent_Msg::broadcast(int timeout, String content){
         Task_Handle AMS;
         Agent_info *temp;
 
@@ -1246,6 +1259,7 @@ namespace MAES{
         msg.content_int=BROADCAST;
         msg.target_agent=NULL;
         msg.sender_agent=Task_self();
+        msg.content_string=content;
 
         /*Getting AP address:
          * 1. Get the Agent info

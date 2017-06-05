@@ -67,25 +67,13 @@ void reading(UArg arg0, UArg arg1);
 void reading2(UArg arg0, UArg arg1);
 
 /*Constructing Agents*/
-Agent Reading("Reading Agent",reading);
-Agent Reading2("Reading2 Agent",reading2);
+Agent Reading("Agent 1",reading);
+Agent Reading2("Agent 2",reading2);
 Agent Writing("Writing Agent",writing);
 
+/*Constructing platform*/
+Agent_Platform AP("Texas Instruments");
 
-
-class test: public USER_DEF_COND{
-public:
-    bool register_cond(){
-       int a;
-       a=rand()%100;
-       System_printf("result: %i\n",a);
-       System_flush();
-       return a>20;
-    }
-};
-test test;
-/*Creating_Platform*/
-Agent_Platform AP("Texas Instruments",&test);
 /*
  *  ======== main ========
  */
@@ -101,10 +89,10 @@ int main()
     System_printf("Blinking Led Example with agents \n");
     System_flush();
 
+    /*Initialize*/
     Writing.init_agent();
     Reading2.init_agent();
     Reading.init_agent();
-
     AP.init();
 
     BIOS_start();
@@ -118,7 +106,7 @@ void reading(UArg arg0, UArg arg1)
     Agent_Msg msg;
     while(1) {
         msg.receive(BIOS_WAIT_FOREVER);
-        System_printf("Receiver: %s Sender: %s Received: %x \n", Task_Handle_name(AP.get_running_agent_aid()),Task_Handle_name(msg.get_sender()),msg.get_msg_type());
+        System_printf("Receiver: %s Sender: %s Received: %d \n", AP.get_agent_name(AP.get_running_agent_aid()),AP.get_agent_name(msg.get_sender()),(int)msg.get_msg_string());
         System_flush();
         GPIO_toggle(Board_LED0);
     }
@@ -130,7 +118,7 @@ void reading2(UArg arg0, UArg arg1)
     Agent_Msg msg;
     while(1) {
         msg.receive(BIOS_WAIT_FOREVER);
-        System_printf("Receiver: %s Sender: %s Received: %x \n", Task_Handle_name(AP.get_running_agent_aid()),Task_Handle_name(msg.get_sender()),msg.get_msg_type());
+        System_printf("Receiver: %s Sender: %s Received: %d \n", AP.get_agent_name(AP.get_running_agent_aid()),AP.get_agent_name(msg.get_sender()),(int)msg.get_msg_string());
         System_flush();
         GPIO_toggle(Board_LED1);
      }
@@ -141,27 +129,21 @@ void writing(UArg arg0, UArg arg1)
 
     Agent_Msg msg;
     int i=0;
-    const Task_Handle *t;
-    msg.request_AP(REGISTER, Reading2.get_AID(), BIOS_WAIT_FOREVER);
     msg.add_receiver(&Reading);
     msg.add_receiver(Reading2.get_AID());
-    t=AP.get_list_subscriber();
 
-    while (i<AP.get_number_subscribers()){
-        System_printf("%x \n",t[i]);
-        System_flush();
-        i++;
+    while(1) {
 
-    }
-    i=0;
-   while(1) {
-      msg.broadcast(BIOS_WAIT_FOREVER);
-      AP.agent_wait(500);
+      System_printf("------\n iteration %d:\n ",i);
+      System_flush();
+
+      if (i==10) msg.request_AP(DEREGISTER, Reading2.get_AID(), BIOS_WAIT_FOREVER);
+
+      msg.set_msg_string((String)i);
+      msg.send();
+      AP.agent_wait(250);
       i++;
-    //  msg.set_msg_type(i);
-
-
-    }
+     }
 
 }
 

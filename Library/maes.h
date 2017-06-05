@@ -119,7 +119,7 @@ namespace MAES
           int content_int;
     }MsgObj;
 /*********************************************************************************************
- *                                  Unnamed namespace                                        *
+ *                           Class and functions in Unnamed namespace                        *
 **********************************************************************************************/
     namespace{
         class AMS_Services{
@@ -146,7 +146,11 @@ namespace MAES
 
         void AMS_task(UArg arg0,UArg arg1);  //AMS_Task
     }
+
 /*********************************************************************************************
+ *                                         CLASSES                                           *
+**********************************************************************************************
+**********************************************************************************************
 * Class: USER_DEF_COND
 * Comment: Class to be overriden for user's own conditions for AMS.
 **********************************************************************************************/
@@ -196,9 +200,6 @@ namespace MAES
       };
 
 /*********************************************************************************************
- *                                         CLASSES                                           *
-**********************************************************************************************
-*********************************************************************************************
 * Class:   Agent_Platform
 * Comment: API for Agent Management Services
 * Variables: AMS_Services: Contains all the private and public AMS services
@@ -226,6 +227,8 @@ namespace MAES
         Task_Handle get_running_agent_aid();
         int get_mode(Task_Handle aid);
         int get_mode(Agent *a);
+        String get_agent_name(Task_Handle aid);
+        String get_agent_name(Agent *a);
         const Agent_info *get_Agent_description(Task_Handle aid);
         const Agent_info *get_Agent_description(Agent *a);
         const AP_Description *get_AP_description();
@@ -281,7 +284,7 @@ namespace MAES
         int request_AP(int request, Task_Handle target_agent,int timeout, Task_Handle content);//Modify
         int request_AP(int request, Task_Handle target_agent,int timeout, int content);
         int request_AP(int request, Agent *a,int timeout, int content);
-        int broadcast(int timeout);
+        int broadcast(int timeout, String content);
 
 
     private:
