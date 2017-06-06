@@ -9,6 +9,7 @@
 
 namespace MAES
 {
+typedef Task_Handle Agent;
 /*********************************************************************************************
  *                                       DEFINITIONS                                         *
 *********************************************************************************************/
@@ -79,13 +80,13 @@ namespace MAES
 * Comment:  Struct containing information about the Agent;
 * Variables: String agent_name: Agent's name;
 *            Mailbox_Handle m: Agent associated mailbox
-*            Task_Handle AP: AP handle where the agent is registered;
+*            Agent AP: AP handle where the agent is registered;
 *            int priority: Priority set by the user.
 **********************************************************************************************/
     typedef struct Agent_info{
         String agent_name;
         Mailbox_Handle mailbox_handle;
-        Task_Handle AP;
+        Agent AP;
         int priority;
     }Agent_info;
 
@@ -93,27 +94,26 @@ namespace MAES
 * Class: AP_Description
 * Comment: Contains information about the AP
 * Variables: String name: Name of the AP
-*            Task_Handle Agent_Handle: List of all the agents contained in the AP. Limited
+*            Agent Agent_Handle: List of all the agents contained in the AP. Limited
 *            by the number defined in AGENT_LIST_SIZE
-*            Task_handle AMS_aid: Handle of the AMS task
+*            Agent AMS_aid: Handle of the AMS task
 *            int next_available: index of the available spot in the list
 **********************************************************************************************/
     typedef struct AP_Description{
-        String name;
-        Task_Handle Agent_Handle[AGENT_LIST_SIZE];
-        Task_Handle AMS_aid;
+        Agent Agent_Handle[AGENT_LIST_SIZE];
+        Agent_info AMS_description;
         int next_available;
     }AP_Description;
 /*********************************************************************************************
 * Class: AP_Description
 * Variables: int msg_type: contain type according to FIPA ACL specification
 *            String body: string containing body of message
-*            Task_Handle handle: to receive information from other agents or to send info
+*            Agent handle: to receive information from other agents or to send info
 *                                to other agents
 **********************************************************************************************/
     typedef struct MsgObj{
-          Task_Handle sender_agent;
-          Task_Handle target_agent;
+          Agent sender_agent;
+          Agent target_agent;
           int type;
           String content_string;
           int content_int;
@@ -126,19 +126,19 @@ namespace MAES
         public:
             AMS_Services();
             /*Methods where user can override conditions*/
-            int register_agent(Task_Handle aid);
-            int deregister_agent(Task_Handle aid);
-            int kill_agent(Task_Handle aid);
-            bool suspend_agent(Task_Handle aid);
-            bool resume_agent(Task_Handle aid);
-            bool modify_agent(Task_Handle aid,Task_Handle new_AP);
-            bool set_agent_pri(Task_Handle aid,int pri);
+            int register_agent(Agent aid);
+            int deregister_agent(Agent aid);
+            int kill_agent(Agent aid);
+            bool suspend_agent(Agent aid);
+            bool resume_agent(Agent aid);
+            bool modify_agent(Agent aid,Agent new_AP);
+            bool set_agent_pri(Agent aid,int pri);
             void broadcast(MsgObj *msg);
 
             /*Methods without user conditions*/
             AP_Description *get_AP();
-            bool search(Task_Handle aid);
-            int get_mode(Task_Handle aid);
+            bool search(Agent aid);
+            int get_mode(Agent aid);
 
         private:
            AP_Description AP;
@@ -169,7 +169,7 @@ namespace MAES
 /*********************************************************************************************
 * Class: Agent
 * Variables: Agent_info description;
-*            Task_handle aid: task handle to agent's task/behaviour. This is used as aid
+*            Agent aid: task handle to agent's task/behaviour. This is used as aid
 *            Task_FuncPtr: function of the agent's task/behaviour
 *            char task_stack[1024]: Default char task_stack
 *
@@ -177,25 +177,20 @@ namespace MAES
 *          Add lines in cfg file to use Mailbox module:
 *          var Mailbox = xdc.useModule('ti.sysbios.knl.Mailbox')
 **********************************************************************************************/
-    class Agent{
+    class Agent_Struct{
     public:
         /*Constructor*/
-        Agent(String name, Task_FuncPtr b);
+        Agent_Struct(String name);
 
         /*Methods*/
-        bool init_agent();
-        bool init_agent(int priority);
-        bool init_agent(int taskstackSize,int queueSize, int priority);
-        bool init_agent(UArg arg0, UArg arg1);
-        bool init_agent(int taskstackSize, int queueSize, int priority,UArg arg0,UArg arg1);
-        bool destroy_agent();
-        Task_Handle get_AID();
-        bool isRegistered();
+        Agent create(Task_FuncPtr behaviour);
+        Agent create(Task_FuncPtr behaviour,int priority);
+        Agent create(Task_FuncPtr behaviour,int taskstackSize,int queueSize, int priority);
+        Agent create(Task_FuncPtr behaviour,UArg arg0, UArg arg1);
+        Agent create(Task_FuncPtr behaviour,int taskstackSize, int queueSize, int priority,UArg arg0,UArg arg1);
 
     private:
         Agent_info description;
-        Task_Handle aid;
-        Task_FuncPtr behaviour;
         char task_stack[1024];
       };
 
@@ -220,37 +215,28 @@ namespace MAES
         bool init(int taskstackSize);
 
         /*Services available for all agents*/
-        bool search(Task_Handle aid);
-        bool search(Agent *a);
+        bool search(Agent aid);
         void agent_wait(Uint32 ticks);
         void agent_yield();
-        Task_Handle get_running_agent_aid();
-        int get_mode(Task_Handle aid);
-        int get_mode(Agent *a);
-        String get_agent_name(Task_Handle aid);
-        String get_agent_name(Agent *a);
-        const Agent_info *get_Agent_description(Task_Handle aid);
-        const Agent_info *get_Agent_description(Agent *a);
+        Agent get_running_agent();
+        int get_mode(Agent aid);
+        const Agent_info *get_Agent_description(Agent aid);
         const AP_Description *get_AP_description();
-        Task_Handle get_AMS_AID();
-        const Task_Handle* get_list_subscriber();
-        int get_number_subscribers();
+        Agent get_AMS_Agent();
 
     private:
         AMS_Services services;
         USER_DEF_COND cond;
         USER_DEF_COND *ptr_cond;
         char task_stack[1024];
-        Agent_info description;
-
     };
 /*********************************************************************************************
 * Class: Agent_Msg
 * Comment: Predefined struct for msg object.
-* Variables: Task_Handle receivers[MAX_Receivers]: list of receivers
+* Variables: Agent receivers[MAX_Receivers]: list of receivers
 *            int next_available: index of the receiver list where denotes the spot available
 *                                in the list
-*            Task_Handle self_handle: Contains info about the calling agent.
+*            Agent self_handle: Contains info about the calling agent.
 *            Mailbox_handle self_mailbox: Contains the mailbox associated to self_handle task
 *            MsgObj msg: To be used to receive and send
 **********************************************************************************************/
@@ -260,15 +246,12 @@ namespace MAES
         Agent_Msg();
 
         /*Methods*/
-        int add_receiver(Task_Handle aid_receiver);
-        int add_receiver(Agent *a);
-        int remove_receiver(Task_Handle aid_receiver);
-        int remove_receiver(Agent *a);
+        int add_receiver(Agent aid_receiver);
+        int remove_receiver(Agent aid_receiver);
         void clear_all_receiver();
         void refresh_list();
         bool receive(Uint32 timeout);
-        int send(Task_Handle aid_receiver);
-        int send(Agent *a);
+        int send(Agent aid_receiver);
         bool send();
         void set_msg_type(int type);
         void set_msg_string(String body);
@@ -277,23 +260,22 @@ namespace MAES
         int get_msg_type();
         String get_msg_string();
         int get_msg_int();
-        Task_Handle get_sender();
-        Task_Handle get_target_agent();
-        int request_AP(int request, Task_Handle target_agent,int timeout);
-        int request_AP(int request, Agent *a,int timeout);
-        int request_AP(int request, Task_Handle target_agent,int timeout, Task_Handle content);//Modify
-        int request_AP(int request, Task_Handle target_agent,int timeout, int content);
-        int request_AP(int request, Agent *a,int timeout, int content);
+        Agent get_sender();
+        Agent get_target_agent();
+        int request_AP(int request, Agent target_agent,int timeout);
+        int request_AP(int request, Agent target_agent,int timeout, Agent content);//Modify
+        int request_AP(int request, Agent target_agent,int timeout, int content);
         int broadcast(int timeout, String content);
 
 
     private:
-        Task_Handle receivers[MAX_RECEIVERS];
-        int next_available;
-        Task_Handle self_handle;
-        Mailbox_Handle self_mailbox;
-        bool isRegistered(Task_Handle aid);
         MsgObj msg;
+        Agent receivers[MAX_RECEIVERS];
+        int next_available;
+        Agent self_handle;
+        Mailbox_Handle self_mailbox;
+        bool isRegistered(Agent aid);
+        Mailbox_Handle get_mailbox(Agent aid);
 
    };
 

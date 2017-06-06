@@ -66,19 +66,32 @@ void writing(UArg arg0, UArg arg1);
 void reading(UArg arg0, UArg arg1);
 void reading2(UArg arg0, UArg arg1);
 
+class test:public USER_DEF_COND{
+    bool register_cond(){
+        int i=0;
+        i=rand() %100;
+        System_printf("result %d",i);
+        return i>18;
+    }
+};
+
+test test;
+
 /*Constructing Agents*/
-Agent Reading("Agent 1",reading);
-Agent Reading2("Agent 2",reading2);
-Agent Writing("Writing Agent",writing);
+Agent_Struct Reading_Struct("Agent 1");
+Agent_Struct Reading2_Struct("Agent 2");
+Agent_Struct Writing_Struct("Writing Agent");
 
 /*Constructing platform*/
-Agent_Platform AP("Texas Instruments");
-
+Agent_Platform AP("Texas Instruments",&test);
+Agent Writing,Reading,Reading2;
 /*
  *  ======== main ========
  */
 int main()
 {
+
+
     /* Call board init functions */
     Board_initGeneral();
     Board_initGPIO();
@@ -90,11 +103,10 @@ int main()
     System_flush();
 
     /*Initialize*/
-    Writing.init_agent();
-    Reading2.init_agent();
-    Reading.init_agent();
+    Writing=Writing_Struct.create(writing);
+    Reading=Reading_Struct.create(reading);
+    Reading2=Reading2_Struct.create(reading2);
     AP.init();
-
     BIOS_start();
     return (0);
 
@@ -102,11 +114,10 @@ int main()
 
 void reading(UArg arg0, UArg arg1)
 {
-
     Agent_Msg msg;
     while(1) {
         msg.receive(BIOS_WAIT_FOREVER);
-        System_printf("Receiver: %s Sender: %s Received: %d \n", AP.get_agent_name(AP.get_running_agent_aid()),AP.get_agent_name(msg.get_sender()),(int)msg.get_msg_string());
+        System_printf("Receiver: %s Sender: %s Received: %d \n", AP.get_Agent_description(msg.get_target_agent())->agent_name,AP.get_Agent_description(msg.get_sender())->agent_name,(int)msg.get_msg_string());
         System_flush();
         GPIO_toggle(Board_LED0);
     }
@@ -118,7 +129,7 @@ void reading2(UArg arg0, UArg arg1)
     Agent_Msg msg;
     while(1) {
         msg.receive(BIOS_WAIT_FOREVER);
-        System_printf("Receiver: %s Sender: %s Received: %d \n", AP.get_agent_name(AP.get_running_agent_aid()),AP.get_agent_name(msg.get_sender()),(int)msg.get_msg_string());
+        System_printf("Receiver: %s Sender: %s Received: %d \n", AP.get_Agent_description(msg.get_target_agent())->agent_name,AP.get_Agent_description(msg.get_sender())->agent_name,(int)msg.get_msg_string());
         System_flush();
         GPIO_toggle(Board_LED1);
      }
@@ -129,16 +140,20 @@ void writing(UArg arg0, UArg arg1)
 
     Agent_Msg msg;
     int i=0;
-    msg.add_receiver(&Reading);
-    msg.add_receiver(Reading2.get_AID());
+
+    msg.add_receiver(Reading);
+    msg.add_receiver(Reading2);
 
     while(1) {
 
       System_printf("------\n iteration %d:\n ",i);
       System_flush();
 
-      if (i==10) msg.request_AP(DEREGISTER, Reading2.get_AID(), BIOS_WAIT_FOREVER);
-
+      if (i==5) msg.request_AP(DEREGISTER, Reading2, BIOS_WAIT_FOREVER);
+      if (i==10) {
+          msg.request_AP(REGISTER, Reading2, BIOS_WAIT_FOREVER);
+          msg.add_receiver(Reading2);
+      }
       msg.set_msg_string((String)i);
       msg.send();
       AP.agent_wait(250);
