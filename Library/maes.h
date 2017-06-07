@@ -6,15 +6,14 @@
 #include <xdc/runtime/System.h>
 #include <string.h>
 
-
 namespace MAES
 {
-typedef Task_Handle Agent;
 /*********************************************************************************************
  *                                       DEFINITIONS                                         *
 *********************************************************************************************/
 #define AGENT_LIST_SIZE 64
 #define MAX_RECEIVERS   AGENT_LIST_SIZE-1
+#define BEHAVIOUR_LIST_SIZE 8
 
 /*********************************************************************************************
 *   Define Agent Mode
@@ -66,16 +65,16 @@ typedef Task_Handle Agent;
 #define REGISTER        0x2A
 #define DEREGISTER      0x2B
 #define KILL            0x2C
-#define MODIFY          0x2D
-#define RESUME          0x2E
-#define SUSPEND         0x2F
-#define MODIFY_PRI      0x30
-#define BROADCAST       0x31
+#define RESUME          0x2D
+#define SUSPEND         0x2E
+#define MODIFY          0x2F
+#define BROADCAST       0x30
 
 /*********************************************************************************************
  *                                         TYPEDEF                                           *
-**********************************************************************************************
-*********************************************************************************************
+**********************************************************************************************/
+typedef Task_Handle Agent;
+/*********************************************************************************************
 * Class: Agent_info
 * Comment:  Struct containing information about the Agent;
 * Variables: String agent_name: Agent's name;
@@ -93,10 +92,9 @@ typedef Task_Handle Agent;
 /*********************************************************************************************
 * Class: AP_Description
 * Comment: Contains information about the AP
-* Variables: String name: Name of the AP
-*            Agent Agent_Handle: List of all the agents contained in the AP. Limited
+* Variables: Agent Agent_Handle: List of all the agents contained in the AP. Limited
 *            by the number defined in AGENT_LIST_SIZE
-*            Agent AMS_aid: Handle of the AMS task
+*            Agent_info: Struct that contains all the information of the AMS agent
 *            int next_available: index of the available spot in the list
 **********************************************************************************************/
     typedef struct AP_Description{
@@ -105,11 +103,12 @@ typedef Task_Handle Agent;
         int next_available;
     }AP_Description;
 /*********************************************************************************************
-* Class: AP_Description
-* Variables: int msg_type: contain type according to FIPA ACL specification
-*            String body: string containing body of message
-*            Agent handle: to receive information from other agents or to send info
-*                                to other agents
+* Class: MsgObj
+* Variables: Agent sender_agent: Agent sending the message
+*            Agent target_agent: Destination agent
+*            type: Type of message
+*            String content_string: Content of the message in string format
+*            int content_int: Content of the message in int format
 **********************************************************************************************/
     typedef struct MsgObj{
           Agent sender_agent;
@@ -131,8 +130,7 @@ typedef Task_Handle Agent;
             int kill_agent(Agent aid);
             bool suspend_agent(Agent aid);
             bool resume_agent(Agent aid);
-            bool modify_agent(Agent aid,Agent new_AP);
-            bool set_agent_pri(Agent aid,int pri);
+            bool modify_agent_pri(Agent aid,int pri);
             void broadcast(MsgObj *msg);
 
             /*Methods without user conditions*/
@@ -162,7 +160,6 @@ typedef Task_Handle Agent;
         virtual bool suspend_cond();
         virtual bool resume_cond();
         virtual bool modify_cond();
-        virtual bool setpri_cond();
         virtual bool broadcast_cond();
     };
 
@@ -263,10 +260,8 @@ typedef Task_Handle Agent;
         Agent get_sender();
         Agent get_target_agent();
         int request_AP(int request, Agent target_agent,int timeout);
-        int request_AP(int request, Agent target_agent,int timeout, Agent content);//Modify
         int request_AP(int request, Agent target_agent,int timeout, int content);
         int broadcast(int timeout, String content);
-
 
     private:
         MsgObj msg;
@@ -277,8 +272,31 @@ typedef Task_Handle Agent;
         bool isRegistered(Agent aid);
         Mailbox_Handle get_mailbox(Agent aid);
 
-   };
+    };
+/*********************************************************************************************
+ *                               BEHAVIOUR CLASSES                                           *
+**********************************************************************************************/
+    class Generic_Behaviour{
+    public:
+        Generic_Behaviour();
+        Agent_Msg msg;
+        virtual void action()=0;
+        virtual bool done()=0;
+        virtual void setup();
+        void execute();
+    };
 
+    class OneShotBehaviour:public Generic_Behaviour{
+    public:
+        OneShotBehaviour();
+        virtual void action()=0;
+        virtual bool done();
+    };
 
-
+    class CyclicBehaviour:public Generic_Behaviour{
+    public:
+        CyclicBehaviour();
+        virtual void action()=0;
+        virtual bool done();
+    };
 }

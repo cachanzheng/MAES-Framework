@@ -65,32 +65,47 @@ using namespace MAES;
 void writing(UArg arg0, UArg arg1);
 void reading(UArg arg0, UArg arg1);
 void reading2(UArg arg0, UArg arg1);
+void function(UArg arg0, UArg arg1);
 
-class test:public USER_DEF_COND{
-    bool register_cond(){
-        int i=0;
-        i=rand() %100;
-        System_printf("result %d",i);
-        return i>18;
-    }
-};
-
-test test;
+/*Constructing platform*/
+Agent_Platform AP("Texas Instruments");
+Agent Writing,Reading,Reading2;
 
 /*Constructing Agents*/
 Agent_Struct Reading_Struct("Agent 1");
 Agent_Struct Reading2_Struct("Agent 2");
 Agent_Struct Writing_Struct("Writing Agent");
 
-/*Constructing platform*/
-Agent_Platform AP("Texas Instruments",&test);
-Agent Writing,Reading,Reading2;
+class behaviours:public OneShotBehaviour{
+public:
+
+    void setup(){
+        msg.add_receiver(Reading);
+        msg.add_receiver(Reading2);
+    }
+    void action(){
+
+        msg.set_msg_string((String)55);
+        msg.send();
+        System_printf("hello\n");
+        System_flush();
+        Task_sleep(500);
+    }
+};
+
+void function(UArg arg0, UArg arg1){
+    behaviours b;
+    behaviours a;
+    b.execute();
+    a.execute();
+};
+
+
 /*
  *  ======== main ========
  */
 int main()
 {
-
 
     /* Call board init functions */
     Board_initGeneral();
@@ -103,7 +118,7 @@ int main()
     System_flush();
 
     /*Initialize*/
-    Writing=Writing_Struct.create(writing);
+    Writing=Writing_Struct.create(function);
     Reading=Reading_Struct.create(reading);
     Reading2=Reading2_Struct.create(reading2);
     AP.init();
@@ -135,30 +150,4 @@ void reading2(UArg arg0, UArg arg1)
      }
 }
 
-void writing(UArg arg0, UArg arg1)
-{
-
-    Agent_Msg msg;
-    int i=0;
-
-    msg.add_receiver(Reading);
-    msg.add_receiver(Reading2);
-
-    while(1) {
-
-      System_printf("------\n iteration %d:\n ",i);
-      System_flush();
-
-      if (i==5) msg.request_AP(DEREGISTER, Reading2, BIOS_WAIT_FOREVER);
-      if (i==10) {
-          msg.request_AP(REGISTER, Reading2, BIOS_WAIT_FOREVER);
-          msg.add_receiver(Reading2);
-      }
-      msg.set_msg_string((String)i);
-      msg.send();
-      AP.agent_wait(250);
-      i++;
-     }
-
-}
 
