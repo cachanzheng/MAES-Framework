@@ -69,7 +69,7 @@ void function(UArg arg0, UArg arg1);
 
 /*Constructing platform*/
 Agent_Platform AP("Texas Instruments");
-Agent Writing,Reading,Reading2;
+Agent_AID Writing,Reading,Reading2;
 
 /*Constructing Agents*/
 Agent_Struct Reading_Struct("Agent 1");
@@ -90,14 +90,15 @@ public:
         System_printf("hello\n");
         System_flush();
         Task_sleep(500);
+      //  msg.request_AP(DEREGISTER, Task_self(), BIOS_WAIT_FOREVER);
     }
 };
 
 void function(UArg arg0, UArg arg1){
     behaviours b;
-    behaviours a;
     b.execute();
-    a.execute();
+   // AP.agent_wait(500);
+
 };
 
 
@@ -119,7 +120,7 @@ int main()
 
     /*Initialize*/
     Writing=Writing_Struct.create(function);
-    Reading=Reading_Struct.create(reading);
+    Reading=Reading_Struct.create(reading,2);
     Reading2=Reading2_Struct.create(reading2);
     AP.init();
     BIOS_start();

@@ -41,7 +41,7 @@ namespace MAES{
 ***********************************************************************************************/
     bool Agent_Platform::init(){
 
-        Agent temp;
+        Agent_AID temp;
         Mailbox_Params mbxParams;
         Task_Params taskParams;
         AP_Description *ptr_AP=services.get_AP();
@@ -55,7 +55,7 @@ namespace MAES{
 
         /*Creating task*/
         Task_Params_init(&taskParams);
-        taskParams.stack=task_stack;
+        taskParams.stack=services.task_stack;
         taskParams.stackSize = 1024;
         taskParams.priority = Task_numPriorities-1;//Assigning max priority
         taskParams.instance->name=ptr_AP->AMS_description.agent_name;
@@ -85,7 +85,7 @@ namespace MAES{
 **********************************************************************************************/
     bool Agent_Platform::init(int taskstackSize){
 
-        Agent temp;
+        Agent_AID temp;
         Mailbox_Params mbxParams;
         Task_Params taskParams;
         AP_Description *ptr_AP=services.get_AP();
@@ -127,7 +127,7 @@ namespace MAES{
 * Return: Bool
 * Comment: search agent in Platform by agent aid
 **********************************************************************************************/
-    bool Agent_Platform::search(Agent aid){
+    bool Agent_Platform::agent_search(Agent_AID aid){
         return services.search(aid);
     }
 /*********************************************************************************************
@@ -150,22 +150,32 @@ namespace MAES{
         Task_yield();
     }
 /*********************************************************************************************
+* Class: Agent_Platform
+* Function: void agent_yield()
+* Return type: NULL
+* Comments: It yields the processor to another readied agent of equal priority.
+*           It lower priorities are on readied, the current task won't be preempted
+*********************************************************************************************/
+    void Agent_Platform::agent_exit(){
+        Task_exit();
+    }
+/*********************************************************************************************
 * Class:Agent_Platform
 * Function: get_running_agent()
 * Return type: NULL
 * Comments: Returns aid of current running agent
 *********************************************************************************************/
-    Agent Agent_Platform::get_running_agent(){
+    Agent_AID Agent_Platform::get_running_agent(){
         return Task_self();
     }
 /*********************************************************************************************
 * Class: Agent_Platform
-* Function:void get_mode
+* Function:void get_state
 * Return:  NULL
 * Comment: get running mode of agent
 **********************************************************************************************/
-    int Agent_Platform:: get_mode(Agent aid){
-        return services.get_mode(aid);
+    int Agent_Platform:: get_state(Agent_AID aid){
+        return services.get_state(aid);
     }
 /*********************************************************************************************
 * Class: Agent_Platform
@@ -174,7 +184,7 @@ namespace MAES{
 * Comment: Returns description of an agent. Returns copy instead of pointer since pointer
 *          can override the information.
 **********************************************************************************************/
-    const Agent_info *Agent_Platform::get_Agent_description(Agent aid){
+    const Agent_info *Agent_Platform::get_Agent_description(Agent_AID aid){
         Agent_info *description;
         description=(Agent_info *)Task_getEnv(aid);
         return description;
@@ -196,7 +206,7 @@ namespace MAES{
 * Return: Task Handle of the AMS
 * Comment: returns AMS task handle in case that exists
 **********************************************************************************************/
-    Agent Agent_Platform::get_AMS_Agent(){
+    Agent_AID Agent_Platform::get_AMS_Agent(){
         return services.get_AP()->AMS_description.AP;
     }
 
@@ -219,9 +229,9 @@ namespace MAES{
 **********************************************************************************************/
         AMS_Services::AMS_Services(){
             int i=0;
-            AP.next_available=0;
+            AP.subscribers=0;
             while (i<AGENT_LIST_SIZE){
-                AP.Agent_Handle[i]=(Agent) NULL;
+                AP.Agent_Handle[i]=(Agent_AID) NULL;
                 Task_setEnv(AP.Agent_Handle[i],NULL);
                 i++;
             }
@@ -231,16 +241,16 @@ namespace MAES{
 * Function: int register_agent(Agent aid)
 * Comment: Register agent to the platform only if it is unique by agent's task
 **********************************************************************************************/
-        int AMS_Services::register_agent(Agent aid){
+        int AMS_Services::register_agent(Agent_AID aid){
             if (aid==NULL) return HANDLE_NULL;
 
             if (!search(aid)){
-                if(AP.next_available<AGENT_LIST_SIZE){
+                if(AP.subscribers<AGENT_LIST_SIZE){
                     Agent_info *description;
                     description=(Agent_info *)Task_getEnv(aid);
                     description->AP=AP.AMS_description.AP;
-                    AP.Agent_Handle[AP.next_available]=aid;
-                    AP.next_available++;
+                    AP.Agent_Handle[AP.subscribers]=aid;
+                    AP.subscribers++;
                     Task_setPri(aid, description->priority);
                     return NO_ERROR;
                 }
@@ -254,7 +264,7 @@ namespace MAES{
 * Comment: Deregister agent on the platform by handle. It searches inside of the list, when found,
 *          the rest of the list is shifted to the right and the agent is removed.
 **********************************************************************************************/
-        int AMS_Services::deregister_agent(Agent aid){
+        int AMS_Services::deregister_agent(Agent_AID aid){
             int i=0;
             while(i<AGENT_LIST_SIZE){
                   if(AP.Agent_Handle[i]==aid){
@@ -268,7 +278,7 @@ namespace MAES{
                           i++;
                       }
                       AP.Agent_Handle[AGENT_LIST_SIZE-1]=NULL;
-                      AP.next_available--;
+                      AP.subscribers--;
                       break;
                   }
                   i++;
@@ -284,7 +294,7 @@ namespace MAES{
 * Comment: Kill agent on the platform. It deregisters the agent first then it delete the
 *           handles by agent's handle
 **********************************************************************************************/
-        int AMS_Services::kill_agent(Agent aid){
+        int AMS_Services::kill_agent(Agent_AID aid){
             int error;
             error=deregister_agent(aid);
 
@@ -306,7 +316,7 @@ namespace MAES{
 * Return:  NULL
 * Comment: suspend_agent Agent. Set it to inactive by setting priority to -1
 **********************************************************************************************/
-        bool AMS_Services::suspend_agent(Agent aid){
+        bool AMS_Services::suspend_agent(Agent_AID aid){
             if(search(aid)) {
                 Task_setPri(aid, -1);
                 return true;
@@ -319,7 +329,7 @@ namespace MAES{
 * Return:  NULL
 * Comment: Restore Agent.
 **********************************************************************************************/
-       bool AMS_Services::resume_agent(Agent aid){
+       bool AMS_Services::resume_agent(Agent_AID aid){
             if(search(aid)) {
                 Agent_info *description;
                 description=(Agent_info *)Task_getEnv(aid);
@@ -334,8 +344,9 @@ namespace MAES{
 * Return: Task Handle of the AMS
 * Comment: returns if was successful
 **********************************************************************************************/
-       bool AMS_Services::modify_agent_pri(Agent aid,int pri){
+       bool AMS_Services::modify_agent_pri(Agent_AID aid,int pri){
             if (search(aid)){
+                if (pri>=Task_numPriorities-1) pri=Task_numPriorities-2;
                 Agent_info *description=(Agent_info *)Task_getEnv(aid);
                 Task_setPri(aid,pri);
                 description->priority=pri;
@@ -352,7 +363,7 @@ namespace MAES{
       void AMS_Services::broadcast(MsgObj *msg){
           Agent_info * description;
           int i=0;
-          while(i<AP.next_available){
+          while(i<AP.subscribers){
               if(msg->sender_agent!=AP.Agent_Handle[i]){
                   description=(Agent_info*)Task_getEnv(AP.Agent_Handle[i]);
                   Mailbox_post(description->mailbox_handle, (xdc_Ptr)msg, BIOS_NO_WAIT);
@@ -373,27 +384,27 @@ namespace MAES{
 * Function:  bool search();
 * Return: Bool
 * Comment: Search AID within list and return true if found.
-*          next_available is used instead of AGENT_LIST_SIZE since it will optimize
+*          subscribers is used instead of AGENT_LIST_SIZE since it will optimize
 *          search
 **********************************************************************************************/
-      bool AMS_Services::search(Agent aid){
+      bool AMS_Services::search(Agent_AID aid){
           int i=0;
 
-            while(i<AP.next_available){
+            while(i<AP.subscribers){
                 if (AP.Agent_Handle[i]==aid) break;
                 i++;
             }
 
-            if (i==AP.next_available) return false;
+            if (i==AP.subscribers) return false;
             else return true;
      }
 /*********************************************************************************************
 * Class: AMS_Services
-* Function:void get_mode
+* Function:void get_state
 * Return:  NULL
 * Comment: get running mode of agent
 **********************************************************************************************/
-     int AMS_Services:: get_mode(Agent aid){
+     int AMS_Services:: get_state(Agent_AID aid){
          if(search(aid)){
              Task_Mode mode;
              mode=Task_getMode(aid);

@@ -20,9 +20,9 @@ namespace MAES{
  *           struct is stored in task's environment variable.
  *           Priority set to -1, only set when the agent is registered
 *********************************************************************************************/
-    Agent Agent_Struct::create(Task_FuncPtr behaviour){
+    Agent_AID Agent_Struct::create(Task_FuncPtr behaviour){
 
-        Agent aid;
+        Agent_AID aid;
         Task_Params taskParams;
         Mailbox_Params mbxParams;
 
@@ -52,12 +52,13 @@ namespace MAES{
  *           struct is stored in task's environment variable.
  *           Priority set to -1, only set when the agent is registered
 *********************************************************************************************/
-   Agent Agent_Struct::create(Task_FuncPtr behaviour,int priority){
+   Agent_AID Agent_Struct::create(Task_FuncPtr behaviour,int priority){
 
-        Agent aid;
+        Agent_AID aid;
         Task_Params taskParams;
         Mailbox_Params mbxParams;
 
+        if (priority>=Task_numPriorities-1) priority=Task_numPriorities-2;
         description.AP=NULL;
         description.priority= priority;
 
@@ -86,12 +87,13 @@ namespace MAES{
  *           Be aware of heap size
  *           Priority set to -1, only set when the agent is registered
 *********************************************************************************************/
-    Agent Agent_Struct::create(Task_FuncPtr behaviour,int taskstackSize, int queueSize, int priority){
+    Agent_AID Agent_Struct::create(Task_FuncPtr behaviour,int taskstackSize, int queueSize, int priority){
 
-        Agent aid;
+        Agent_AID aid;
         Task_Params taskParams;
         Mailbox_Params mbxParams;
 
+        if (priority>=Task_numPriorities-1) priority=Task_numPriorities-2;
         description.AP=NULL;
         description.priority=priority;
 
@@ -120,9 +122,9 @@ namespace MAES{
 *           This init is with user custom arguments.
 *           Priority set to -1, only set when the agent is registered
 *********************************************************************************************/
-    Agent Agent_Struct::create(Task_FuncPtr behaviour,UArg arg0, UArg arg1){
+    Agent_AID Agent_Struct::create(Task_FuncPtr behaviour,UArg arg0, UArg arg1){
 
-        Agent aid;
+        Agent_AID aid;
         Task_Params taskParams;
         Mailbox_Params mbxParams;
 
@@ -155,9 +157,9 @@ namespace MAES{
 *           This init is with user custom arguments, task stack size, queue size and priority.
 *           Be aware of heap size. Priority set to -1, only set when the agent is registered
 *********************************************************************************************/
-    Agent Agent_Struct::create(Task_FuncPtr behaviour,int taskstackSize, int queueSize, int priority, UArg arg0, UArg arg1){
+    Agent_AID Agent_Struct::create(Task_FuncPtr behaviour,int taskstackSize, int queueSize, int priority, UArg arg0, UArg arg1){
 
-        Agent aid;
+        Agent_AID aid;
         Task_Params taskParams;
         Mailbox_Params mbxParams;
 

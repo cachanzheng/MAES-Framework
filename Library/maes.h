@@ -73,7 +73,7 @@ namespace MAES
 /*********************************************************************************************
  *                                         TYPEDEF                                           *
 **********************************************************************************************/
-typedef Task_Handle Agent;
+typedef Task_Handle Agent_AID;
 /*********************************************************************************************
 * Class: Agent_info
 * Comment:  Struct containing information about the Agent;
@@ -85,7 +85,7 @@ typedef Task_Handle Agent;
     typedef struct Agent_info{
         String agent_name;
         Mailbox_Handle mailbox_handle;
-        Agent AP;
+        Agent_AID AP;
         int priority;
     }Agent_info;
 
@@ -95,12 +95,12 @@ typedef Task_Handle Agent;
 * Variables: Agent Agent_Handle: List of all the agents contained in the AP. Limited
 *            by the number defined in AGENT_LIST_SIZE
 *            Agent_info: Struct that contains all the information of the AMS agent
-*            int next_available: index of the available spot in the list
+*            int subscribers: index of the available spot in the list
 **********************************************************************************************/
     typedef struct AP_Description{
-        Agent Agent_Handle[AGENT_LIST_SIZE];
         Agent_info AMS_description;
-        int next_available;
+        Agent_AID Agent_Handle[AGENT_LIST_SIZE];
+        int subscribers;
     }AP_Description;
 /*********************************************************************************************
 * Class: MsgObj
@@ -111,8 +111,8 @@ typedef Task_Handle Agent;
 *            int content_int: Content of the message in int format
 **********************************************************************************************/
     typedef struct MsgObj{
-          Agent sender_agent;
-          Agent target_agent;
+          Agent_AID sender_agent;
+          Agent_AID target_agent;
           int type;
           String content_string;
           int content_int;
@@ -123,23 +123,26 @@ typedef Task_Handle Agent;
     namespace{
         class AMS_Services{
         public:
+            /*Constructor*/
             AMS_Services();
             /*Methods where user can override conditions*/
-            int register_agent(Agent aid);
-            int deregister_agent(Agent aid);
-            int kill_agent(Agent aid);
-            bool suspend_agent(Agent aid);
-            bool resume_agent(Agent aid);
-            bool modify_agent_pri(Agent aid,int pri);
+            int register_agent(Agent_AID aid);
+            int deregister_agent(Agent_AID aid);
+            int kill_agent(Agent_AID aid);
+            bool suspend_agent(Agent_AID aid);
+            bool resume_agent(Agent_AID aid);
+            bool modify_agent_pri(Agent_AID aid,int pri);
             void broadcast(MsgObj *msg);
 
             /*Methods without user conditions*/
             AP_Description *get_AP();
-            bool search(Agent aid);
-            int get_mode(Agent aid);
+            bool search(Agent_AID aid);
+            int get_state(Agent_AID aid);
 
-        private:
-           AP_Description AP;
+            /*Other variables*/
+            char task_stack[1024];
+            AP_Description AP;
+
         };
 
         void AMS_task(UArg arg0,UArg arg1);  //AMS_Task
@@ -164,7 +167,7 @@ typedef Task_Handle Agent;
     };
 
 /*********************************************************************************************
-* Class: Agent
+* Class: Agent_Struct
 * Variables: Agent_info description;
 *            Agent aid: task handle to agent's task/behaviour. This is used as aid
 *            Task_FuncPtr: function of the agent's task/behaviour
@@ -180,16 +183,16 @@ typedef Task_Handle Agent;
         Agent_Struct(String name);
 
         /*Methods*/
-        Agent create(Task_FuncPtr behaviour);
-        Agent create(Task_FuncPtr behaviour,int priority);
-        Agent create(Task_FuncPtr behaviour,int taskstackSize,int queueSize, int priority);
-        Agent create(Task_FuncPtr behaviour,UArg arg0, UArg arg1);
-        Agent create(Task_FuncPtr behaviour,int taskstackSize, int queueSize, int priority,UArg arg0,UArg arg1);
+        Agent_AID create(Task_FuncPtr behaviour);
+        Agent_AID create(Task_FuncPtr behaviour,int priority);
+        Agent_AID create(Task_FuncPtr behaviour,int taskstackSize,int queueSize, int priority);
+        Agent_AID create(Task_FuncPtr behaviour,UArg arg0, UArg arg1);
+        Agent_AID create(Task_FuncPtr behaviour,int taskstackSize, int queueSize, int priority,UArg arg0,UArg arg1);
 
     private:
         Agent_info description;
         char task_stack[1024];
-      };
+    };
 
 /*********************************************************************************************
 * Class:   Agent_Platform
@@ -207,31 +210,31 @@ typedef Task_Handle Agent;
         Agent_Platform(String name);
         Agent_Platform(String name,USER_DEF_COND*user_cond);
 
-    /*Methods*/
+        /*Methods*/
         bool init();
         bool init(int taskstackSize);
 
-        /*Services available for all agents*/
-        bool search(Agent aid);
+        /*Public Services available for all agents*/
+        bool agent_search(Agent_AID aid);
         void agent_wait(Uint32 ticks);
         void agent_yield();
-        Agent get_running_agent();
-        int get_mode(Agent aid);
-        const Agent_info *get_Agent_description(Agent aid);
+        void agent_exit();
+        Agent_AID get_running_agent();
+        int get_state(Agent_AID aid);
+        const Agent_info *get_Agent_description(Agent_AID aid);
         const AP_Description *get_AP_description();
-        Agent get_AMS_Agent();
+        Agent_AID get_AMS_Agent();
 
     private:
         AMS_Services services;
         USER_DEF_COND cond;
         USER_DEF_COND *ptr_cond;
-        char task_stack[1024];
     };
 /*********************************************************************************************
 * Class: Agent_Msg
-* Comment: Predefined struct for msg object.
+* Comment:   Predefined struct for msg object.
 * Variables: Agent receivers[MAX_Receivers]: list of receivers
-*            int next_available: index of the receiver list where denotes the spot available
+*            int subscribers: index of the receiver list where denotes the spot available
 *                                in the list
 *            Agent self_handle: Contains info about the calling agent.
 *            Mailbox_handle self_mailbox: Contains the mailbox associated to self_handle task
@@ -243,12 +246,12 @@ typedef Task_Handle Agent;
         Agent_Msg();
 
         /*Methods*/
-        int add_receiver(Agent aid_receiver);
-        int remove_receiver(Agent aid_receiver);
+        int add_receiver(Agent_AID aid_receiver);
+        int remove_receiver(Agent_AID aid_receiver);
         void clear_all_receiver();
         void refresh_list();
         bool receive(Uint32 timeout);
-        int send(Agent aid_receiver);
+        int send(Agent_AID aid_receiver);
         bool send();
         void set_msg_type(int type);
         void set_msg_string(String body);
@@ -257,21 +260,19 @@ typedef Task_Handle Agent;
         int get_msg_type();
         String get_msg_string();
         int get_msg_int();
-        Agent get_sender();
-        Agent get_target_agent();
-        int request_AP(int request, Agent target_agent,int timeout);
-        int request_AP(int request, Agent target_agent,int timeout, int content);
+        Agent_AID get_sender();
+        Agent_AID get_target_agent();
+        int request_AP(int request, Agent_AID target_agent,int timeout);
+        int request_AP(int request, Agent_AID target_agent,int timeout, int pri);
         int broadcast(int timeout, String content);
 
     private:
         MsgObj msg;
-        Agent receivers[MAX_RECEIVERS];
-        int next_available;
-        Agent self_handle;
-        Mailbox_Handle self_mailbox;
-        bool isRegistered(Agent aid);
-        Mailbox_Handle get_mailbox(Agent aid);
-
+        Agent_AID receivers[MAX_RECEIVERS];
+        int subscribers;
+        Agent_AID caller;
+        bool isRegistered(Agent_AID aid);
+        Mailbox_Handle get_mailbox(Agent_AID aid);
     };
 /*********************************************************************************************
  *                               BEHAVIOUR CLASSES                                           *

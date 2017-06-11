@@ -15,11 +15,9 @@ namespace MAES
 *          The object contains information of the task handle, mailbox and the name
 **********************************************************************************************/
    Agent_Msg::Agent_Msg(){
-      Agent_info *description=(Agent_info*)Task_getEnv(Task_self());
-      self_handle=Task_self();
-      self_mailbox=description->mailbox_handle;
+      caller=Task_self();
       clear_all_receiver();
-      next_available=0;
+      subscribers=0;
    }
 /*********************************************************************************************
 * Class: Agent_Msg
@@ -27,9 +25,9 @@ namespace MAES
 * Return type: Boolean
 * Comment: if returns false, sender or receiver is not registered in the same platform
 **********************************************************************************************/
-  bool Agent_Msg::isRegistered(Agent aid){
+  bool Agent_Msg::isRegistered(Agent_AID aid){
       Agent_info *description_receiver=(Agent_info *)Task_getEnv(aid);
-      Agent_info *description_sender=(Agent_info *)Task_getEnv(self_handle);
+      Agent_info *description_sender=(Agent_info *)Task_getEnv(caller);
 
       if(description_receiver->AP==description_sender->AP) return true;
       else return false;
@@ -40,7 +38,7 @@ namespace MAES
 * Function: private get_mailbox(Agent aid)
 * Return type: Mailbox_Handle
 **********************************************************************************************/
-    Mailbox_Handle Agent_Msg::get_mailbox(Agent aid){
+    Mailbox_Handle Agent_Msg::get_mailbox(Agent_AID aid){
         Agent_info * description;
         description = (Agent_info*) Task_getEnv(aid);
         return description->mailbox_handle;
@@ -51,14 +49,14 @@ namespace MAES
 * Return type: Boolean. True if receiver is added successfully.
 * Comment: Add receiver to list of receivers by using the agent's aid
 **********************************************************************************************/
-   int Agent_Msg::add_receiver(Agent aid_receiver){
+   int Agent_Msg::add_receiver(Agent_AID aid_receiver){
 
         if(isRegistered(aid_receiver)){
            if (aid_receiver==NULL) return HANDLE_NULL;
 
-           if(next_available<MAX_RECEIVERS){
-               receivers[next_available]=aid_receiver;
-               next_available++;
+           if(subscribers<MAX_RECEIVERS){
+               receivers[subscribers]=aid_receiver;
+               subscribers++;
                return NO_ERROR;
            }
 
@@ -74,7 +72,7 @@ namespace MAES
 * Comment: Remove receiver in list of receivers. It searches inside of the list, when found,
 * the rest of the list is shifted to the right and the receiver is removed.
 **********************************************************************************************/
-   int Agent_Msg::remove_receiver(Agent aid){
+   int Agent_Msg::remove_receiver(Agent_AID aid){
 
         int i=0;
         while(i<MAX_RECEIVERS){
@@ -84,7 +82,7 @@ namespace MAES
                     i++;
                 }
                 receivers[MAX_RECEIVERS-1]=NULL;
-                next_available--;
+                subscribers--;
                 break;
             }
             i++;
@@ -113,7 +111,7 @@ namespace MAES
 **********************************************************************************************/
     void Agent_Msg::refresh_list(){
         int i=0;
-        while (i<next_available){
+        while (i<subscribers){
             if(!isRegistered(receivers[i]))remove_receiver(receivers[i]);
             i++;
         }
@@ -126,8 +124,7 @@ namespace MAES
 *          task handle of the calling function of this object.
 **********************************************************************************************/
     bool Agent_Msg::receive(Uint32 timeout){
-
-        return Mailbox_pend(self_mailbox, (xdc_Ptr) &msg, timeout);
+        return Mailbox_pend(get_mailbox(caller), (xdc_Ptr) &msg, timeout);
     }
 
 /*********************************************************************************************
@@ -137,8 +134,8 @@ namespace MAES
 * Comment: Send msg to specific mailbox.
 *          Set the MsgObj handle to sender's handle.
 **********************************************************************************************/
-    int Agent_Msg::send(Agent aid_receiver){
-        msg.sender_agent=self_handle;
+    int Agent_Msg::send(Agent_AID aid_receiver){
+        msg.sender_agent=caller;
         msg.target_agent=aid_receiver;
 
         if(isRegistered(aid_receiver)){
@@ -159,7 +156,7 @@ namespace MAES
      bool Agent_Msg::send(){
         int i=0;
         bool no_error=true;
-        msg.sender_agent=self_handle;
+        msg.sender_agent=caller;
 
         while (receivers[i]!=NULL){
             if(isRegistered(receivers[i])){
@@ -245,7 +242,7 @@ namespace MAES
 * Return type: Agent
 * Comment: Get sender
 **********************************************************************************************/
-    Agent Agent_Msg::get_sender(){
+    Agent_AID Agent_Msg::get_sender(){
         return msg.sender_agent;
     }
 /*********************************************************************************************
@@ -254,7 +251,7 @@ namespace MAES
 * Return type: Agent
 * Comment: Get target aid
 **********************************************************************************************/
-    Agent Agent_Msg::get_target_agent(){
+    Agent_AID Agent_Msg::get_target_agent(){
         return msg.target_agent;
     }
 /*********************************************************************************************
@@ -264,8 +261,8 @@ namespace MAES
 * Comment: request the Agent Platform to perform a service and wait for response during
 *          a time specified by the user
 **********************************************************************************************/
-    int Agent_Msg::request_AP(int request, Agent target_agent,int timeout){
-        Agent AMS;
+    int Agent_Msg::request_AP(int request, Agent_AID target_agent,int timeout){
+        Agent_AID AMS;
         Agent_info *temp;
 
         if (request != BROADCAST && request!=MODIFY){
@@ -279,7 +276,7 @@ namespace MAES
             /*Getting AP address:
              * 1. Get the Agent info
              * 2. Get the AMS info*/
-            temp= (Agent_info*) Task_getEnv(self_handle);
+            temp= (Agent_info*) Task_getEnv(caller);
             AMS=temp->AP;
 
             /*Sending request*/
@@ -299,8 +296,8 @@ namespace MAES
 * Return type: Int
 * Comment: request the agent to modify priority of target agent
 **********************************************************************************************/
-    int Agent_Msg::request_AP(int request, Agent target_agent,int timeout, int content){
-        Agent AMS;
+    int Agent_Msg::request_AP(int request, Agent_AID target_agent,int timeout, int content){
+        Agent_AID AMS;
         Agent_info *temp;
 
         if(request==MODIFY){
@@ -315,7 +312,7 @@ namespace MAES
             /*Getting AP address:
              * 1. Get the Agent info
              * 2. Get the AMS info*/
-            temp= (Agent_info*) Task_getEnv(self_handle);
+            temp= (Agent_info*) Task_getEnv(caller);
             AMS=temp->AP;
 
             /*Sending request*/
@@ -336,7 +333,7 @@ namespace MAES
 * Comment: request the agent to set
 **********************************************************************************************/
     int Agent_Msg::broadcast(int timeout, String content){
-        Agent AMS;
+        Agent_AID AMS;
         Agent_info *temp;
 
         msg.type=REQUEST;
@@ -348,7 +345,7 @@ namespace MAES
         /*Getting AP address:
          * 1. Get the Agent info
          * 2. Get the AMS info*/
-        temp= (Agent_info*) Task_getEnv(self_handle);
+        temp= (Agent_info*) Task_getEnv(caller);
         AMS=temp->AP;
 
         /*Sending request*/
