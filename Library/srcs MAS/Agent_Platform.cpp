@@ -37,7 +37,7 @@ namespace MAES{
 * Class: Agent_Platform
 * Function: bool init();
 * Return: Boolean
-* Comment: Create AMS task with default stack of 1024
+* Comment: Create AMS task with default stack of 2048
 ***********************************************************************************************/
     bool Agent_Platform::init(){
 
@@ -56,7 +56,7 @@ namespace MAES{
         /*Creating task*/
         Task_Params_init(&taskParams);
         taskParams.stack=services.task_stack;
-        taskParams.stackSize = 1024;
+        taskParams.stackSize = 2048;
         taskParams.priority = Task_numPriorities-1;//Assigning max priority
         taskParams.instance->name=ptr_AP->AMS_description.agent_name;
         taskParams.env=&ptr_AP->AMS_description;
@@ -74,7 +74,10 @@ namespace MAES{
             }
             return true;
         }
-        else return false;
+        else {
+            System_abort("AP init failed");
+            return false;
+        }
    }
 
 /*********************************************************************************************
@@ -119,7 +122,10 @@ namespace MAES{
 
             return true;
         }
-        else return false;
+        else {
+            System_abort("AP init failed");
+            return false;
+        }
    }
 /**********************************************************************************************
 * Class: Agent_Platform

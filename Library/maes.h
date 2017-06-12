@@ -5,6 +5,7 @@
 #include <xdc/std.h>
 #include <xdc/runtime/System.h>
 #include <string.h>
+#include <xdc/runtime/Error.h>
 
 namespace MAES
 {
@@ -140,7 +141,7 @@ typedef Task_Handle Agent_AID;
             int get_state(Agent_AID aid);
 
             /*Other variables*/
-            char task_stack[1024];
+            char task_stack[2048];
             AP_Description AP;
 
         };
@@ -167,20 +168,20 @@ typedef Task_Handle Agent_AID;
     };
 
 /*********************************************************************************************
-* Class: Agent_Struct
+* Class: Agent
 * Variables: Agent_info description;
 *            Agent aid: task handle to agent's task/behaviour. This is used as aid
 *            Task_FuncPtr: function of the agent's task/behaviour
-*            char task_stack[1024]: Default char task_stack
+*            char task_stack[2048]: Default char task_stack
 *
 * Comment: Agent construction class.
 *          Add lines in cfg file to use Mailbox module:
 *          var Mailbox = xdc.useModule('ti.sysbios.knl.Mailbox')
 **********************************************************************************************/
-    class Agent_Struct{
+    class Agent{
     public:
         /*Constructor*/
-        Agent_Struct(String name);
+        Agent(String name);
 
         /*Methods*/
         Agent_AID create(Task_FuncPtr behaviour);
@@ -188,10 +189,11 @@ typedef Task_Handle Agent_AID;
         Agent_AID create(Task_FuncPtr behaviour,int taskstackSize,int queueSize, int priority);
         Agent_AID create(Task_FuncPtr behaviour,UArg arg0, UArg arg1);
         Agent_AID create(Task_FuncPtr behaviour,int taskstackSize, int queueSize, int priority,UArg arg0,UArg arg1);
+        Agent_AID AID();
 
     private:
         Agent_info description;
-        char task_stack[1024];
+        char task_stack[2048];
     };
 
 /*********************************************************************************************
@@ -201,7 +203,7 @@ typedef Task_Handle Agent_AID;
 *            USER_DEF_COND cond: contains the default conditions for AMS private services.
 *            USER_DEF_cond ptr_cond: pointer to the USER_DEF_COND where contain the user
 *                                    defined functions.
-*            char task_stack[1024]: default size if additional services of AMS is required
+*            char task_stack[2048]: default size if additional services of AMS is required
 *            Agent_info description: Description of AMS task.
 **********************************************************************************************/
     class Agent_Platform{
