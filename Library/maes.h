@@ -192,6 +192,7 @@ typedef Task_Handle Agent_AID;
         Agent_AID AID();
 
     private:
+        Agent_AID aid;
         Agent_info description;
         char task_stack[2048];
     };

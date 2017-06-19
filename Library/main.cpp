@@ -1,154 +1,32 @@
-/*
- * Copyright (c) 2015, Texas Instruments Incorporated
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * *  Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * *  Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *
- * *  Neither the name of Texas Instruments Incorporated nor the names of
- *    its contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+#include "app_files/app.h"
 
-/*
- *  ======== empty_min.c ========
- */
-/* XDCtools Header files */
-#include <xdc/std.h>
-#include <xdc/runtime/System.h>
+/*Agent object building and Agent_Platform object building*/
+Agent UART_Agent("UART Agent");
+Agent Sensor_Agent("Sensor Control Agent");
+Agent Kalman_Agent("Kalman Agent");
+Agent_Platform AP("AOCS");
 
-/* BIOS Header files */
-#include <ti/sysbios/BIOS.h>
-#include <ti/sysbios/knl/Task.h>
-#include <ti/sysbios/knl/Mailbox.h>
+/*  ======== main ========*/
+int main(void){
+	/* Call board init functions */
+	Board_initGeneral();
+	Board_initGPIO();
+	Board_initI2C();
+	Board_initUART();
 
-/* TI-RTOS Header files */
-#include <ti/drivers/GPIO.h>
-// #include <ti/drivers/I2C.h>
-// #include <ti/drivers/SDSPI.h>
-// #include <ti/drivers/SPI.h>
-// #include <ti/drivers/UART.h>
-// #include <ti/drivers/Watchdog.h>
-// #include <ti/drivers/WiFi.h>
+	/* Turn on user LED */
+	GPIO_write(Board_LED0, Board_LED_ON);
 
-/* Board Header file */
-#include "Board.h"
+  //  BMI=BMI_Agent.create(matrix_func, 2);
+	UART_AID=UART_Agent.create(uartFxn,2);
+	Sensor_AID=Sensor_Agent.create(sensor, 1);
+	Kalman_AID=Kalman_Agent.create(kalman,4096,8,2);
 
-/* Include Agent file*/
+	AP.init();
+	System_flush();
 
-#include "maes.h"
-#include <stdlib.h>
-#include <stdio.h>
-using namespace MAES;
+	/*BIOS_start*/
+	BIOS_start();
 
-/*Construction functions*/
-void writing(UArg arg0, UArg arg1);
-void reading(UArg arg0, UArg arg1);
-void reading2(UArg arg0, UArg arg1);
-void function(UArg arg0, UArg arg1);
-
-/*Constructing platform*/
-Agent_Platform AP("Texas Instruments");
-Agent_AID Writing,Reading,Reading2;
-
-/*Constructing Agents*/
-Agent_Struct Reading_Struct("Agent 1");
-Agent_Struct Reading2_Struct("Agent 2");
-Agent_Struct Writing_Struct("Writing Agent");
-
-class behaviours:public OneShotBehaviour{
-public:
-
-    void setup(){
-        msg.add_receiver(Reading);
-        msg.add_receiver(Reading2);
-    }
-    void action(){
-
-        msg.set_msg_string((String)55);
-        msg.send();
-        System_printf("hello\n");
-        System_flush();
-        Task_sleep(500);
-      //  msg.request_AP(DEREGISTER, Task_self(), BIOS_WAIT_FOREVER);
-    }
-};
-
-void function(UArg arg0, UArg arg1){
-    behaviours b;
-    b.execute();
-   // AP.agent_wait(500);
-
-};
-
-
-/*
- *  ======== main ========
- */
-int main()
-{
-
-    /* Call board init functions */
-    Board_initGeneral();
-    Board_initGPIO();
-
-    GPIO_write(Board_LED0, Board_LED_ON);
-
-    /* SysMin will only print to the console when you call flush or exit */
-    System_printf("Blinking Led Example with agents \n");
-    System_flush();
-
-    /*Initialize*/
-    Writing=Writing_Struct.create(function);
-    Reading=Reading_Struct.create(reading,2);
-    Reading2=Reading2_Struct.create(reading2);
-    AP.init();
-    BIOS_start();
-    return (0);
-
+	return (0);
 }
-
-void reading(UArg arg0, UArg arg1)
-{
-    Agent_Msg msg;
-    while(1) {
-        msg.receive(BIOS_WAIT_FOREVER);
-        System_printf("Receiver: %s Sender: %s Received: %d \n", AP.get_Agent_description(msg.get_target_agent())->agent_name,AP.get_Agent_description(msg.get_sender())->agent_name,(int)msg.get_msg_string());
-        System_flush();
-        GPIO_toggle(Board_LED0);
-    }
-}
-
-void reading2(UArg arg0, UArg arg1)
-{
-
-    Agent_Msg msg;
-    while(1) {
-        msg.receive(BIOS_WAIT_FOREVER);
-        System_printf("Receiver: %s Sender: %s Received: %d \n", AP.get_Agent_description(msg.get_target_agent())->agent_name,AP.get_Agent_description(msg.get_sender())->agent_name,(int)msg.get_msg_string());
-        System_flush();
-        GPIO_toggle(Board_LED1);
-     }
-}
-
-
