@@ -15,6 +15,7 @@ namespace MAES
 #define AGENT_LIST_SIZE 64
 #define MAX_RECEIVERS   AGENT_LIST_SIZE-1
 #define BEHAVIOUR_LIST_SIZE 8
+#define ORGANIZATIONS_SIZE 16
 
 /*********************************************************************************************
 *   Define Agent Mode
@@ -27,82 +28,93 @@ namespace MAES
 /*********************************************************************************************
 *   Define Error handling
 **********************************************************************************************/
-#define NO_ERROR        0x04
-#define FOUND           0x05
-#define HANDLE_NULL     0x06
-#define LIST_FULL       0x07
-#define DUPLICATED      0x08
-#define NOT_FOUND       0x09
-#define TIMEOUT         0x0A
+#define NO_ERROR        0x00
+#define FOUND           0x01
+#define HANDLE_NULL     0x02
+#define LIST_FULL       0x03
+#define DUPLICATED      0x04
+#define NOT_FOUND       0x05
+#define TIMEOUT         0x06
+#define INVALID         0x07
+#define NOT_REGISTERED  0x08
+
 /*********************************************************************************************
 *   Define msg type according to FIPA ACL Message Representation in Bit-Efficient Encoding
 *   Specification
 **********************************************************************************************/
-#define ACCEPT_PROPOSAL  0x0B
-#define AGREE            0x0C
-#define CANCEL           0x0D
-#define CFP              0x0E
-#define CONFIRM          0x0F
-#define DISCONFIRM       0x10
-#define FAILURE          0x11
-#define INFORM           0x12
-#define INFORM_IF        0x13
-#define INFORM_REF       0x14
-#define NOT_UNDERSTOOD   0x15
-#define PROPAGATE        0x16
-#define PROPOSE          0x17
-#define QUERY_IF         0x18
-#define QUERY_REF        0x19
-#define REFUSE           0x1A
-#define REJECT_PROPOSAL  0x1B
-#define REQUEST          0x1C
-#define REQUEST_WHEN     0x1D
-#define REQUEST_WHENEVER 0x1E
-#define SUBSCRIBE        0x1F
-
+#define ACCEPT_PROPOSAL  0x10
+#define AGREE            0x11
+#define CANCEL           0x12
+#define CFP              0x13
+#define CONFIRM          0x14
+#define DISCONFIRM       0x15
+#define FAILURE          0x16
+#define INFORM           0x17
+#define INFORM_IF        0x18
+#define INFORM_REF       0x19
+#define NOT_UNDERSTOOD   0x1A
+#define PROPAGATE        0x1B
+#define PROPOSE          0x1C
+#define QUERY_IF         0x1D
+#define QUERY_REF        0x1E
+#define REFUSE           0x1F
+#define REJECT_PROPOSAL  0x20
+#define REQUEST          0x21
+#define REQUEST_WHEN     0x22
+#define REQUEST_WHENEVER 0x23
+#define SUBSCRIBE        0x24
+#define NO_RESPONSE      0x25
 /*********************************************************************************************
 *   Define Request Action
 **********************************************************************************************/
-#define REGISTER        0x2A
-#define DEREGISTER      0x2B
-#define KILL            0x2C
-#define RESUME          0x2D
-#define SUSPEND         0x2E
-#define MODIFY          0x2F
-#define BROADCAST       0x30
+#define REGISTER        0x30
+#define DEREGISTER      0x31
+#define KILL            0x32
+#define RESUME          0x33
+#define SUSPEND         0x34
+#define MODIFY          0x35
+#define BROADCAST       0x36
+#define CREATE          0x37
+#define RESTART         0x38
+
+/*********************************************************************************************
+*   Define Organization Affiliation/Role
+**********************************************************************************************/
+#define OWNER           0x40
+#define ADMIN           0x41
+#define MEMBER          0X42
+#define OUTCAST         0x43
+#define MODERATOR       0x44
+#define PARTICIPANT     0x45
+#define VISITOR         0x46
+#define NONE            0x47
+/*********************************************************************************************
+*   Define Organization Type
+**********************************************************************************************/
+#define HIERARCHY       0x50
+#define TEAM            0x51
 
 /*********************************************************************************************
  *                                         TYPEDEF                                           *
 **********************************************************************************************/
 typedef Task_Handle Agent_AID;
+typedef char        Agent_Stack;
+typedef int         ERROR_CODE;
+typedef int         MSG_TYPE;
 /*********************************************************************************************
-* Class: Agent_info
-* Comment:  Struct containing information about the Agent;
-* Variables: String agent_name: Agent's name;
-*            Mailbox_Handle m: Agent associated mailbox
-*            Agent AP: AP handle where the agent is registered;
-*            int priority: Priority set by the user.
+* Class: Agent_Organization
+* Comment:
+* Variables
 **********************************************************************************************/
-    typedef struct Agent_info{
-        String agent_name;
-        Mailbox_Handle mailbox_handle;
-        Agent_AID AP;
-        int priority;
-    }Agent_info;
+    typedef struct{
+        int org_type;
+        int next_available;
+        Agent_AID members[AGENT_LIST_SIZE];
+        Agent_AID owner;
+        Agent_AID admin;
+        Agent_AID moderator;
+    }org_info;
 
-/*********************************************************************************************
-* Class: AP_Description
-* Comment: Contains information about the AP
-* Variables: Agent Agent_Handle: List of all the agents contained in the AP. Limited
-*            by the number defined in AGENT_LIST_SIZE
-*            Agent_info: Struct that contains all the information of the AMS agent
-*            int subscribers: index of the available spot in the list
-**********************************************************************************************/
-    typedef struct AP_Description{
-        Agent_info AMS_description;
-        Agent_AID Agent_Handle[AGENT_LIST_SIZE];
-        int subscribers;
-    }AP_Description;
 /*********************************************************************************************
 * Class: MsgObj
 * Variables: Agent sender_agent: Agent sending the message
@@ -111,7 +123,7 @@ typedef Task_Handle Agent_AID;
 *            String content_string: Content of the message in string format
 *            int content_int: Content of the message in int format
 **********************************************************************************************/
-    typedef struct MsgObj{
+    typedef struct{
           Agent_AID sender_agent;
           Agent_AID target_agent;
           int type;
@@ -119,35 +131,26 @@ typedef Task_Handle Agent_AID;
           int content_int;
     }MsgObj;
 /*********************************************************************************************
- *                           Class and functions in Unnamed namespace                        *
-**********************************************************************************************/
-    namespace{
-        class AMS_Services{
-        public:
-            /*Constructor*/
-            AMS_Services();
-            /*Methods where user can override conditions*/
-            int register_agent(Agent_AID aid);
-            int deregister_agent(Agent_AID aid);
-            int kill_agent(Agent_AID aid);
-            bool suspend_agent(Agent_AID aid);
-            bool resume_agent(Agent_AID aid);
-            bool modify_agent_pri(Agent_AID aid,int pri);
-            void broadcast(MsgObj *msg);
-
-            /*Methods without user conditions*/
-            AP_Description *get_AP();
-            bool search(Agent_AID aid);
-            int get_state(Agent_AID aid);
-
-            /*Other variables*/
-            char task_stack[2048];
-            AP_Description AP;
-
-        };
-
-        void AMS_task(UArg arg0,UArg arg1);  //AMS_Task
-    }
+* Class: Agent_info
+* Variables: Agent_AID aid: agent's AID
+*            Mailbox_Handle mailbox_handle: communication method
+*            String agent_name: agent's name
+*            int priority: Priority of the agent
+*            Agent_AID AP: AMS AID who manage the agent.
+*            org_inf *org: Organization which belongs the agent
+*            int affiliation: affiliation with the org
+*            int role: role withing organization
+***********************************************************************************************/
+    typedef struct{
+        Agent_AID aid;
+        Mailbox_Handle mailbox_handle;
+        String agent_name;
+        int priority;
+        Agent_AID AP;
+        org_info *org;
+        int affiliation;
+        int role;
+    }Agent_info;
 
 /*********************************************************************************************
  *                                         CLASSES                                           *
@@ -165,14 +168,15 @@ typedef Task_Handle Agent_AID;
         virtual bool resume_cond();
         virtual bool modify_cond();
         virtual bool broadcast_cond();
+        virtual bool restart();
+        virtual bool create();
     };
 
 /*********************************************************************************************
 * Class: Agent
 * Variables: Agent_info description;
-*            Agent aid: task handle to agent's task/behaviour. This is used as aid
-*            Task_FuncPtr: function of the agent's task/behaviour
-*            char task_stack[2048]: Default char task_stack
+*            char *task_stack: pointer to the stack
+*            int stackSize: task stack size
 *
 * Comment: Agent construction class.
 *          Add lines in cfg file to use Mailbox module:
@@ -180,32 +184,44 @@ typedef Task_Handle Agent_AID;
 **********************************************************************************************/
     class Agent{
     public:
+        friend class Agent_Platform;
+        friend class Agent_Msg;
         /*Constructor*/
-        Agent(String name);
-
-        /*Methods*/
-        Agent_AID create(Task_FuncPtr behaviour);
-        Agent_AID create(Task_FuncPtr behaviour,int priority);
-        Agent_AID create(Task_FuncPtr behaviour,int taskstackSize,int queueSize, int priority);
-        Agent_AID create(Task_FuncPtr behaviour,UArg arg0, UArg arg1);
-        Agent_AID create(Task_FuncPtr behaviour,int taskstackSize, int queueSize, int priority,UArg arg0,UArg arg1);
-        Agent_AID AID();
+        Agent(String name, int pri, char *AgentStack,int sizeStack);
 
     private:
-        Agent_AID aid;
-        Agent_info description;
-        char task_stack[2048];
+        Agent();
+        char *stack;
+        int stackSize;
+        Agent_info agent;
     };
 
 /*********************************************************************************************
+ *                           Class and functions in Unnamed namespace for AP                 *
+**********************************************************************************************/
+namespace{
+        void AMS_task(UArg arg0,UArg arg1);  //AMS_Task
+}
+/*********************************************************************************************
+* Class: AP_Description
+* Variables: Agent_AID AMS_AID: Task handle of AMS
+*            String AP_name: Platform name
+*            int subscribers: members in the platform
+***********************************************************************************************/
+    typedef struct{
+        Agent_AID AMS_AID;
+        String AP_name;
+        int subscribers;
+    }AP_Description;
+/*********************************************************************************************
 * Class:   Agent_Platform
 * Comment: API for Agent Management Services
-* Variables: AMS_Services: Contains all the private and public AMS services
-*            USER_DEF_COND cond: contains the default conditions for AMS private services.
+* Variables: USER_DEF_COND cond: contains the default conditions for AMS private services.
 *            USER_DEF_cond ptr_cond: pointer to the USER_DEF_COND where contain the user
 *                                    defined functions.
 *            char task_stack[2048]: default size if additional services of AMS is required
-*            Agent_info description: Description of AMS task.
+*            Agent_AID Agent_Handle[AGENT_LIST_SIZE]: members subscribed
+*            AP_description platform: Information about the platform.
 **********************************************************************************************/
     class Agent_Platform{
     public:
@@ -214,46 +230,65 @@ typedef Task_Handle Agent_AID;
         Agent_Platform(String name,USER_DEF_COND*user_cond);
 
         /*Methods*/
-        bool init();
-        bool init(int taskstackSize);
+        bool boot();
+        bool boot(int taskstackSize);
+
+        /*Only called from Main*/
+        void agent_init(Agent &a, Task_FuncPtr behaviour, Agent_AID &aid);
+        void agent_init(Agent &a, Task_FuncPtr behaviour, UArg arg0, UArg arg1,Agent_AID &aid);
 
         /*Public Services available for all agents*/
         bool agent_search(Agent_AID aid);
         void agent_wait(Uint32 ticks);
         void agent_yield();
-        void agent_exit();
         Agent_AID get_running_agent();
         int get_state(Agent_AID aid);
-        const Agent_info *get_Agent_description(Agent_AID aid);
-        const AP_Description *get_AP_description();
-        Agent_AID get_AMS_Agent();
+        Agent_info get_Agent_description(Agent_AID aid);
+        AP_Description get_AP_description();// to do
+
+        /*Services only can be done by AMS task*/
+        int register_agent(Agent_AID aid);
+        int deregister_agent(Agent_AID aid);
+        int kill_agent(Agent_AID aid);
+        int suspend_agent(Agent_AID aid);
+        int resume_agent(Agent_AID aid);
+        int modify_agent_pri(Agent_AID aid,int pri);
+        void broadcast(MsgObj *msg);
+        void restart(Agent_AID aid);
 
     private:
-        AMS_Services services;
+        /*Class variables*/
+        char task_stack[2048];
+        Agent agentAMS;
+        Agent_AID Agent_Handle[AGENT_LIST_SIZE];
+        int subscribers;
         USER_DEF_COND cond;
         USER_DEF_COND *ptr_cond;
+
     };
+
 /*********************************************************************************************
 * Class: Agent_Msg
-* Comment:   Predefined struct for msg object.
-* Variables: Agent receivers[MAX_Receivers]: list of receivers
+* Comment:   Predefined class for msg object.
+* Variables: MsgObj msg: To be used to receive and send
+*            Agent receivers[MAX_Receivers]: list of receivers
 *            int subscribers: index of the receiver list where denotes the spot available
 *                                in the list
-*            Agent self_handle: Contains info about the calling agent.
-*            Mailbox_handle self_mailbox: Contains the mailbox associated to self_handle task
-*            MsgObj msg: To be used to receive and send
-**********************************************************************************************/
+*            Agent caller: Contains info about the calling agent.
+*            bool isRegistered: Private method to check if Agent is registered
+*            Mailbox_Handle: Private method to get Mailbox from Agent_AID
+***********************************************************************************************/
     class Agent_Msg {
     public:
         /*Constructor*/
         Agent_Msg();
-
+        //friend class AMS_Services;
         /*Methods*/
         int add_receiver(Agent_AID aid_receiver);
         int remove_receiver(Agent_AID aid_receiver);
         void clear_all_receiver();
         void refresh_list();
-        bool receive(Uint32 timeout);
+        MSG_TYPE receive(Uint32 timeout);
         int send(Agent_AID aid_receiver);
         bool send();
         void set_msg_type(int type);
@@ -265,9 +300,12 @@ typedef Task_Handle Agent_AID;
         int get_msg_int();
         Agent_AID get_sender();
         Agent_AID get_target_agent();
-        int request_AP(int request, Agent_AID target_agent,int timeout);
-        int request_AP(int request, Agent_AID target_agent,int timeout, int pri);
-        int broadcast(int timeout, String content);
+        ERROR_CODE request_AP(int request, Agent_AID target_agent);
+        ERROR_CODE modify_pri(Agent_AID target_agent, int pri);
+        ERROR_CODE kill(Agent_AID &target_agent);
+        ERROR_CODE broadcast(String content);
+        ERROR_CODE restart();
+        ERROR_CODE create(Agent *a,Task_FuncPtr behaviour,Agent_AID &aid);
 
     private:
         MsgObj msg;
@@ -278,6 +316,44 @@ typedef Task_Handle Agent_AID;
         Mailbox_Handle get_mailbox(Agent_AID aid);
     };
 /*********************************************************************************************
+* Class: Agent_Organization
+* Comment:   Predefined struct for agent organization
+* Variables: org_info description: description of the organization
+*            Agent_AID banned[AGENT_LIST_SIZE]: list of banned agents
+*            int banned_num: number of banned agents
+*            bool isRegistered: private method to check if agent is registered
+**********************************************************************************************/
+    class Agent_Organization{
+    public:
+        Agent_Organization(int organization_type);
+        ~Agent_Organization();
+        ERROR_CODE create();
+        ERROR_CODE destroy();
+        ERROR_CODE isBanned(Agent_AID aid);
+        ERROR_CODE isMember(Agent_AID aid);
+        ERROR_CODE change_owner(Agent_AID aid);
+        ERROR_CODE set_admin(Agent_AID aid);
+        ERROR_CODE set_moderator(Agent_AID aid);
+        ERROR_CODE ban_agent(Agent_AID aid);
+        ERROR_CODE remove_ban(Agent_AID aid);
+        void clear_ban_list();
+        void set_participant(Agent_AID aid);
+        void set_visitor(Agent_AID aid);
+        int get_size();
+        ERROR_CODE add_agent(Agent_AID aid);
+        ERROR_CODE kick_agent(Agent_AID aid);
+        ERROR_CODE leave(); //to do: check
+        ERROR_CODE invite(Agent_Msg msg, int password, Agent_AID target_agent, int timeout);
+        const org_info* get_info();
+        int get_org_type();
+
+    private:
+        org_info description;
+        Agent_AID banned[AGENT_LIST_SIZE];
+        int banned_num;
+        bool isRegistered(Agent_AID aid);
+    };
+/*********************************************************************************************
  *                               BEHAVIOUR CLASSES                                           *
 **********************************************************************************************/
     class Generic_Behaviour{
@@ -285,7 +361,10 @@ typedef Task_Handle Agent_AID;
         Generic_Behaviour();
         Agent_Msg msg;
         virtual void action()=0;
-        virtual bool done()=0;
+        virtual bool done();
+        virtual bool failure_detection();
+        virtual void failure_identification();
+        virtual void failure_recovery();
         virtual void setup();
         void execute();
     };
@@ -303,4 +382,5 @@ typedef Task_Handle Agent_AID;
         virtual void action()=0;
         virtual bool done();
     };
+
 }
