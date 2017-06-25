@@ -30,5 +30,12 @@ namespace MAES{
     bool USER_DEF_COND::broadcast_cond(){
         return true;
     }
+    bool USER_DEF_COND::restart(){
+        return true;
+    }
+    bool USER_DEF_COND::create(){
+        return true;
+    }
+
 
 }

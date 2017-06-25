@@ -90,14 +90,7 @@ void uartFxn(UArg arg0, UArg arg1){
     Agent_Msg msg;
     while (1) {
         msg.receive(BIOS_WAIT_FOREVER);
-//        System_printf("\n");
-//        char p[100];
-//        sprintf(p,"%.14f  %.14f  %.14f  %.14f  ",x.pData[0],x.pData[1],x.pData[2],x.pData[3]);
-//        System_printf(p);
-//        System_flush();
 
-
-//
         snprintf(stringBuffer, 295,
                 "{\"gyro\":{\"x\":%d,\"y\":%d,\"z\":%d},"
                 "\"accel\":{\"x\":%d,\"y\":%d,\"z\":%d},"

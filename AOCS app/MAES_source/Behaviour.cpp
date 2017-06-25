@@ -7,10 +7,22 @@ namespace MAES{
 **********************************************************************************************/
     Generic_Behaviour::Generic_Behaviour(){}
     void Generic_Behaviour::setup(){}
+    void Generic_Behaviour::failure_identification(){}
+    void Generic_Behaviour::failure_recovery(){}
+    bool Generic_Behaviour::done(){
+        return true;
+    }
+    bool Generic_Behaviour::failure_detection(){
+        return false;
+    }
     void Generic_Behaviour::execute(){
         setup();
         do{
             action();
+            if(failure_detection()){
+                failure_identification();
+                failure_recovery();
+            }
         }while (!done());
     }
 

@@ -26,10 +26,10 @@ namespace MAES
 * Comment: if returns false, sender or receiver is not registered in the same platform
 **********************************************************************************************/
   bool Agent_Msg::isRegistered(Agent_AID aid){
-      Agent_info *description_receiver=(Agent_info *)Task_getEnv(aid);
-      Agent_info *description_sender=(Agent_info *)Task_getEnv(caller);
+      Agent *description_receiver=(Agent *)Task_getEnv(aid);
+      Agent *description_sender=(Agent *)Task_getEnv(caller);
 
-      if(description_receiver->AP==description_sender->AP) return true;
+      if(description_receiver->agent.AP==description_sender->agent.AP) return true;
       else return false;
 }
 
@@ -39,9 +39,9 @@ namespace MAES
 * Return type: Mailbox_Handle
 **********************************************************************************************/
     Mailbox_Handle Agent_Msg::get_mailbox(Agent_AID aid){
-        Agent_info * description;
-        description = (Agent_info*) Task_getEnv(aid);
-        return description->mailbox_handle;
+        Agent * description;
+        description = (Agent*) Task_getEnv(aid);
+        return description->agent.mailbox_handle;
     }
 /*********************************************************************************************
 * Class: Agent_Msg
@@ -49,22 +49,21 @@ namespace MAES
 * Return type: Boolean. True if receiver is added successfully.
 * Comment: Add receiver to list of receivers by using the agent's aid
 **********************************************************************************************/
-   int Agent_Msg::add_receiver(Agent_AID aid_receiver){
+    int Agent_Msg::add_receiver(Agent_AID aid_receiver){
 
         if(isRegistered(aid_receiver)){
-           if (aid_receiver==NULL) return HANDLE_NULL;
+            if (aid_receiver==NULL) return HANDLE_NULL;
 
-           if(subscribers<MAX_RECEIVERS){
+            if(subscribers<MAX_RECEIVERS){
                receivers[subscribers]=aid_receiver;
                subscribers++;
                return NO_ERROR;
-           }
+            }
 
-           else return LIST_FULL;
-
-       }
-       else return NOT_FOUND;
-   }
+            else return LIST_FULL;
+        }
+        else return NOT_FOUND;
+    }
 /*********************************************************************************************
 * Class: Agent_Msg
 * Function: remove_receiver(Agent aid)
@@ -123,8 +122,10 @@ namespace MAES
 * Comment: Receiving msg in its queue. Block call. The mailbox is obtained from the
 *          task handle of the calling function of this object.
 **********************************************************************************************/
-    bool Agent_Msg::receive(Uint32 timeout){
-        return Mailbox_pend(get_mailbox(caller), (xdc_Ptr) &msg, timeout);
+    MSG_TYPE Agent_Msg::receive(Uint32 timeout){
+
+        if (!Mailbox_pend(get_mailbox(caller), (xdc_Ptr) &msg, timeout)) msg.type=NO_RESPONSE;
+        return msg.type;
     }
 
 /*********************************************************************************************
@@ -133,17 +134,33 @@ namespace MAES
 * Return type: Boolean. TRUE if successful, FALSE if timeout
 * Comment: Send msg to specific mailbox.
 *          Set the MsgObj handle to sender's handle.
+*          Send only if is registered in platform
+*          Send only if same organizaton
 **********************************************************************************************/
     int Agent_Msg::send(Agent_AID aid_receiver){
-        msg.sender_agent=caller;
         msg.target_agent=aid_receiver;
+        msg.sender_agent=caller;
 
-        if(isRegistered(aid_receiver)){
+
+        Agent *agent_caller,*agent_receiver;
+        agent_caller = (Agent*) Task_getEnv(caller);
+        agent_receiver=(Agent*) Task_getEnv(aid_receiver);
+
+        if (!isRegistered(aid_receiver)) return NOT_REGISTERED;
+        else if (agent_caller->agent.org==NULL && agent_receiver->agent.org==NULL){ //Anarchy
             if(Mailbox_post(get_mailbox(aid_receiver), (xdc_Ptr)&msg, BIOS_NO_WAIT)) return NO_ERROR;
             else return TIMEOUT;
         }
-        else return NOT_FOUND;
 
+        else if (agent_caller->agent.org==agent_receiver->agent.org){
+            if (agent_caller->agent.org->org_type!=HIERARCHY || (agent_caller->agent.org->org_type==HIERARCHY && agent_receiver->agent.role==MODERATOR)){
+                if(Mailbox_post(get_mailbox(aid_receiver), (xdc_Ptr)&msg, BIOS_NO_WAIT)) return NO_ERROR;
+                else return TIMEOUT;
+            }
+            else return INVALID;
+        }
+
+        else return INVALID;
     }
 /*********************************************************************************************
 * Class: Agent_Msg
@@ -155,20 +172,16 @@ namespace MAES
 **********************************************************************************************/
      bool Agent_Msg::send(){
         int i=0;
-        bool no_error=true;
-        msg.sender_agent=caller;
+        int error_code;
+        bool error=false;
 
         while (receivers[i]!=NULL){
-            if(isRegistered(receivers[i])){
-                msg.target_agent=receivers[i];
-                if(!Mailbox_post(get_mailbox(receivers[i]),(xdc_Ptr)&msg, BIOS_NO_WAIT));
-                    no_error=false;
-                i++;
-
-            }
-            else refresh_list();
+            error_code=send(receivers[i]);
+            if (error_code==NO_ERROR) i++;
+            else if (error_code==NOT_REGISTERED) refresh_list();
+            else error = true;
         }
-        return no_error;
+        return error;
     }
 /*********************************************************************************************
 * Class: Agent_Msg
@@ -256,105 +269,167 @@ namespace MAES
     }
 /*********************************************************************************************
 * Class: Agent_Msg
-* Function: int request_AP(int request, Agent target_agent,int timeout)
+* Function: int request_AP(int request, Agent target_agent)
 * Return type: Int
-* Comment: request the Agent Platform to perform a service and wait for response during
-*          a time specified by the user
+* Comment: request the Agent Platform to perform a service. Returns NO_ERROR
+*          if request was posted correctly.
 **********************************************************************************************/
-    int Agent_Msg::request_AP(int request, Agent_AID target_agent,int timeout){
+    ERROR_CODE Agent_Msg::request_AP(int request, Agent_AID target_agent){
         Agent_AID AMS;
-        Agent_info *temp;
+        Agent *agent_caller;
+        Agent *agent_target;
+        agent_caller = (Agent*) Task_getEnv(caller);
+        agent_target = (Agent*) Task_getEnv(target_agent);
 
-        if (request != BROADCAST && request!=MODIFY){
+        if (request == BROADCAST || request==MODIFY || request==KILL) return INVALID;
+        else if (target_agent==NULL) return HANDLE_NULL;
+        else if (agent_caller->agent.org==NULL || (agent_caller->agent.org!=NULL && (agent_caller->agent.role==OWNER || agent_caller->agent.role==ADMIN))){
+            if (agent_caller->agent.org==agent_target->agent.org){
+                 /*Setting msg*/
+                msg.type=REQUEST;
+                msg.content_int=request;
+                msg.target_agent=target_agent;
+                msg.sender_agent=Task_self();
 
-            /*Setting msg*/
-            msg.type=REQUEST;
-            msg.content_int=request;
-            msg.target_agent=target_agent;
-            msg.sender_agent=Task_self();
+                //Get the AMS info*/
+                AMS=agent_caller->agent.AP;
+                /*Sending request*/
+                if (Mailbox_post(get_mailbox(AMS), (xdc_Ptr)&msg, BIOS_NO_WAIT)) return NO_ERROR;
+                else return INVALID;
+            }
 
-            /*Getting AP address:
-             * 1. Get the Agent info
-             * 2. Get the AMS info*/
-            temp= (Agent_info*) Task_getEnv(caller);
-            AMS=temp->AP;
+            else return INVALID;
 
-            /*Sending request*/
-            Mailbox_post(get_mailbox(AMS), (xdc_Ptr)&msg, BIOS_NO_WAIT);
-
-            /*Waiting for answer*/
-            receive(timeout);
-
-            return msg.type;
         }
+        else return INVALID;
 
-        else return REFUSE;
     }
+
 /*********************************************************************************************
 * Class: Agent_Msg
-* Function: int request_AP(int request, Agent target_agent,int timeout,int content)
+* Function: int kill(int request, Agent &target_agent)
 * Return type: Int
-* Comment: request the agent to modify priority of target agent
+* Comment: request the Agent Platform to kill an agent.Returns NO_ERROR
+*          if request was posted correctly.
 **********************************************************************************************/
-    int Agent_Msg::request_AP(int request, Agent_AID target_agent,int timeout, int content){
+    ERROR_CODE Agent_Msg::kill(Agent_AID &target_agent){
         Agent_AID AMS;
-        Agent_info *temp;
+        Agent *agent_caller;
+        Agent *agent_target;
+        agent_caller = (Agent*) Task_getEnv(caller);
+        agent_target = (Agent*) Task_getEnv(target_agent);
 
-        if(request==MODIFY){
+        if (target_agent==NULL) return HANDLE_NULL;
+        else if (agent_caller->agent.org==NULL || (agent_caller->agent.org!=NULL && (agent_caller->agent.role==OWNER || agent_caller->agent.role==ADMIN))){
+            if (agent_caller->agent.org==agent_target->agent.org){
+                    /*Setting msg*/
+                    msg.type=REQUEST;
+                    msg.content_int=KILL;
+                    msg.target_agent=target_agent;
+                    msg.sender_agent=Task_self();
 
-            /*Setting msg*/
-            msg.type=REQUEST;
-            msg.content_int=request;
-            msg.content_string=(String) content;
-            msg.target_agent=target_agent;
-            msg.sender_agent=Task_self();
+                    //Get the AMS info*/
+                    AMS=agent_caller->agent.AP;
 
-            /*Getting AP address:
-             * 1. Get the Agent info
-             * 2. Get the AMS info*/
-            temp= (Agent_info*) Task_getEnv(caller);
-            AMS=temp->AP;
-
-            /*Sending request*/
-            Mailbox_post(get_mailbox(AMS), (xdc_Ptr)&msg, BIOS_NO_WAIT);
-
-            /*Waiting for answer*/
-            receive(timeout);
-
-            return msg.type;
+                    /*Sending request*/
+                    if(Mailbox_post(get_mailbox(AMS), (xdc_Ptr)&msg, BIOS_NO_WAIT)){
+                        if(agent_target->agent.aid==NULL)  {
+                            target_agent=NULL;
+                            return NO_ERROR;
+                        }
+                        else return INVALID;
+                    }
+                    else return INVALID;
+            }
+            else return INVALID;
         }
+        else return INVALID;
+   }
+/*********************************************************************************************
+* Class: Agent_Msg
+* Function: int request_AP(int request, Agent target_agent,int new_pri)
+* Return type: Int
+* Comment: request the AMS agent to modify priority of target agent.
+*           Returns NO_ERROR if request was posted correctly.
+**********************************************************************************************/
+    int Agent_Msg::modify_pri(Agent_AID target_agent, int new_pri){
+        Agent_AID AMS;
+        Agent *agent_caller;
+        Agent *agent_target;
+        agent_caller = (Agent*) Task_getEnv(caller);
+        agent_target = (Agent*) Task_getEnv(target_agent);
 
-        else return REFUSE;
-    }
+        if (target_agent==NULL) return HANDLE_NULL;
+        else if (agent_caller->agent.org==NULL || (agent_caller->agent.org!=NULL && (agent_caller->agent.role==OWNER || agent_caller->agent.role==ADMIN))){
+            if (agent_caller->agent.org==agent_target->agent.org){
+                /*Setting msg*/
+                msg.type=REQUEST;
+                msg.content_int=MODIFY;
+                msg.content_string=(String) new_pri;
+                msg.target_agent=target_agent;
+                msg.sender_agent=Task_self();
+
+                //Get the AMS info*/
+                AMS=agent_caller->agent.AP;
+
+                if (Mailbox_post(get_mailbox(AMS), (xdc_Ptr)&msg, BIOS_NO_WAIT)) return NO_ERROR;
+                else return INVALID;
+            }
+            else return INVALID;
+        }
+        else return INVALID;
+   }
 /*********************************************************************************************
 * Class: Agent_Msg
 * Function: void Broadcast();
 * Return type: Int
-* Comment: request the agent to set
+* Comment: request the AMS to broadcast a request message. Returns NO_ERROR
+*          if request was posted correctly.
 **********************************************************************************************/
-    int Agent_Msg::broadcast(int timeout, String content){
+    int Agent_Msg::broadcast(String content){
         Agent_AID AMS;
-        Agent_info *temp;
+        Agent *agent_caller;
+        agent_caller = (Agent*) Task_getEnv(caller);
+
+        if (agent_caller->agent.org==NULL || (agent_caller->agent.org!=NULL && (agent_caller->agent.role==OWNER || agent_caller->agent.role==ADMIN))){
+            msg.type=REQUEST;
+            msg.content_int=BROADCAST;
+            msg.target_agent=NULL;
+            msg.sender_agent=Task_self();
+            msg.content_string=content;
+
+            //Get the AMS info*/
+             AMS=agent_caller->agent.AP;
+
+            /*Sending request*/
+             if (Mailbox_post(get_mailbox(AMS), (xdc_Ptr)&msg, BIOS_NO_WAIT)) return NO_ERROR;
+             else return INVALID;
+        }
+
+        else return INVALID;
+    }
+/*********************************************************************************************
+* Class: Agent_Msg
+* Function: void restart();
+* Return type: Int
+* Comment: request the AMS to kill itself and create it again.
+**********************************************************************************************/
+    int Agent_Msg::restart(){
+        Agent_AID AMS;
+        Agent *agent_caller;
+        agent_caller = (Agent*) Task_getEnv(caller);
 
         msg.type=REQUEST;
-        msg.content_int=BROADCAST;
-        msg.target_agent=NULL;
+        msg.content_int=RESTART;
+        msg.target_agent=Task_self();
         msg.sender_agent=Task_self();
-        msg.content_string=content;
 
-        /*Getting AP address:
-         * 1. Get the Agent info
-         * 2. Get the AMS info*/
-        temp= (Agent_info*) Task_getEnv(caller);
-        AMS=temp->AP;
+        //Get the AMS info*/
+        AMS=agent_caller->agent.AP;
 
         /*Sending request*/
-        Mailbox_post(get_mailbox(AMS), (xdc_Ptr)&msg, BIOS_NO_WAIT);
+        if (Mailbox_post(get_mailbox(AMS), (xdc_Ptr)&msg, BIOS_NO_WAIT)) return NO_ERROR;
+        else return INVALID;
 
-        /*Waiting for answer*/
-        receive(timeout);
-        return msg.type;
     }
-
-
 }
