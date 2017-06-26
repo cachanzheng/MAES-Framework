@@ -70,7 +70,7 @@ class sensor_control:public CyclicBehaviour{
           GateMutexPri_leave(i2cGate, gatekey);
 
           /*Sending to UART port*/
-          msg.send(Kalman_AID);
+          msg.send(Kalman_AID,BIOS_NO_WAIT);
         }
     }
 };

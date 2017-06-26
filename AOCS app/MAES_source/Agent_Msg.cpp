@@ -106,13 +106,18 @@ namespace MAES
 * Class: Agent_Msg
 * Function: refresh_list()
 * Return type: NULL
-* Comment: Refresh the list with all the registered agents. Remove agent if it is not registered
+* Comment: Refresh the list with all the registered agents. Remove agent if it is not registered or not
+* same organization
 **********************************************************************************************/
     void Agent_Msg::refresh_list(){
-        int i=0;
-        while (i<subscribers){
-            if(!isRegistered(receivers[i]))remove_receiver(receivers[i]);
-            i++;
+        Agent *agent_caller,*agent_receiver;
+        agent_caller = (Agent*) Task_getEnv(caller);
+
+        for (int i=0; i<subscribers; i++){
+            agent_receiver=(Agent*) Task_getEnv(receivers[i]);
+            if(!isRegistered(receivers[i]) || agent_caller->agent.org!=agent_receiver->agent.org){
+                remove_receiver(receivers[i]);
+            }
         }
     }
 /*********************************************************************************************
@@ -137,7 +142,7 @@ namespace MAES
 *          Send only if is registered in platform
 *          Send only if same organizaton
 **********************************************************************************************/
-    int Agent_Msg::send(Agent_AID aid_receiver){
+    ERROR_CODE Agent_Msg::send(Agent_AID aid_receiver,int timeout){
         msg.target_agent=aid_receiver;
         msg.sender_agent=caller;
 
@@ -147,39 +152,40 @@ namespace MAES
         agent_receiver=(Agent*) Task_getEnv(aid_receiver);
 
         if (!isRegistered(aid_receiver)) return NOT_REGISTERED;
-        else if (agent_caller->agent.org==NULL && agent_receiver->agent.org==NULL){ //Anarchy
-            if(Mailbox_post(get_mailbox(aid_receiver), (xdc_Ptr)&msg, BIOS_NO_WAIT)) return NO_ERROR;
-            else return TIMEOUT;
-        }
 
-        else if (agent_caller->agent.org==agent_receiver->agent.org){
-            if (agent_caller->agent.org->org_type!=HIERARCHY || (agent_caller->agent.org->org_type==HIERARCHY && agent_receiver->agent.role==MODERATOR)){
-                if(Mailbox_post(get_mailbox(aid_receiver), (xdc_Ptr)&msg, BIOS_NO_WAIT)) return NO_ERROR;
+        else{
+
+            if (agent_caller->agent.org==NULL && agent_receiver->agent.org==NULL){ //Anarchy
+                if(Mailbox_post(get_mailbox(aid_receiver), (xdc_Ptr)&msg, timeout)) return NO_ERROR;
                 else return TIMEOUT;
             }
-            else return INVALID;
-        }
 
-        else return INVALID;
+             if (agent_caller->agent.org==agent_receiver->agent.org){
+                if (agent_caller->agent.org->org_type!=HIERARCHY || (agent_caller->agent.org->org_type==HIERARCHY && agent_receiver->agent.role==MODERATOR)){
+                    if(Mailbox_post(get_mailbox(aid_receiver), (xdc_Ptr)&msg, timeout)) return NO_ERROR;
+                    else return TIMEOUT;
+                }
+                else return  INVALID;
+            }
+            else return NOT_REGISTERED;
+        }
     }
 /*********************************************************************************************
 * Class: Agent_Msg
 * Function: send()
 * Return type: Boolean. TRUE if all msgs are sent successfully to all receivers
 *                       FALSE if there were an error.
-* Comment: Iterate over the list. If there is an error for any receiver, will return false
-*          if there is any error.
+* Comment: Iterate over the list. Returns last error.
 **********************************************************************************************/
-     bool Agent_Msg::send(){
+     ERROR_CODE Agent_Msg::send(){
         int i=0;
         int error_code;
-        bool error=false;
+        int error=NO_ERROR;
 
         while (receivers[i]!=NULL){
-            error_code=send(receivers[i]);
-            if (error_code==NO_ERROR) i++;
-            else if (error_code==NOT_REGISTERED) refresh_list();
-            else error = true;
+            error_code=send(receivers[i],BIOS_NO_WAIT);
+            if (error_code!=NO_ERROR) error = error_code;
+            i++;
         }
         return error;
     }

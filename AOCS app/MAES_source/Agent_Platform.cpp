@@ -531,7 +531,7 @@ namespace MAES{
                             }
                             /*Respond*/
                             msg.set_msg_int(error_msg);
-                            msg.send(msg.get_sender());
+                            msg.send(msg.get_sender(),BIOS_NO_WAIT);
                             break;
 
                         case DEREGISTER:
@@ -548,7 +548,7 @@ namespace MAES{
                             }
                             /*Respond*/
                             msg.set_msg_int(error_msg);
-                            msg.send(msg.get_sender());
+                            msg.send(msg.get_sender(),BIOS_NO_WAIT);
                             break;
 
                         case KILL:
@@ -565,7 +565,7 @@ namespace MAES{
                               }
                             /*Respond*/
                             msg.set_msg_int(error_msg);
-                            msg.send(msg.get_sender());
+                            msg.send(msg.get_sender(),BIOS_NO_WAIT);
                             break;
 
                         case RESUME:
@@ -582,7 +582,7 @@ namespace MAES{
                                 }
                                 /*Respond*/
                                 msg.set_msg_int(error_msg);
-                                msg.send(msg.get_sender());
+                                msg.send(msg.get_sender(),BIOS_NO_WAIT);
                                 break;
 
                             case SUSPEND:
@@ -599,7 +599,7 @@ namespace MAES{
                                 }
                                 /*Respond*/
                                 msg.set_msg_int(error_msg);
-                                msg.send(msg.get_sender());
+                                msg.send(msg.get_sender(),BIOS_NO_WAIT);
                                 break;
 
                             case MODIFY:
@@ -616,7 +616,7 @@ namespace MAES{
                                 }
                                 /*Respond*/
                                 msg.set_msg_int(error_msg);
-                                msg.send(msg.get_sender());
+                                msg.send(msg.get_sender(),BIOS_NO_WAIT);
                                 break;
 
                             case BROADCAST:
@@ -630,7 +630,7 @@ namespace MAES{
                                 }
                                 /*Respond*/
                                 msg.set_msg_type(error_msg);
-                                msg.send(msg.get_sender());
+                                msg.send(msg.get_sender(),BIOS_NO_WAIT);
                                 break;
 
                             case RESTART:
@@ -639,7 +639,7 @@ namespace MAES{
                                 }
                                 else{
                                     msg.set_msg_type(REFUSE);
-                                    msg.send(msg.get_sender());
+                                    msg.send(msg.get_sender(),BIOS_NO_WAIT);
                                 }
                                break;
 
@@ -649,7 +649,7 @@ namespace MAES{
                     else{
                         msg.set_msg_type(NOT_UNDERSTOOD);
                         msg.set_msg_int(INVALID);
-                        msg.send(msg.get_sender());
+                        msg.send(msg.get_sender(),BIOS_NO_WAIT);
                     }
                 }//finish while
         }

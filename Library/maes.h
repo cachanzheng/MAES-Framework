@@ -186,6 +186,7 @@ typedef int         MSG_TYPE;
     public:
         friend class Agent_Platform;
         friend class Agent_Msg;
+        friend class Agent_Organization;
         /*Constructor*/
         Agent(String name, int pri, char *AgentStack,int sizeStack);
 
@@ -289,8 +290,8 @@ namespace{
         void clear_all_receiver();
         void refresh_list();
         MSG_TYPE receive(Uint32 timeout);
-        int send(Agent_AID aid_receiver);
-        bool send();
+        ERROR_CODE send(Agent_AID aid_receiver,int timeout);
+        ERROR_CODE send();
         void set_msg_type(int type);
         void set_msg_string(String body);
         void set_msg_int(int content);
@@ -326,11 +327,13 @@ namespace{
     class Agent_Organization{
     public:
         Agent_Organization(int organization_type);
-        ~Agent_Organization();
+      //  ~Agent_Organization();
         ERROR_CODE create();
         ERROR_CODE destroy();
-        ERROR_CODE isBanned(Agent_AID aid);
         ERROR_CODE isMember(Agent_AID aid);
+        ERROR_CODE isBanned(Agent_AID aid);
+        ERROR_CODE add_agent(Agent_AID aid);
+        ERROR_CODE kick_agent(Agent_AID aid);
         ERROR_CODE change_owner(Agent_AID aid);
         ERROR_CODE set_admin(Agent_AID aid);
         ERROR_CODE set_moderator(Agent_AID aid);
@@ -339,13 +342,15 @@ namespace{
         void clear_ban_list();
         void set_participant(Agent_AID aid);
         void set_visitor(Agent_AID aid);
-        int get_size();
-        ERROR_CODE add_agent(Agent_AID aid);
-        ERROR_CODE kick_agent(Agent_AID aid);
-        ERROR_CODE leave(); //to do: check
-        ERROR_CODE invite(Agent_Msg msg, int password, Agent_AID target_agent, int timeout);
-        const org_info* get_info();
         int get_org_type();
+        org_info get_info();
+        int get_size();
+
+
+        ERROR_CODE invite(Agent_Msg msg, int password, Agent_AID target_agent, int timeout);
+
+
+        void print();
 
     private:
         org_info description;

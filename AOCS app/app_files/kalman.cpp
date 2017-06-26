@@ -92,7 +92,7 @@ class kalman_filter: public CyclicBehaviour{
 
                 gyro_meas=gyro_meas_next;
                 step=GET_MEASUREMENTS;
-                msg.send(UART_AID);
+                msg.send(UART_AID,BIOS_NO_WAIT);
                 break;
         }
     }

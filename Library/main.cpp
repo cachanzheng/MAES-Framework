@@ -32,8 +32,8 @@ Agent_Stack Agent2[2048];
 Agent_Stack Agent3[4096];
 Agent_Stack Agent4[1024];
 Agent Reading("Agent 1", 2, Agent1,2048);
-Agent Reading2("Agent 2", 3, Agent2,2048);
-Agent Writing("Writing Agent",2,Agent3,4096);
+Agent Reading2("Agent 2", 2, Agent2,2048);
+Agent Writing("Writing Agent",1,Agent3,4096);
 Agent test("New Agent",2,Agent4,1024);
 
 class behaviours:public CyclicBehaviour{
@@ -46,7 +46,8 @@ public:
     void action(){
 
        // msg.set_msg_string(55);
-        msg.send();
+      //  System_printf("error %x\n", msg.send(ReadingAID));
+       msg.send();
         System_flush();
         Task_sleep(500);
 
@@ -59,6 +60,7 @@ void function(UArg arg0, UArg arg1){
 
 /*Constructing platform and AID handle*/
 Agent_Platform AP("Texas Instruments");
+Agent_Organization Org1(HIERARCHY);
 
 /*  ======== main ========
  */
@@ -78,6 +80,7 @@ int main()
     AP.agent_init(Reading, reading, ReadingAID);
     AP.agent_init(Writing, function, WritingAID);
     AP.agent_init(Reading2, reading2, Reading2AID);
+  //  AP.agent_init(test, reading2, test123);
     AP.boot();
 
     BIOS_start();
@@ -86,30 +89,42 @@ int main()
 
 void reading(UArg arg0, UArg arg1)
 {
-     Agent_Msg msg;
-     int i=0;
-     System_printf("Yuju\n");
-     System_flush();
-     while(1) {
-         if (i==5) msg.restart();
-         msg.receive(BIOS_WAIT_FOREVER);
-         System_printf("Agent1\n");
-           System_flush();
-         AP.agent_wait(500);
-         GPIO_toggle(Board_LED0);
-         i++;
+    Agent_Msg msg;
+    int i=0;
+
+    while(1) {
+
+        msg.receive(BIOS_WAIT_FOREVER);
+        System_printf("Agent1\n");
+        System_flush();
+        AP.agent_wait(500);
+        GPIO_toggle(Board_LED0);
+        i++;
     }
 }
 
 void reading2(UArg arg0, UArg arg1)
 {
     Agent_Msg msg;
-
+    int i=0;
+    Org1.create();
+    System_printf("Adding %x\n", Org1.add_agent(ReadingAID));
+    System_printf("Adding %x\n", Org1.add_agent(WritingAID));
+    System_printf("Change %x\n", Org1.set_admin(Reading2AID));
+    System_printf("Change %x\n", Org1.set_moderator(Reading2AID));
+    System_flush();
     while(1) {
         msg.receive(BIOS_WAIT_FOREVER);
         System_printf("Agent2\n");
         System_flush();
         GPIO_toggle(Board_LED1);
+
+        if (i==5) {
+                   Org1.destroy();
+
+
+       }
+        i++;
      }
 }
 
