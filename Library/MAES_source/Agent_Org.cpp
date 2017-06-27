@@ -8,7 +8,7 @@ void Agent_Organization::print(){
 //    System_printf("mode %x\n", description.moderator);
 //    System_flush();
 
-    for (int i=0; i<description.next_available;i++){
+    for (int i=0; i<description.members_num;i++){
               System_printf("member %x \n", description.members[i]);
               System_printf("banned %x \n", banned[i]);
              // System_printf("description %x\n", description.owner);
@@ -23,7 +23,7 @@ void Agent_Organization::print(){
 *********************************************************************************************/
     Agent_Organization::Agent_Organization(int type){
         description.org_type=type;
-        description.next_available=0;
+        description.members_num=0;
         banned_num=0;
 
         for (int i=0; i<AGENT_LIST_SIZE;i++){
@@ -40,7 +40,7 @@ void Agent_Organization::print(){
 * Comments:  Private member, search member within the list.
 *********************************************************************************************/
     int Agent_Organization::isMember(Agent_AID aid){
-        for(int i=0;i<description.next_available;i++){
+        for(int i=0;i<description.members_num;i++){
           if (description.members[i]==aid) return FOUND;
         }
         return NOT_FOUND;
@@ -69,7 +69,8 @@ void Agent_Organization::print(){
 *           is assigned. If it already has owner or it is not registered to any platform, returns false.
 *********************************************************************************************/
     ERROR_CODE Agent_Organization::create(){
-        if(description.owner==NULL){
+        if (Task_self()==NULL) return INVALID;
+        else if(description.owner==NULL){
             Agent *agent=(Agent *)Task_getEnv(Task_self());
 
             if(agent->agent.AP!=NULL) {
@@ -77,8 +78,8 @@ void Agent_Organization::print(){
                 agent->agent.affiliation=OWNER;
                 agent->agent.org=&description;
                 description.owner=Task_self();
-                description.members[description.next_available]=description.owner;
-                description.next_available++;
+                description.members[description.members_num]=description.owner;
+                description.members_num++;
                 return NO_ERROR;
             }
             else return NOT_REGISTERED;
@@ -99,13 +100,13 @@ void Agent_Organization::print(){
     ERROR_CODE Agent_Organization::add_agent(Agent_AID aid){
         Agent *agent=(Agent *)Task_getEnv(aid);
 
-        if (description.next_available==AGENT_LIST_SIZE) return LIST_FULL;
+        if (description.members_num==AGENT_LIST_SIZE) return LIST_FULL;
         else if (agent->agent.org!=NULL || isBanned(aid)==FOUND || agent->agent.AP==NULL) return INVALID;
         else if (isMember(aid)==FOUND) return DUPLICATED;
         else if (description.owner==Task_self() || description.admin==Task_self()){
 
-            description.members[description.next_available]=aid;
-            description.next_available++;
+            description.members[description.members_num]=aid;
+            description.members_num++;
             agent->agent.affiliation=MEMBER;
             agent->agent.role=VISITOR;
             agent->agent.org=&description;
@@ -134,7 +135,7 @@ void Agent_Organization::print(){
                         i++;
                     }
                     description.members[AGENT_LIST_SIZE-1]=NULL;
-                    description.next_available--;
+                    description.members_num--;
                     agent->agent.role=NONE;
                     agent->agent.affiliation=NONE;
                     agent->agent.org=NULL;
@@ -161,7 +162,7 @@ void Agent_Organization::print(){
     ERROR_CODE  Agent_Organization::destroy(){
         if (description.owner==Task_self()){
             Agent * agent;
-            for(int i=0;i<description.next_available;i++){
+            for(int i=0;i<description.members_num;i++){
                 agent = (Agent*) Task_getEnv(description.members[i]);
                 agent->agent.org=NULL;
                 agent->agent.affiliation=NONE;
@@ -323,7 +324,7 @@ void Agent_Organization::print(){
 * Comments: How many agents are inside the organization
 *********************************************************************************************/
     int Agent_Organization::get_size(){
-       return description.next_available;
+       return description.members_num;
     }
 
 

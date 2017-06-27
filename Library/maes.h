@@ -108,7 +108,7 @@ typedef int         MSG_TYPE;
 **********************************************************************************************/
     typedef struct{
         int org_type;
-        int next_available;
+        int members_num;
         Agent_AID members[AGENT_LIST_SIZE];
         Agent_AID owner;
         Agent_AID admin;
@@ -153,6 +153,16 @@ typedef int         MSG_TYPE;
     }Agent_info;
 
 /*********************************************************************************************
+* Class: Agent_resources
+* Variables: Agent_Stack *stack: pointer to stack
+*            int size: Agent Size
+***********************************************************************************************/
+    typedef struct{
+        char *stack;
+        int stackSize;
+    }Agent_resources;
+
+/*********************************************************************************************
  *                                         CLASSES                                           *
 **********************************************************************************************
 **********************************************************************************************
@@ -192,8 +202,7 @@ typedef int         MSG_TYPE;
 
     private:
         Agent();
-        char *stack;
-        int stackSize;
+        Agent_resources resources;
         Agent_info agent;
     };
 
@@ -232,7 +241,6 @@ namespace{
 
         /*Methods*/
         bool boot();
-        bool boot(int taskstackSize);
 
         /*Only called from Main*/
         void agent_init(Agent &a, Task_FuncPtr behaviour, Agent_AID &aid);
@@ -259,8 +267,8 @@ namespace{
 
     private:
         /*Class variables*/
-        char task_stack[2048];
         Agent agentAMS;
+        char task_stack[4096];
         Agent_AID Agent_Handle[AGENT_LIST_SIZE];
         int subscribers;
         USER_DEF_COND cond;
@@ -345,8 +353,6 @@ namespace{
         int get_org_type();
         org_info get_info();
         int get_size();
-
-
         ERROR_CODE invite(Agent_Msg msg, int password, Agent_AID target_agent, int timeout);
 
 

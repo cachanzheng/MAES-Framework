@@ -46,7 +46,7 @@ namespace MAES{
 * Class: Agent_Platform
 * Function: bool init();
 * Return: Boolean
-* Comment: Create AMS task with default stack of 2048. Can only deployed in Main
+* Comment: Create AMS task with default stack of 4096. Can only deployed in Main
 ***********************************************************************************************/
     bool Agent_Platform::boot(){
         if (Task_self()==NULL){
@@ -62,52 +62,7 @@ namespace MAES{
             /*Creating task*/
             Task_Params_init(&taskParams);
             taskParams.stack=&task_stack;
-            taskParams.stackSize = 2048;
-            taskParams.priority = Task_numPriorities-1;//Assigning max priority
-            taskParams.instance->name= "AMS";
-            taskParams.env=&agentAMS;
-            taskParams.arg0=(UArg)this;
-            taskParams.arg1=(UArg)ptr_cond;
-            agentAMS.agent.aid= Task_create(AMS_task, &taskParams, NULL);
-            agentAMS.agent.AP=agentAMS.agent.aid;
-
-            /*Initializing all the previously created task*/
-            if (agentAMS.agent.aid!=NULL){
-                temp=Task_Object_first();
-                while (temp!=NULL && temp!=agentAMS.agent.aid!=NULL){
-                    register_agent(temp);
-                    temp=Task_Object_next(temp);
-                }
-                return NO_ERROR;
-            }
-            else {
-                System_abort("AP init failed");
-                return INVALID;
-            }
-        }
-        else return INVALID;
-   }
-
-/*********************************************************************************************
-* Class: Agent_Platform
-* Function: bool init(Task_FuncPtr action,int taskstackSize);;
-* Comment: Create AMS task with user custom stack size
-*          Be aware of heap size
-**********************************************************************************************/
-    bool Agent_Platform::boot(int taskstackSize){
-        if (Task_self()==NULL){
-            Agent_AID temp;
-
-            Mailbox_Params mbxParams;
-            Task_Params taskParams;
-
-            /*Creating mailbox*/
-            Mailbox_Params_init(&mbxParams);
-            agentAMS.agent.mailbox_handle= Mailbox_create(20,8,&mbxParams,NULL);
-
-            /*Creating task*/
-            Task_Params_init(&taskParams);
-            taskParams.stackSize =  taskstackSize;
+            taskParams.stackSize = 4096;
             taskParams.priority = Task_numPriorities-1;//Assigning max priority
             taskParams.instance->name= "AMS";
             taskParams.env=&agentAMS;
@@ -154,8 +109,8 @@ namespace MAES{
 
             /*Creating task*/
             Task_Params_init(&taskParams);
-            taskParams.stack=a.stack;
-            taskParams.stackSize =a.stackSize;
+            taskParams.stack=a.resources.stack;
+            taskParams.stackSize =a.resources.stackSize;
             taskParams.priority = -1;
             taskParams.instance->name=a.agent.agent_name; //To do: take that out to optimize
             taskParams.env=(xdc_Ptr) &a;
@@ -189,8 +144,8 @@ namespace MAES{
 
             /*Creating task*/
             Task_Params_init(&taskParams);
-            taskParams.stack=a.stack;
-            taskParams.stackSize =a.stackSize;
+            taskParams.stack=a.resources.stack;
+            taskParams.stackSize =a.resources.stackSize;
             taskParams.priority = -1;
             taskParams.instance->name=a.agent.agent_name; //To do: take that out to optimize
             taskParams.env=(xdc_Ptr) &a;
@@ -492,8 +447,8 @@ namespace MAES{
 
             /*Creating task*/
             Task_Params_init(&taskParams);
-            taskParams.stack=a->stack;
-            taskParams.stackSize =a->stackSize;
+            taskParams.stack=a->resources.stack;
+            taskParams.stackSize =a->resources.stackSize;
             taskParams.priority = a->agent.priority;
             taskParams.instance->name="test";//a->agent.agent_name; //To do: take that out to optimize
             taskParams.env=(xdc_Ptr) a;
