@@ -15,8 +15,8 @@ namespace MAES{
             agent.mailbox_handle=NULL;
             agent.agent_name=name;
             agent.priority = pri;
-            stack=AgentStack;
-            stackSize=sizeStack;
+            resources.stack=AgentStack;
+            resources.stackSize=sizeStack;
             agent.AP=NULL;
             agent.org=NULL;
             agent.affiliation=NONE;
