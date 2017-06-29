@@ -161,7 +161,7 @@ namespace MAES
             }
 
              if (agent_caller->agent.org==agent_receiver->agent.org){
-                if (agent_caller->agent.org->org_type!=HIERARCHY || (agent_caller->agent.org->org_type==HIERARCHY && agent_receiver->agent.role==MODERATOR)){
+                if (agent_caller->agent.org->org_type==TEAM && agent_caller->agent.role==PARTICIPANT || (agent_caller->agent.org->org_type==HIERARCHY && agent_receiver->agent.role==MODERATOR)){
                     if(Mailbox_post(get_mailbox(aid_receiver), (xdc_Ptr)&msg, timeout)) return NO_ERROR;
                     else return TIMEOUT;
                 }

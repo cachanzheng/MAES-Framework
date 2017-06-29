@@ -1,20 +1,6 @@
 #include "maes.h"
 namespace MAES
 {
-
-void Agent_Organization::print(){
-//    System_printf("owner %x\n", description.owner);
-//    System_printf("admin %x\n", description.admin);
-//    System_printf("mode %x\n", description.moderator);
-//    System_flush();
-
-    for (int i=0; i<description.members_num;i++){
-              System_printf("member %x \n", description.members[i]);
-              System_printf("banned %x \n", banned[i]);
-             // System_printf("description %x\n", description.owner);
-              System_flush();
-    }
-}
 /*********************************************************************************************
 * Class: Agent_Organization
 * Function: Organization constructor
@@ -24,11 +10,11 @@ void Agent_Organization::print(){
     Agent_Organization::Agent_Organization(int type){
         description.org_type=type;
         description.members_num=0;
-        banned_num=0;
+        description.banned_num=0;
 
         for (int i=0; i<AGENT_LIST_SIZE;i++){
             description.members[i]=NULL;
-            banned[i]=NULL;
+            description.banned[i]=NULL;
         }
 
     }
@@ -52,8 +38,8 @@ void Agent_Organization::print(){
 * Comments:  Private member, search member within the list.
 *********************************************************************************************/
     int Agent_Organization::isBanned(Agent_AID aid){
-        for(int i=0;i<banned_num;i++){
-            if (banned[i]==aid) return FOUND;
+        for(int i=0;i<description.banned_num;i++){
+            if (description.banned[i]==aid) return FOUND;
 
         }
         return NOT_FOUND;
@@ -93,7 +79,7 @@ void Agent_Organization::print(){
 * Return type: int
 * Comments: adds agent as member to the list. Only can be done by owner or admin.
 *           Returns error if: List is full, agent is already in another org, it's not
-*           registered in the platform, it's duplicated, it's banned
+*           registered in the platform, it's duplicated, it's description.banned
 *           or this method is performed other than
 *           owner or admin.
 *********************************************************************************************/
@@ -108,7 +94,7 @@ void Agent_Organization::print(){
             description.members[description.members_num]=aid;
             description.members_num++;
             agent->agent.affiliation=MEMBER;
-            agent->agent.role=VISITOR;
+            agent->agent.role=PARTICIPANT;
             agent->agent.org=&description;
             return NO_ERROR;
         }
@@ -170,8 +156,8 @@ void Agent_Organization::print(){
                 description.members[i]=NULL;
 
             }
-            for(int i=0; i<banned_num;i++){
-                 banned[i]=NULL;
+            for(int i=0; i<description.banned_num;i++){
+                 description.banned[i]=NULL;
             }
             return NO_ERROR;
         }
@@ -236,15 +222,15 @@ void Agent_Organization::print(){
 * Class: Agent_Organization
 * Function: bool ban_agent(Agent_AID aid)
 * Return type: Boolean
-* Comments: Looks if the aid is already banned. If not put it to the list.
+* Comments: Looks if the aid is already description.banned. If not put it to the list.
 *           Only can be done by owner and moderator.
 *********************************************************************************************/
     ERROR_CODE Agent_Organization::ban_agent(Agent_AID aid){
-        if (banned_num==AGENT_LIST_SIZE) return LIST_FULL;
+        if (description.banned_num==AGENT_LIST_SIZE) return LIST_FULL;
         else if (isBanned(aid)==FOUND)  return DUPLICATED;
         else if (description.owner==Task_self() || description.admin==Task_self()){
-            banned[banned_num]=aid;
-            banned_num++;
+            description.banned[description.banned_num]=aid;
+            description.banned_num++;
             if(isMember(aid)==FOUND) kick_agent(aid);
             return NO_ERROR;
         }
@@ -255,20 +241,20 @@ void Agent_Organization::print(){
 * Class: Agent_Organization
 * Function: ERROR_CODE remove_ban(Agent_AID aid)
 * Return type: Boolean
-* Comments: Looks if the aid is already banned. If not put it to the list.
+* Comments: Looks if the aid is already description.banned. If not put it to the list.
 *           only can be done by owner and moderator.
 *********************************************************************************************/
     ERROR_CODE Agent_Organization::remove_ban(Agent_AID aid){
         if (description.owner==Task_self() || description.admin==Task_self()){
             int i=0;
             while(i<AGENT_LIST_SIZE){
-                if(banned[i]==aid){
+                if(description.banned[i]==aid){
                     while(i<AGENT_LIST_SIZE-1){
-                       banned[i]=banned[i+1];
+                       description.banned[i]=description.banned[i+1];
                        i++;
                     }
-                    banned[AGENT_LIST_SIZE-1]=NULL;
-                    banned_num--;
+                    description.banned[AGENT_LIST_SIZE-1]=NULL;
+                    description.banned_num--;
                     break;
                 }
                 i++;
@@ -283,13 +269,13 @@ void Agent_Organization::print(){
 * Class: Agent_Organization
 * Function: void clear_ban_list()
 * Return type: Boolean
-* Comments: Clears all the banned list
+* Comments: Clears all the description.banned list
 *           only can be done by owner and moderator.
 *********************************************************************************************/
     void Agent_Organization::clear_ban_list(){
         if (description.owner==Task_self() || description.admin==Task_self()){
             for(int i=0;i<AGENT_LIST_SIZE;i++){
-               banned[i]=NULL;
+               description.banned[i]=NULL;
             }
         }
     }
@@ -299,11 +285,13 @@ void Agent_Organization::print(){
 * Return type: NULL
 * Comments: Gives voice to an agent
 *********************************************************************************************/
-    void Agent_Organization::set_participant(Agent_AID aid){
+    ERROR_CODE Agent_Organization::set_participant(Agent_AID aid){
         if ((description.owner==Task_self() || description.moderator==Task_self()) && isMember(aid)==FOUND){
             Agent *agent=(Agent *)Task_getEnv(aid);
             agent->agent.role=PARTICIPANT;
+            return NO_ERROR;
         }
+        else return INVALID;
     }
 /*********************************************************************************************
 * Class: Agent_Organization
@@ -311,11 +299,13 @@ void Agent_Organization::print(){
 * Return type: NULL
 * Comments: Agent only can hear but not talk
 *********************************************************************************************/
-    void Agent_Organization::set_visitor(Agent_AID aid){
+    ERROR_CODE Agent_Organization::set_visitor(Agent_AID aid){
         if ((description.owner==Task_self() || description.moderator==Task_self()) && isMember(aid)==FOUND){
             Agent *agent=(Agent *)Task_getEnv(aid);
             agent->agent.role=VISITOR;
+            return NO_ERROR;
         }
+        else return INVALID;
     }
 /*********************************************************************************************
 * Class: Agent_Organization
@@ -346,30 +336,30 @@ void Agent_Organization::print(){
     int Agent_Organization::get_org_type(){
         return description.org_type;
     }
-///*********************************************************************************************
-//* Class: Agent_Organization
-//* Function: invite(Agent_Msg msg, int password, Agent_AID target_agent, int timeout)
-//* Return type: int
-//* Comments: Invite specific agent and wait response for certain time.
-//*********************************************************************************************/
-//    MSG_TYPE Agent_Organization::invite(Agent_Msg msg, int password, Agent_AID target_agent, int timeout){
-//        Agent *caller=(Agent *)Task_getEnv(Task_self());
-//
-//        if (caller->affiliation==OWNER || caller->affiliation==ADMIN){
-//            msg.set_msg_type(PROPOSE);
-//            msg.set_msg_string("Join Organization");
-//            msg.set_msg_int(password);
-//            msg.send(target_agent);
-//
-//            msg.receive(timeout);
-//
-//            if (msg.get_msg_type()==ACCEPT_PROPOSAL) add_agent (target_agent);
-//        }
-//
-//        else msg.set_msg_type(REFUSE);
-//        return msg.get_msg_type();
-//
-//    }
+/*********************************************************************************************
+* Class: Agent_Organization
+* Function: invite(Agent_Msg msg, int password, Agent_AID target_agent, int timeout)
+* Return type: int
+* Comments: Invite specific agent and wait response for certain time.
+*********************************************************************************************/
+    MSG_TYPE Agent_Organization::invite(Agent_Msg msg, int password, Agent_AID target_agent, int timeout){
+        Agent *caller=(Agent *)Task_getEnv(Task_self());
+
+        if (caller->agent.affiliation==OWNER || caller->agent.affiliation==ADMIN){
+            msg.set_msg_type(PROPOSE);
+            msg.set_msg_string("Join Organization");
+            msg.set_msg_int(password);
+            msg.send(target_agent,timeout);
+
+            msg.receive(timeout);
+
+            if (msg.get_msg_type()==ACCEPT_PROPOSAL) add_agent (target_agent);
+        }
+
+        else msg.set_msg_type(REFUSE);
+        return msg.get_msg_type();
+
+    }
 }
 
 

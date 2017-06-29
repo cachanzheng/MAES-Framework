@@ -109,7 +109,9 @@ typedef int         MSG_TYPE;
     typedef struct{
         int org_type;
         int members_num;
+        int banned_num;
         Agent_AID members[AGENT_LIST_SIZE];
+        Agent_AID banned[AGENT_LIST_SIZE];
         Agent_AID owner;
         Agent_AID admin;
         Agent_AID moderator;
@@ -256,12 +258,12 @@ namespace{
         AP_Description get_AP_description();// to do
 
         /*Services only can be done by AMS task*/
-        int register_agent(Agent_AID aid);
-        int deregister_agent(Agent_AID aid);
-        int kill_agent(Agent_AID aid);
-        int suspend_agent(Agent_AID aid);
-        int resume_agent(Agent_AID aid);
-        int modify_agent_pri(Agent_AID aid,int pri);
+        ERROR_CODE register_agent(Agent_AID aid);
+        ERROR_CODE deregister_agent(Agent_AID aid);
+        ERROR_CODE kill_agent(Agent_AID aid);
+        ERROR_CODE suspend_agent(Agent_AID aid);
+        ERROR_CODE resume_agent(Agent_AID aid);
+        ERROR_CODE modify_agent_pri(Agent_AID aid,int pri);
         void broadcast(MsgObj *msg);
         void restart(Agent_AID aid);
 
@@ -293,8 +295,8 @@ namespace{
         Agent_Msg();
         //friend class AMS_Services;
         /*Methods*/
-        int add_receiver(Agent_AID aid_receiver);
-        int remove_receiver(Agent_AID aid_receiver);
+        ERROR_CODE add_receiver(Agent_AID aid_receiver);
+        ERROR_CODE remove_receiver(Agent_AID aid_receiver);
         void clear_all_receiver();
         void refresh_list();
         MSG_TYPE receive(Uint32 timeout);
@@ -314,7 +316,6 @@ namespace{
         ERROR_CODE kill(Agent_AID &target_agent);
         ERROR_CODE broadcast(String content);
         ERROR_CODE restart();
-        ERROR_CODE create(Agent *a,Task_FuncPtr behaviour,Agent_AID &aid);
 
     private:
         MsgObj msg;
@@ -335,33 +336,27 @@ namespace{
     class Agent_Organization{
     public:
         Agent_Organization(int organization_type);
-      //  ~Agent_Organization();
         ERROR_CODE create();
         ERROR_CODE destroy();
         ERROR_CODE isMember(Agent_AID aid);
         ERROR_CODE isBanned(Agent_AID aid);
-        ERROR_CODE add_agent(Agent_AID aid);
-        ERROR_CODE kick_agent(Agent_AID aid);
         ERROR_CODE change_owner(Agent_AID aid);
         ERROR_CODE set_admin(Agent_AID aid);
         ERROR_CODE set_moderator(Agent_AID aid);
+        ERROR_CODE add_agent(Agent_AID aid);
+        ERROR_CODE kick_agent(Agent_AID aid);
         ERROR_CODE ban_agent(Agent_AID aid);
         ERROR_CODE remove_ban(Agent_AID aid);
         void clear_ban_list();
-        void set_participant(Agent_AID aid);
-        void set_visitor(Agent_AID aid);
+        ERROR_CODE set_participant(Agent_AID aid);
+        ERROR_CODE set_visitor(Agent_AID aid);
         int get_org_type();
         org_info get_info();
         int get_size();
         ERROR_CODE invite(Agent_Msg msg, int password, Agent_AID target_agent, int timeout);
 
-
-        void print();
-
     private:
         org_info description;
-        Agent_AID banned[AGENT_LIST_SIZE];
-        int banned_num;
         bool isRegistered(Agent_AID aid);
     };
 /*********************************************************************************************
