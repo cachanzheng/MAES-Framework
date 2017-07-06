@@ -333,7 +333,7 @@ namespace MAES
 * Return type: int
 * Comments: Get Organization type
 *********************************************************************************************/
-    int Agent_Organization::get_org_type(){
+    ORG_TYPE Agent_Organization::get_org_type(){
         return description.org_type;
     }
 /*********************************************************************************************

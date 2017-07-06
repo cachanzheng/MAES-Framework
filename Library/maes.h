@@ -83,7 +83,6 @@ enum REQUEST_ACTION{
   SUSPEND,
   MODIFY,
   BROADCAST,
-  CREATE,
   RESTART
 };
 /*********************************************************************************************
@@ -364,7 +363,7 @@ namespace{
         void clear_ban_list();
         ERROR_CODE set_participant(Agent_AID aid);
         ERROR_CODE set_visitor(Agent_AID aid);
-        int get_org_type();
+        ORG_TYPE get_org_type();
         org_info get_info();
         int get_size();
         MSG_TYPE invite(Agent_Msg msg, int password, Agent_AID target_agent, int timeout);
