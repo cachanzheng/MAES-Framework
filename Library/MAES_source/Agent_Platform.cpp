@@ -206,7 +206,7 @@ namespace MAES{
 * Return:  NULL
 * Comment: get running mode of agent
 **********************************************************************************************/
-        int Agent_Platform:: get_state(Agent_AID aid){
+        AGENT_MODE Agent_Platform:: get_state(Agent_AID aid){
          if(agent_search(aid)){
              Task_Mode mode;
              mode=Task_getMode(aid);
@@ -224,11 +224,11 @@ namespace MAES{
              case Task_Mode_TERMINATED:
                  return TERMINATED;
 
-             default: return NULL;
+             default: return NO_MODE;
 
              }
          }
-         else return NULL;
+         else return NO_MODE;
         }
 
 /*********************************************************************************************
@@ -262,7 +262,7 @@ namespace MAES{
 * Comment: Register agent to the platform only if
 *          it is unique by agent's task. Only can be done by AMS or Main
 **********************************************************************************************/
-    int Agent_Platform::register_agent(Agent_AID aid){
+    ERROR_CODE Agent_Platform::register_agent(Agent_AID aid){
         if (aid==NULL) return HANDLE_NULL;
         else if (Task_self()==NULL || Task_getPri(Task_self())==Task_numPriorities-1){
             if (!agent_search(aid)){
@@ -288,7 +288,7 @@ namespace MAES{
 * Comment: Deregister agent on the platform by handle. It searches inside of the list, when found,
 *          the rest of the list is shifted to the right and the agent is removed.
 **********************************************************************************************/
-    int Agent_Platform::deregister_agent(Agent_AID aid){
+    ERROR_CODE Agent_Platform::deregister_agent(Agent_AID aid){
         if(Task_getPri(Task_self())==Task_numPriorities-1){
              int i=0;
             while(i<AGENT_LIST_SIZE){
@@ -322,9 +322,9 @@ namespace MAES{
 * Comment: Kill agent on the platform. It deregisters the agent first then it delete the
 *           handles by agent's handle
 **********************************************************************************************/
-    int Agent_Platform::kill_agent(Agent_AID aid){
+    ERROR_CODE Agent_Platform::kill_agent(Agent_AID aid){
         if(Task_getPri(Task_self())==Task_numPriorities-1){
-            int error;
+            ERROR_CODE error;
             error=deregister_agent(aid);
 
             if(error==NO_ERROR){
@@ -349,7 +349,7 @@ namespace MAES{
 * Return:  NULL
 * Comment: suspend_agent Agent. Set it to inactive by setting priority to -1
 **********************************************************************************************/
-    int Agent_Platform::suspend_agent(Agent_AID aid){
+    ERROR_CODE Agent_Platform::suspend_agent(Agent_AID aid){
         if(Task_getPri(Task_self())==Task_numPriorities-1){
             if(agent_search(aid)) {
                 Task_setPri(aid, -1);
@@ -366,7 +366,7 @@ namespace MAES{
 * Return:  NULL
 * Comment: Restore Agent.
 **********************************************************************************************/
-    int Agent_Platform::resume_agent(Agent_AID aid){
+    ERROR_CODE Agent_Platform::resume_agent(Agent_AID aid){
         if(Task_getPri(Task_self())==Task_numPriorities-1){
             if(agent_search(aid)) {
                 Agent* description;
@@ -384,7 +384,7 @@ namespace MAES{
 * Return: Task Handle of the AMS
 * Comment: returns if was successful
 **********************************************************************************************/
-    int Agent_Platform::modify_agent_pri(Agent_AID aid,int pri){
+    ERROR_CODE Agent_Platform::modify_agent_pri(Agent_AID aid,int pri){
         if(Task_getPri(Task_self())==Task_numPriorities-1){
             if (agent_search(aid)){
                 if (pri>=Task_numPriorities-1) pri=Task_numPriorities-2;
@@ -584,7 +584,7 @@ namespace MAES{
                                     error_msg=INVALID;
                                 }
                                 /*Respond*/
-                                msg.set_msg_type(error_msg);
+                                msg.set_msg_int(error_msg);
                                 msg.send(msg.get_sender(),BIOS_NO_WAIT);
                                 break;
 

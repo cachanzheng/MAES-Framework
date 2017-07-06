@@ -19,7 +19,7 @@ namespace MAES{
             resources.stackSize=sizeStack;
             agent.AP=NULL;
             agent.org=NULL;
-            agent.affiliation=NONE;
+            agent.affiliation=NON_MEMBER;
             agent.role=NONE;
     }
 

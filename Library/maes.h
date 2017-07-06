@@ -10,7 +10,7 @@
 namespace MAES
 {
 /*********************************************************************************************
- *                                       DEFINITIONS                                         *
+ *                                      SIZE DEFINITIONS                                         *
 *********************************************************************************************/
 #define AGENT_LIST_SIZE 64
 #define MAX_RECEIVERS   AGENT_LIST_SIZE-1
@@ -20,94 +20,108 @@ namespace MAES
 /*********************************************************************************************
 *   Define Agent Mode
 **********************************************************************************************/
-#define ACTIVE          0x00
-#define SUSPENDED       0x01
-#define WAITING         0x02
-#define TERMINATED      0x03
+enum AGENT_MODE{
+    ACTIVE,
+    SUSPENDED,
+    WAITING,
+    TERMINATED,
+    NO_MODE,
+};
 
 /*********************************************************************************************
 *   Define Error handling
 **********************************************************************************************/
-#define NO_ERROR        0x00
-#define FOUND           0x01
-#define HANDLE_NULL     0x02
-#define LIST_FULL       0x03
-#define DUPLICATED      0x04
-#define NOT_FOUND       0x05
-#define TIMEOUT         0x06
-#define INVALID         0x07
-#define NOT_REGISTERED  0x08
+enum ERROR_CODE{
+  NO_ERROR,
+  FOUND,
+  HANDLE_NULL,
+  LIST_FULL,
+  DUPLICATED,
+  NOT_FOUND,
+  TIMEOUT,
+  INVALID,
+  NOT_REGISTERED,
+};
 
 /*********************************************************************************************
 *   Define msg type according to FIPA ACL Message Representation in Bit-Efficient Encoding
 *   Specification
 **********************************************************************************************/
-#define ACCEPT_PROPOSAL  0x10
-#define AGREE            0x11
-#define CANCEL           0x12
-#define CFP              0x13
-#define CONFIRM          0x14
-#define DISCONFIRM       0x15
-#define FAILURE          0x16
-#define INFORM           0x17
-#define INFORM_IF        0x18
-#define INFORM_REF       0x19
-#define NOT_UNDERSTOOD   0x1A
-#define PROPAGATE        0x1B
-#define PROPOSE          0x1C
-#define QUERY_IF         0x1D
-#define QUERY_REF        0x1E
-#define REFUSE           0x1F
-#define REJECT_PROPOSAL  0x20
-#define REQUEST          0x21
-#define REQUEST_WHEN     0x22
-#define REQUEST_WHENEVER 0x23
-#define SUBSCRIBE        0x24
-#define NO_RESPONSE      0x25
+enum MSG_TYPE{
+   ACCEPT_PROPOSAL,
+   AGREE,
+   CANCEL,
+   CFP,
+   CONFIRM,
+   DISCONFIRM,
+   FAILURE,
+   INFORM,
+   INFORM_IF,
+   INFORM_REF,
+   NOT_UNDERSTOOD,
+   PROPAGATE,
+   PROPOSE,
+   QUERY_IF,
+   QUERY_REF,
+   REFUSE,
+   REJECT_PROPOSAL,
+   REQUEST,
+   REQUEST_WHEN,
+   REQUEST_WHENEVER,
+   SUBSCRIBE,
+   NO_RESPONSE,
+};
+
 /*********************************************************************************************
 *   Define Request Action
 **********************************************************************************************/
-#define REGISTER        0x30
-#define DEREGISTER      0x31
-#define KILL            0x32
-#define RESUME          0x33
-#define SUSPEND         0x34
-#define MODIFY          0x35
-#define BROADCAST       0x36
-#define CREATE          0x37
-#define RESTART         0x38
-
+enum REQUEST_ACTION{
+  REGISTER,
+  DEREGISTER,
+  KILL,
+  RESUME,
+  SUSPEND,
+  MODIFY,
+  BROADCAST,
+  CREATE,
+  RESTART
+};
 /*********************************************************************************************
 *   Define Organization Affiliation/Role
 **********************************************************************************************/
-#define OWNER           0x40
-#define ADMIN           0x41
-#define MEMBER          0X42
-#define OUTCAST         0x43
-#define MODERATOR       0x44
-#define PARTICIPANT     0x45
-#define VISITOR         0x46
-#define NONE            0x47
+enum ORG_AFFILIATION{
+    OWNER,
+    ADMIN,
+    MEMBER,
+    NON_MEMBER,
+};
+
+enum ORG_ROLE{
+  MODERATOR,
+  PARTICIPANT,
+  VISITOR,
+  NONE,
+};
+
 /*********************************************************************************************
 *   Define Organization Type
 **********************************************************************************************/
-#define HIERARCHY       0x50
-#define TEAM            0x51
-
+enum ORG_TYPE{
+    HIERARCHY,
+    TEAM,
+};
 /*********************************************************************************************
  *                                         TYPEDEF                                           *
 **********************************************************************************************/
 typedef Task_Handle Agent_AID;
 typedef char        Agent_Stack;
-typedef int         ERROR_CODE;
-typedef int         MSG_TYPE;
 /*********************************************************************************************
 * Class: Agent_Organization
 * Comment:
 * Variables
 **********************************************************************************************/
     typedef struct{
-        int org_type;
+        ORG_TYPE org_type;
         int members_num;
         int banned_num;
         Agent_AID members[AGENT_LIST_SIZE];
@@ -128,7 +142,7 @@ typedef int         MSG_TYPE;
     typedef struct{
           Agent_AID sender_agent;
           Agent_AID target_agent;
-          int type;
+          MSG_TYPE type;
           String content_string;
           int content_int;
     }MsgObj;
@@ -150,8 +164,8 @@ typedef int         MSG_TYPE;
         int priority;
         Agent_AID AP;
         org_info *org;
-        int affiliation;
-        int role;
+        ORG_AFFILIATION affiliation;
+        ORG_ROLE role;
     }Agent_info;
 
 /*********************************************************************************************
@@ -253,7 +267,7 @@ namespace{
         void agent_wait(Uint32 ticks);
         void agent_yield();
         Agent_AID get_running_agent();
-        int get_state(Agent_AID aid);
+        AGENT_MODE get_state(Agent_AID aid);
         Agent_info get_Agent_description(Agent_AID aid);
         AP_Description get_AP_description();// to do
 
@@ -302,16 +316,16 @@ namespace{
         MSG_TYPE receive(Uint32 timeout);
         ERROR_CODE send(Agent_AID aid_receiver,int timeout);
         ERROR_CODE send();
-        void set_msg_type(int type);
+        void set_msg_type(MSG_TYPE type);
         void set_msg_string(String body);
         void set_msg_int(int content);
         MsgObj *get_msg();
-        int get_msg_type();
+        MSG_TYPE get_msg_type();
         String get_msg_string();
         int get_msg_int();
         Agent_AID get_sender();
         Agent_AID get_target_agent();
-        ERROR_CODE request_AP(int request, Agent_AID target_agent);
+        ERROR_CODE request_AP(REQUEST_ACTION request, Agent_AID target_agent);
         ERROR_CODE modify_pri(Agent_AID target_agent, int pri);
         ERROR_CODE kill(Agent_AID &target_agent);
         ERROR_CODE broadcast(String content);
@@ -335,7 +349,7 @@ namespace{
 **********************************************************************************************/
     class Agent_Organization{
     public:
-        Agent_Organization(int organization_type);
+        Agent_Organization(ORG_TYPE organization_type);
         ERROR_CODE create();
         ERROR_CODE destroy();
         ERROR_CODE isMember(Agent_AID aid);
@@ -353,7 +367,7 @@ namespace{
         int get_org_type();
         org_info get_info();
         int get_size();
-        ERROR_CODE invite(Agent_Msg msg, int password, Agent_AID target_agent, int timeout);
+        MSG_TYPE invite(Agent_Msg msg, int password, Agent_AID target_agent, int timeout);
 
     private:
         org_info description;

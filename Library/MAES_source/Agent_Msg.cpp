@@ -49,7 +49,7 @@ namespace MAES
 * Return type: Boolean. True if receiver is added successfully.
 * Comment: Add receiver to list of receivers by using the agent's aid
 **********************************************************************************************/
-    int Agent_Msg::add_receiver(Agent_AID aid_receiver){
+    ERROR_CODE Agent_Msg::add_receiver(Agent_AID aid_receiver){
 
         if(isRegistered(aid_receiver)){
             if (aid_receiver==NULL) return HANDLE_NULL;
@@ -71,7 +71,7 @@ namespace MAES
 * Comment: Remove receiver in list of receivers. It searches inside of the list, when found,
 * the rest of the list is shifted to the right and the receiver is removed.
 **********************************************************************************************/
-   int Agent_Msg::remove_receiver(Agent_AID aid){
+    ERROR_CODE Agent_Msg::remove_receiver(Agent_AID aid){
 
         int i=0;
         while(i<MAX_RECEIVERS){
@@ -179,8 +179,8 @@ namespace MAES
 **********************************************************************************************/
      ERROR_CODE Agent_Msg::send(){
         int i=0;
-        int error_code;
-        int error=NO_ERROR;
+        ERROR_CODE error_code;
+        ERROR_CODE error=NO_ERROR;
 
         while (receivers[i]!=NULL){
             error_code=send(receivers[i],BIOS_NO_WAIT);
@@ -195,7 +195,7 @@ namespace MAES
 * Return type: NULL
 * Comment: Set message type according to FIPA ACL
 **********************************************************************************************/
-    void Agent_Msg::set_msg_type(int msg_type){
+    void Agent_Msg::set_msg_type(MSG_TYPE msg_type){
         msg.type=msg_type;
     }
 
@@ -233,7 +233,7 @@ namespace MAES
 * Return type: int
 * Comment: Get message type
 **********************************************************************************************/
-    int Agent_Msg::get_msg_type(){
+    MSG_TYPE Agent_Msg::get_msg_type(){
         return msg.type;
     }
 
@@ -280,7 +280,7 @@ namespace MAES
 * Comment: request the Agent Platform to perform a service. Returns NO_ERROR
 *          if request was posted correctly.
 **********************************************************************************************/
-    ERROR_CODE Agent_Msg::request_AP(int request, Agent_AID target_agent){
+    ERROR_CODE Agent_Msg::request_AP(REQUEST_ACTION request, Agent_AID target_agent){
         Agent_AID AMS;
         Agent *agent_caller;
         Agent *agent_target;
@@ -358,7 +358,7 @@ namespace MAES
 * Comment: request the AMS agent to modify priority of target agent.
 *           Returns NO_ERROR if request was posted correctly.
 **********************************************************************************************/
-    int Agent_Msg::modify_pri(Agent_AID target_agent, int new_pri){
+    ERROR_CODE Agent_Msg::modify_pri(Agent_AID target_agent, int new_pri){
         Agent_AID AMS;
         Agent *agent_caller;
         Agent *agent_target;
@@ -392,7 +392,7 @@ namespace MAES
 * Comment: request the AMS to broadcast a request message. Returns NO_ERROR
 *          if request was posted correctly.
 **********************************************************************************************/
-    int Agent_Msg::broadcast(String content){
+    ERROR_CODE Agent_Msg::broadcast(String content){
         Agent_AID AMS;
         Agent *agent_caller;
         agent_caller = (Agent*) Task_getEnv(caller);
@@ -420,7 +420,7 @@ namespace MAES
 * Return type: Int
 * Comment: request the AMS to kill itself and create it again.
 **********************************************************************************************/
-    int Agent_Msg::restart(){
+    ERROR_CODE Agent_Msg::restart(){
         Agent_AID AMS;
         Agent *agent_caller;
         agent_caller = (Agent*) Task_getEnv(caller);

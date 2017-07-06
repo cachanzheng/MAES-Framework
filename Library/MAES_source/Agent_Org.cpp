@@ -7,7 +7,7 @@ namespace MAES
 * Return type: NULL
 * Comments: Creates the organization with specific type
 *********************************************************************************************/
-    Agent_Organization::Agent_Organization(int type){
+    Agent_Organization::Agent_Organization(ORG_TYPE type){
         description.org_type=type;
         description.members_num=0;
         description.banned_num=0;
@@ -25,7 +25,7 @@ namespace MAES
 * Return type: int
 * Comments:  Private member, search member within the list.
 *********************************************************************************************/
-    int Agent_Organization::isMember(Agent_AID aid){
+    ERROR_CODE Agent_Organization::isMember(Agent_AID aid){
         for(int i=0;i<description.members_num;i++){
           if (description.members[i]==aid) return FOUND;
         }
@@ -37,7 +37,7 @@ namespace MAES
 * Return type: int
 * Comments:  Private member, search member within the list.
 *********************************************************************************************/
-    int Agent_Organization::isBanned(Agent_AID aid){
+    ERROR_CODE Agent_Organization::isBanned(Agent_AID aid){
         for(int i=0;i<description.banned_num;i++){
             if (description.banned[i]==aid) return FOUND;
 
@@ -123,7 +123,7 @@ namespace MAES
                     description.members[AGENT_LIST_SIZE-1]=NULL;
                     description.members_num--;
                     agent->agent.role=NONE;
-                    agent->agent.affiliation=NONE;
+                    agent->agent.affiliation=NON_MEMBER;
                     agent->agent.org=NULL;
 
                     System_printf("test123 %x\n", agent->agent.AP);
@@ -151,7 +151,7 @@ namespace MAES
             for(int i=0;i<description.members_num;i++){
                 agent = (Agent*) Task_getEnv(description.members[i]);
                 agent->agent.org=NULL;
-                agent->agent.affiliation=NONE;
+                agent->agent.affiliation=NON_MEMBER;
                 agent->agent.role=NONE;
                 description.members[i]=NULL;
 
