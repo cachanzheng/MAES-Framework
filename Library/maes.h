@@ -386,6 +386,7 @@ namespace{
         virtual void failure_recovery();
         virtual void setup();
         void execute();
+        UArg arg0,arg1;
     };
 
     class OneShotBehaviour:public Generic_Behaviour{
