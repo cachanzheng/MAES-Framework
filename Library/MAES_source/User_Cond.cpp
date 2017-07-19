@@ -24,12 +24,6 @@ namespace MAES{
     bool USER_DEF_COND::resume_cond(){
         return true;
     }
-    bool USER_DEF_COND::modify_cond(){
-        return true;
-    }
-    bool USER_DEF_COND::broadcast_cond(){
-        return true;
-    }
     bool USER_DEF_COND::restart(){
         return true;
     }

@@ -380,42 +380,6 @@ namespace MAES{
    }
 /*********************************************************************************************
 * Class: Agent_Platform
-* Function: get_AMS_AID();
-* Return: Task Handle of the AMS
-* Comment: returns if was successful
-**********************************************************************************************/
-    ERROR_CODE Agent_Platform::modify_agent_pri(Agent_AID aid,int pri){
-        if(Task_getPri(Task_self())==Task_numPriorities-1){
-            if (agent_search(aid)){
-                if (pri>=Task_numPriorities-1) pri=Task_numPriorities-2;
-                Agent *description=(Agent*)Task_getEnv(aid);
-                Task_setPri(aid,pri);
-                description->agent.priority=pri;
-                return NO_ERROR;
-            }
-            else return NOT_FOUND;
-        }
-        else return INVALID;
-    }
-/*********************************************************************************************
-* Class: Agent_Platform
-* Function: broadcast(MsgObj &msg)
-* Return: int
-* Comment: broadcast the msg to all subscribers as REQUEST type
-**********************************************************************************************/
-    void Agent_Platform::broadcast(MsgObj *msg){
-        if(Task_getPri(Task_self())==Task_numPriorities-1){
-            Agent * description;
-            for(int i=0;i<subscribers;i++){
-              if(msg->sender_agent!=Agent_Handle[i]){
-                  description=(Agent*)Task_getEnv(Agent_Handle[i]);
-                  Mailbox_post(description->agent.mailbox_handle, (xdc_Ptr)msg, BIOS_NO_WAIT);
-              }
-            }
-        }
-    }
-/*********************************************************************************************
-* Class: Agent_Platform
 * Function: restart(Agent_AID aid)
 * Return: int
 * Comment: Delete the agent and re-create it. Only AMS agent can perform the task.
@@ -467,143 +431,90 @@ namespace MAES{
             Agent_Platform *services=(Agent_Platform*)arg0;
             USER_DEF_COND *cond= (USER_DEF_COND*)arg1;
             Agent_Msg msg;
+//            REQUEST_ACTION request;
             int error_msg=0;
             while(1){
                     msg.receive(BIOS_WAIT_FOREVER);
                     if (msg.get_msg_type()==REQUEST){
-                        switch(msg.get_msg_int()){
-                        case REGISTER:
-                            if(cond->register_cond()){
-                                error_msg=services->register_agent(msg.get_target_agent());
-                                if(error_msg==NO_ERROR){
-                                    msg.set_msg_type(CONFIRM);
-                                }
-                                else msg.set_msg_type(REFUSE);
-                            }
-                            else{
-                                msg.set_msg_type(REFUSE);
-                                error_msg=INVALID;
-                            }
-                            /*Respond*/
-                            msg.set_msg_int(error_msg);
-                            msg.send(msg.get_sender(),BIOS_NO_WAIT);
-                            break;
 
-                        case DEREGISTER:
-                            if(cond->deregister_cond()){
-                                error_msg=services->deregister_agent(msg.get_target_agent());
-                                if(error_msg==NO_ERROR){
-                                    msg.set_msg_type(CONFIRM);
-                                }
-                                else msg.set_msg_type(REFUSE);
-                            }
-                            else {
-                                msg.set_msg_type(REFUSE);
-                                error_msg=INVALID;
-                            }
-                            /*Respond*/
-                            msg.set_msg_int(error_msg);
-                            msg.send(msg.get_sender(),BIOS_NO_WAIT);
-                            break;
-
-                        case KILL:
+                        if (strcmp(msg.get_msg_content(),"KILL")==0){
                             if(cond->kill_cond()){
                                 error_msg=services->kill_agent(msg.get_target_agent());
-                                if(error_msg==NO_ERROR){ //To do: extra condition
-                                   msg.set_msg_type(CONFIRM);
-                                }
+                                if(error_msg==NO_ERROR) msg.set_msg_type(CONFIRM);
                                 else msg.set_msg_type(REFUSE);
                             }
-                            else {
-                                  msg.set_msg_type(REFUSE);
-                                  error_msg=INVALID;
-                              }
+                            else msg.set_msg_type(REFUSE);
+
                             /*Respond*/
-                            msg.set_msg_int(error_msg);
                             msg.send(msg.get_sender(),BIOS_NO_WAIT);
-                            break;
+                        }//Finish KILL Case
 
-                        case RESUME:
-                                if (cond->resume_cond()){
-                                    error_msg=services->resume_agent(msg.get_target_agent());
-                                    if(error_msg==NO_ERROR){ //To do: extra condition
-                                       msg.set_msg_type(CONFIRM);
-                                    }
-                                    else msg.set_msg_type(REFUSE);
-                                }
-                                else {
-                                    msg.set_msg_type(REFUSE);
-                                    error_msg=INVALID;
-                                }
-                                /*Respond*/
-                                msg.set_msg_int(error_msg);
-                                msg.send(msg.get_sender(),BIOS_NO_WAIT);
-                                break;
+                        else if(strcmp(msg.get_msg_content(),"REGISTER")==0){
+                            if(cond->register_cond()){
+                                error_msg=services->register_agent(msg.get_target_agent());
+                                if(error_msg==NO_ERROR) msg.set_msg_type(CONFIRM);
+                                else msg.set_msg_type(REFUSE);
+                            }
+                            else msg.set_msg_type(REFUSE);
 
-                            case SUSPEND:
-                                if (cond->suspend_cond()){
-                                    error_msg=services->suspend_agent(msg.get_target_agent());
-                                    if(error_msg==NO_ERROR){ //To do: extra condition
-                                       msg.set_msg_type(CONFIRM);
-                                    }
-                                    else msg.set_msg_type(REFUSE);
-                                }
-                                else {
-                                    msg.set_msg_type(REFUSE);
-                                    error_msg=INVALID;
-                                }
-                                /*Respond*/
-                                msg.set_msg_int(error_msg);
-                                msg.send(msg.get_sender(),BIOS_NO_WAIT);
-                                break;
+                            /*Respond*/
+                            msg.send(msg.get_sender(),BIOS_NO_WAIT);
+                        }//Finish register case
 
-                            case MODIFY:
-                                if(cond->modify_cond()){
-                                    error_msg=services->modify_agent_pri(msg.get_target_agent(),(int)msg.get_msg_string());
-                                    if(error_msg==NO_ERROR){ //To do: extra condition
-                                      msg.set_msg_type(CONFIRM);
-                                    }
-                                    else msg.set_msg_type(REFUSE);
-                                }
-                                else {
-                                    msg.set_msg_type(REFUSE);
-                                    error_msg=INVALID;
-                                }
-                                /*Respond*/
-                                msg.set_msg_int(error_msg);
-                                msg.send(msg.get_sender(),BIOS_NO_WAIT);
-                                break;
+                        else if(strcmp(msg.get_msg_content(),"DEREGISTER")==0){
+                            if(cond->deregister_cond()){
+                                error_msg=services->deregister_agent(msg.get_target_agent());
+                                if(error_msg==NO_ERROR) msg.set_msg_type(CONFIRM);
+                                else msg.set_msg_type(REFUSE);
+                            }
+                            else msg.set_msg_type(REFUSE);
 
-                            case BROADCAST:
-                                if(cond->broadcast_cond()){
-                                    services->broadcast(msg.get_msg());
-                                    msg.set_msg_type(CONFIRM);
-                                }
-                                else {
-                                    msg.set_msg_type(REFUSE);
-                                    error_msg=INVALID;
-                                }
-                                /*Respond*/
-                                msg.set_msg_int(error_msg);
-                                msg.send(msg.get_sender(),BIOS_NO_WAIT);
-                                break;
+                            /*Respond*/
+                            msg.send(msg.get_sender(),BIOS_NO_WAIT);
+                        }//finish deregister
 
-                            case RESTART:
-                                if(cond->modify_cond()){
-                                    services->restart(msg.get_target_agent());
-                                }
-                                else{
-                                    msg.set_msg_type(REFUSE);
-                                    msg.send(msg.get_sender(),BIOS_NO_WAIT);
-                                }
-                               break;
+                        else if(strcmp(msg.get_msg_content(),"SUSPEND")==0){
+                            if (cond->suspend_cond()){
+                                error_msg=services->suspend_agent(msg.get_target_agent());
+                                if(error_msg==NO_ERROR) msg.set_msg_type(CONFIRM);
+                                else msg.set_msg_type(REFUSE);
+                            }
+                            else msg.set_msg_type(REFUSE);
 
-                        }//end switch
+                            /*Respond*/
+                            msg.send(msg.get_sender(),BIOS_NO_WAIT);
+                        }//finish suspend
+
+                        else if(strcmp(msg.get_msg_content(),"RESUME")==0){
+                            if (cond->resume_cond()){
+                                error_msg=services->resume_agent(msg.get_target_agent());
+                                if(error_msg==NO_ERROR) msg.set_msg_type(CONFIRM);
+                                else msg.set_msg_type(REFUSE);
+                            }
+                            else msg.set_msg_type(REFUSE);
+
+                            /*Respond*/
+                            msg.send(msg.get_sender(),BIOS_NO_WAIT);
+                        }//finish resume
+
+                        else if(strcmp(msg.get_msg_content(),"RESTART")==0){
+                            if(cond->modify_cond()) services->restart(msg.get_target_agent());
+
+                            else msg.set_msg_type(REFUSE);
+
+                            /*Respond*/
+                            msg.send(msg.get_sender(),BIOS_NO_WAIT);
+                        }//finish restart
+
+                        else{
+                            msg.set_msg_type(NOT_UNDERSTOOD);
+                            msg.send(msg.get_sender(),BIOS_NO_WAIT);
+                        }
+
                     }//End if
 
                     else{
                         msg.set_msg_type(NOT_UNDERSTOOD);
-                        msg.set_msg_int(INVALID);
                         msg.send(msg.get_sender(),BIOS_NO_WAIT);
                     }
                 }//finish while

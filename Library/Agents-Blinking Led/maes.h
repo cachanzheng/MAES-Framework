@@ -73,19 +73,6 @@ enum MSG_TYPE{
 };
 
 /*********************************************************************************************
-*   Define Request Action
-**********************************************************************************************/
-enum REQUEST_ACTION{
-  REGISTER,
-  DEREGISTER,
-  KILL,
-  RESUME,
-  SUSPEND,
-  MODIFY,
-  BROADCAST,
-  RESTART
-};
-/*********************************************************************************************
 *   Define Organization Affiliation/Role
 **********************************************************************************************/
 enum ORG_AFFILIATION{
@@ -142,8 +129,7 @@ typedef char        Agent_Stack;
           Agent_AID sender_agent;
           Agent_AID target_agent;
           MSG_TYPE type;
-          String content_string;
-          int content_int;
+          String content;
     }MsgObj;
 /*********************************************************************************************
 * Class: Agent_info
@@ -276,8 +262,6 @@ namespace{
         ERROR_CODE kill_agent(Agent_AID aid);
         ERROR_CODE suspend_agent(Agent_AID aid);
         ERROR_CODE resume_agent(Agent_AID aid);
-        ERROR_CODE modify_agent_pri(Agent_AID aid,int pri);
-        void broadcast(MsgObj *msg);
         void restart(Agent_AID aid);
 
     private:
@@ -316,18 +300,19 @@ namespace{
         ERROR_CODE send(Agent_AID aid_receiver,int timeout);
         ERROR_CODE send();
         void set_msg_type(MSG_TYPE type);
-        void set_msg_string(String body);
-        void set_msg_int(int content);
+        void set_msg_content(String body);
+
         MsgObj *get_msg();
         MSG_TYPE get_msg_type();
-        String get_msg_string();
-        int get_msg_int();
+        String get_msg_content();
         Agent_AID get_sender();
         Agent_AID get_target_agent();
-        ERROR_CODE request_AP(REQUEST_ACTION request, Agent_AID target_agent);
-        ERROR_CODE modify_pri(Agent_AID target_agent, int pri);
+
+        ERROR_CODE registration(Agent_AID target_agent);
+        ERROR_CODE deregistration(Agent_AID target_agent);
+        ERROR_CODE suspend(Agent_AID target_agent);
+        ERROR_CODE resume(Agent_AID target_agent);
         ERROR_CODE kill(Agent_AID &target_agent);
-        ERROR_CODE broadcast(String content);
         ERROR_CODE restart();
 
     private:
@@ -386,6 +371,7 @@ namespace{
         virtual void failure_recovery();
         virtual void setup();
         void execute();
+        UArg arg0,arg1;
     };
 
     class OneShotBehaviour:public Generic_Behaviour{

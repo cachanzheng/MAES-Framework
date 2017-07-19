@@ -205,17 +205,8 @@ namespace MAES
 * Return type: NULL
 * Comment: Set message body according to FIPA ACL
 **********************************************************************************************/
-    void Agent_Msg::set_msg_string(String msg_body){
-        msg.content_string=msg_body;
-    }
-/*********************************************************************************************
-* Class: Agent_Msg
-* Function: set_msg_int(int content)
-* Return type: NULL
-* Comment: Set message body according to FIPA ACL
-**********************************************************************************************/
-    void Agent_Msg::set_msg_int(int content){
-        msg.content_int=content;
+    void Agent_Msg::set_msg_content(String msg_body){
+        msg.content=msg_body;
     }
 /*********************************************************************************************
 * Class: Agent_Msg
@@ -243,17 +234,8 @@ namespace MAES
 * Return type: String
 * Comment: Get string content
 **********************************************************************************************/
-    String Agent_Msg::get_msg_string(){
-        return msg.content_string;
-    }
-/*********************************************************************************************
-* Class: Agent_Msg
-* Function: get_msg_int()
-* Return type: int
-* Comment: Get int content
-**********************************************************************************************/
-    int Agent_Msg::get_msg_int(){
-        return msg.content_int;
+    String Agent_Msg::get_msg_content(){
+        return msg.content;
     }
 /*********************************************************************************************
 * Class: Agent_Msg
@@ -275,25 +257,128 @@ namespace MAES
     }
 /*********************************************************************************************
 * Class: Agent_Msg
-* Function: int request_AP(int request, Agent target_agent)
-* Return type: Int
-* Comment: request the Agent Platform to perform a service. Returns NO_ERROR
-*          if request was posted correctly.
+* Function: Error_CODE registration(Agent target_agent)
+* Return type: ERROR_CODE
+* Comment: request the Agent Platform for registration service
 **********************************************************************************************/
-    ERROR_CODE Agent_Msg::request_AP(REQUEST_ACTION request, Agent_AID target_agent){
+    ERROR_CODE Agent_Msg::registration(Agent_AID target_agent){
         Agent_AID AMS;
         Agent *agent_caller;
         Agent *agent_target;
         agent_caller = (Agent*) Task_getEnv(caller);
         agent_target = (Agent*) Task_getEnv(target_agent);
 
-        if (request == BROADCAST || request==MODIFY || request==KILL) return INVALID;
-        else if (target_agent==NULL) return HANDLE_NULL;
+        if (target_agent==NULL) return HANDLE_NULL;
         else if (agent_caller->agent.org==NULL || (agent_caller->agent.org!=NULL && (agent_caller->agent.role==OWNER || agent_caller->agent.role==ADMIN))){
             if (agent_caller->agent.org==agent_target->agent.org){
                  /*Setting msg*/
                 msg.type=REQUEST;
-                msg.content_int=request;
+                msg.content="REGISTER";
+                msg.target_agent=target_agent;
+                msg.sender_agent=Task_self();
+
+                //Get the AMS info*/
+                AMS=agent_caller->agent.AP;
+                /*Sending request*/
+                if (Mailbox_post(get_mailbox(AMS), (xdc_Ptr)&msg, BIOS_NO_WAIT)) return NO_ERROR;
+                else return INVALID;
+            }
+
+            else return INVALID;
+
+        }
+        else return INVALID;
+
+    }
+/*********************************************************************************************
+* Class: Agent_Msg
+* Function: Error_CODE deregistration(Agent target_agent)
+* Return type: ERROR_CODE
+* Comment: request the Agent Platform for deregistration service
+**********************************************************************************************/
+    ERROR_CODE Agent_Msg::deregistration(Agent_AID target_agent){
+        Agent_AID AMS;
+        Agent *agent_caller;
+        Agent *agent_target;
+        agent_caller = (Agent*) Task_getEnv(caller);
+        agent_target = (Agent*) Task_getEnv(target_agent);
+
+        if (target_agent==NULL) return HANDLE_NULL;
+        else if (agent_caller->agent.org==NULL || (agent_caller->agent.org!=NULL && (agent_caller->agent.role==OWNER || agent_caller->agent.role==ADMIN))){
+            if (agent_caller->agent.org==agent_target->agent.org){
+                 /*Setting msg*/
+                msg.type=REQUEST;
+                msg.content="DEREGISTER";
+                msg.target_agent=target_agent;
+                msg.sender_agent=Task_self();
+
+                //Get the AMS info*/
+                AMS=agent_caller->agent.AP;
+                /*Sending request*/
+                if (Mailbox_post(get_mailbox(AMS), (xdc_Ptr)&msg, BIOS_NO_WAIT)) return NO_ERROR;
+                else return INVALID;
+            }
+
+            else return INVALID;
+
+        }
+        else return INVALID;
+
+    }
+/*********************************************************************************************
+* Class: Agent_Msg
+* Function: Error_CODE suspend(Agent target_agent)
+* Return type: ERROR_CODE
+* Comment: request the Agent Platform for suspend service
+**********************************************************************************************/
+    ERROR_CODE Agent_Msg::suspend(Agent_AID target_agent){
+        Agent_AID AMS;
+        Agent *agent_caller;
+        Agent *agent_target;
+        agent_caller = (Agent*) Task_getEnv(caller);
+        agent_target = (Agent*) Task_getEnv(target_agent);
+
+        if (target_agent==NULL) return HANDLE_NULL;
+        else if (agent_caller->agent.org==NULL || (agent_caller->agent.org!=NULL && (agent_caller->agent.role==OWNER || agent_caller->agent.role==ADMIN))){
+            if (agent_caller->agent.org==agent_target->agent.org){
+                 /*Setting msg*/
+                msg.type=REQUEST;
+                msg.content="SUSPEND";
+                msg.target_agent=target_agent;
+                msg.sender_agent=Task_self();
+
+                //Get the AMS info*/
+                AMS=agent_caller->agent.AP;
+                /*Sending request*/
+                if (Mailbox_post(get_mailbox(AMS), (xdc_Ptr)&msg, BIOS_NO_WAIT)) return NO_ERROR;
+                else return INVALID;
+            }
+
+            else return INVALID;
+
+        }
+        else return INVALID;
+
+    }
+/*********************************************************************************************
+* Class: Agent_Msg
+* Function: Error_CODE resume(Agent target_agent)
+* Return type: ERROR_CODE
+* Comment: request the Agent Platform for resume service
+**********************************************************************************************/
+    ERROR_CODE Agent_Msg::resume(Agent_AID target_agent){
+        Agent_AID AMS;
+        Agent *agent_caller;
+        Agent *agent_target;
+        agent_caller = (Agent*) Task_getEnv(caller);
+        agent_target = (Agent*) Task_getEnv(target_agent);
+
+        if (target_agent==NULL) return HANDLE_NULL;
+        else if (agent_caller->agent.org==NULL || (agent_caller->agent.org!=NULL && (agent_caller->agent.role==OWNER || agent_caller->agent.role==ADMIN))){
+            if (agent_caller->agent.org==agent_target->agent.org){
+                 /*Setting msg*/
+                msg.type=REQUEST;
+                msg.content="RESUME";
                 msg.target_agent=target_agent;
                 msg.sender_agent=Task_self();
 
@@ -330,7 +415,7 @@ namespace MAES
             if (agent_caller->agent.org==agent_target->agent.org){
                     /*Setting msg*/
                     msg.type=REQUEST;
-                    msg.content_int=KILL;
+                    msg.content="KILL";
                     msg.target_agent=target_agent;
                     msg.sender_agent=Task_self();
 
@@ -353,69 +438,6 @@ namespace MAES
    }
 /*********************************************************************************************
 * Class: Agent_Msg
-* Function: int request_AP(int request, Agent target_agent,int new_pri)
-* Return type: Int
-* Comment: request the AMS agent to modify priority of target agent.
-*           Returns NO_ERROR if request was posted correctly.
-**********************************************************************************************/
-    ERROR_CODE Agent_Msg::modify_pri(Agent_AID target_agent, int new_pri){
-        Agent_AID AMS;
-        Agent *agent_caller;
-        Agent *agent_target;
-        agent_caller = (Agent*) Task_getEnv(caller);
-        agent_target = (Agent*) Task_getEnv(target_agent);
-
-        if (target_agent==NULL) return HANDLE_NULL;
-        else if (agent_caller->agent.org==NULL || (agent_caller->agent.org!=NULL && (agent_caller->agent.role==OWNER || agent_caller->agent.role==ADMIN))){
-            if (agent_caller->agent.org==agent_target->agent.org){
-                /*Setting msg*/
-                msg.type=REQUEST;
-                msg.content_int=MODIFY;
-                msg.content_string=(String) new_pri;
-                msg.target_agent=target_agent;
-                msg.sender_agent=Task_self();
-
-                //Get the AMS info*/
-                AMS=agent_caller->agent.AP;
-
-                if (Mailbox_post(get_mailbox(AMS), (xdc_Ptr)&msg, BIOS_NO_WAIT)) return NO_ERROR;
-                else return INVALID;
-            }
-            else return INVALID;
-        }
-        else return INVALID;
-   }
-/*********************************************************************************************
-* Class: Agent_Msg
-* Function: void Broadcast();
-* Return type: Int
-* Comment: request the AMS to broadcast a request message. Returns NO_ERROR
-*          if request was posted correctly.
-**********************************************************************************************/
-    ERROR_CODE Agent_Msg::broadcast(String content){
-        Agent_AID AMS;
-        Agent *agent_caller;
-        agent_caller = (Agent*) Task_getEnv(caller);
-
-        if (agent_caller->agent.org==NULL || (agent_caller->agent.org!=NULL && (agent_caller->agent.role==OWNER || agent_caller->agent.role==ADMIN))){
-            msg.type=REQUEST;
-            msg.content_int=BROADCAST;
-            msg.target_agent=NULL;
-            msg.sender_agent=Task_self();
-            msg.content_string=content;
-
-            //Get the AMS info*/
-             AMS=agent_caller->agent.AP;
-
-            /*Sending request*/
-             if (Mailbox_post(get_mailbox(AMS), (xdc_Ptr)&msg, BIOS_NO_WAIT)) return NO_ERROR;
-             else return INVALID;
-        }
-
-        else return INVALID;
-    }
-/*********************************************************************************************
-* Class: Agent_Msg
 * Function: void restart();
 * Return type: Int
 * Comment: request the AMS to kill itself and create it again.
@@ -426,7 +448,7 @@ namespace MAES
         agent_caller = (Agent*) Task_getEnv(caller);
 
         msg.type=REQUEST;
-        msg.content_int=RESTART;
+        msg.content= "RESTART";
         msg.target_agent=Task_self();
         msg.sender_agent=Task_self();
 
