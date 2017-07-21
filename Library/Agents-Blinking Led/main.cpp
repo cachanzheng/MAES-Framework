@@ -30,14 +30,14 @@ Agent Writing("Writing Agent",1,Agent3,1024);
 class WritingBehaviour:public CyclicBehaviour{
 public:
     void setup(){
-        msg.add_receiver(Reading.AID());
-        msg.add_receiver(Reading2.AID());
+       // msg.add_receiver(Reading.AID());
+        //msg.add_receiver(Reading2.AID());
     }
 
     void action(){
         Task_sleep(1000);
-        msg.send();
-
+        msg.send(Reading.AID(),BIOS_WAIT_FOREVER);
+        msg.send(Reading2.AID(),BIOS_WAIT_FOREVER);
 
     }
 };

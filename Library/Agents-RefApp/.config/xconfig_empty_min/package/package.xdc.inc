@@ -1,0 +1,12 @@
+package.xdc
+package.xs
+package/xconfig_empty_min.sch
+package/.vers_g180
+package/.vers_r170
+package/.vers_b160
+package/.xdc-B06
+package/xconfig_empty_min.java
+package/xconfig_empty_min.class
+package/package_xconfig_empty_min.c
+package/package.defs.h
+package/xconfig_empty_min.ccs

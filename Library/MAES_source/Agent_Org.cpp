@@ -195,8 +195,8 @@ namespace MAES
     ERROR_CODE Agent_Organization::set_admin(Agent_AID aid){
         if (description.owner==Task_self() && isMember(aid)==FOUND){
             Agent * agent= (Agent*) Task_getEnv(aid);
-            agent->agent.affiliation=ADMIN;
-            agent->agent.role=VISITOR;
+            if (agent->agent.affiliation!=OWNER) agent->agent.affiliation=ADMIN;
+            agent->agent.role=PARTICIPANT;
             description.admin=aid;
             return NO_ERROR;
         }
@@ -211,7 +211,6 @@ namespace MAES
     ERROR_CODE Agent_Organization::set_moderator(Agent_AID aid){
         if (description.owner==Task_self() && isMember(aid)==FOUND){
             Agent * agent= (Agent*) Task_getEnv(aid);
-            agent->agent.affiliation=MEMBER;
             agent->agent.role=MODERATOR;
             description.moderator=aid;
             return NO_ERROR;
