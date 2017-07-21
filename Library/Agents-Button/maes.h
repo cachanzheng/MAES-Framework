@@ -173,14 +173,11 @@ typedef char        Agent_Stack;
     class USER_DEF_COND{
     public:
         virtual bool register_cond();
-        virtual bool kill_cond();
         virtual bool deregister_cond();
         virtual bool suspend_cond();
+        virtual bool kill_cond();
         virtual bool resume_cond();
-        virtual bool modify_cond();
-        virtual bool broadcast_cond();
-        virtual bool restart();
-        virtual bool create();
+        virtual bool restart_cond();
     };
 
 /*********************************************************************************************
@@ -200,6 +197,7 @@ typedef char        Agent_Stack;
         friend class Agent_Organization;
         /*Constructor*/
         Agent(String name, int pri, char *AgentStack,int sizeStack);
+        Agent_AID AID();
 
     private:
         Agent();
@@ -244,8 +242,8 @@ namespace{
         bool boot();
 
         /*Only called from Main*/
-        void agent_init(Agent &a, Task_FuncPtr behaviour, Agent_AID &aid);
-        void agent_init(Agent &a, Task_FuncPtr behaviour, UArg arg0, UArg arg1,Agent_AID &aid);
+        void agent_init(Agent &a, Task_FuncPtr behaviour);
+        void agent_init(Agent &a, Task_FuncPtr behaviour, UArg arg0, UArg arg1);
 
         /*Public Services available for all agents*/
         bool agent_search(Agent_AID aid);

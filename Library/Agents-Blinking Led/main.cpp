@@ -19,8 +19,6 @@
 #include <stdio.h>
 using namespace MAES;
 
-
-Agent_AID WritingAID,ReadingAID,Reading2AID;
 Agent_Stack Agent1[1024];
 Agent_Stack Agent2[1024];
 Agent_Stack Agent3[1024];
@@ -32,8 +30,8 @@ Agent Writing("Writing Agent",1,Agent3,1024);
 class WritingBehaviour:public CyclicBehaviour{
 public:
     void setup(){
-        msg.add_receiver(ReadingAID);
-        msg.add_receiver(Reading2AID);
+        msg.add_receiver(Reading.AID());
+        msg.add_receiver(Reading2.AID());
     }
 
     void action(){
@@ -96,9 +94,9 @@ int main()
     System_printf("Blinking Led Example with agents \n");
     System_flush();
 
-    AP.agent_init(Reading, reading, ReadingAID);
-    AP.agent_init(Writing, function, WritingAID);
-    AP.agent_init(Reading2, reading2, Reading2AID);
+    AP.agent_init(Reading, reading);
+    AP.agent_init(Writing, function);
+    AP.agent_init(Reading2, reading2);
     AP.boot();
 
     BIOS_start();

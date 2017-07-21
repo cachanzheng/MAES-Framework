@@ -26,4 +26,8 @@ namespace MAES{
     Agent::Agent(){
 
     }
+
+    Agent_AID Agent::AID(){
+        return agent.aid;
+    }
 }

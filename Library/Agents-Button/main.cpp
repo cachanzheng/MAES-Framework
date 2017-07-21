@@ -22,9 +22,6 @@ using namespace MAES;
 /*Construction functions*/
 void togglingbutton(UArg arg0, UArg arg1);
 
-
-
-Agent_AID button1_AID, button2_AID;
 Agent_Stack Agent1[1024];
 Agent_Stack Agent2[1024];
 Agent Button1("Agent 1", 2, Agent1,1024);
@@ -34,7 +31,7 @@ class toggling: public CyclicBehaviour{
     void action(){
         msg.receive(BIOS_WAIT_FOREVER);
         GPIO_toggle(arg0);
-        System_printf("Button %d pressed \n", msg.get_msg_int());
+        System_printf("Button %d pressed \n", msg.get_msg_content());
         System_flush();
     }
 };
@@ -58,8 +55,8 @@ void gpioButtonFxn0(unsigned int index)
     Agent_info agent;
     MsgObj msg;
 
-    msg.content_int=0;
-    agent=AP.get_Agent_description(button1_AID);
+    msg.content=(String) 0;
+    agent=AP.get_Agent_description(Button1.AID());
     Mailbox_post(agent.mailbox_handle, &msg, BIOS_NO_WAIT);
 }
 
@@ -73,9 +70,9 @@ void gpioButtonFxn1(unsigned int index)
     Agent_info agent;
     MsgObj msg;
 
-    msg.content_int=1;
+    msg.content=(String)1;
 
-    agent=AP.get_Agent_description(button2_AID);
+    agent=AP.get_Agent_description(Button2.AID());
     Mailbox_post(agent.mailbox_handle, &msg, BIOS_NO_WAIT);
 }
 
@@ -111,8 +108,8 @@ int main()
     }
 
     /*Agents init*/
-    AP.agent_init(Button1, togglingbutton, (UArg)Board_LED0,0, button1_AID);
-    AP.agent_init(Button2, togglingbutton, (UArg)Board_LED1,0, button2_AID);
+    AP.agent_init(Button1, togglingbutton, (UArg)Board_LED0,0);
+    AP.agent_init(Button2, togglingbutton, (UArg)Board_LED1,0);
     AP.boot();
 
     BIOS_start();

@@ -98,7 +98,7 @@ namespace MAES{
 *          Task_FuncPtr behaviour: Behaviour to be assigned to the agent
 *          Agent_AID &aid: Return the aid of the Agent.
 **********************************************************************************************/
-    void Agent_Platform::agent_init(Agent &a, Task_FuncPtr behaviour, Agent_AID &aid){
+    void Agent_Platform::agent_init(Agent &a, Task_FuncPtr behaviour){
         if (Task_self()==NULL){
             Task_Params taskParams;
             Mailbox_Params mbxParams;
@@ -115,12 +115,9 @@ namespace MAES{
             taskParams.instance->name=a.agent.agent_name; //To do: take that out to optimize
             taskParams.env=(xdc_Ptr) &a;
             a.agent.aid = Task_create(behaviour, &taskParams, NULL);
-
-            if (a.agent.aid!=NULL) aid=a.agent.aid;
-            else aid=NULL;
         }
 
-        else aid=NULL;
+       // else aid=NULL;
 
     }
 /**********************************************************************************************
@@ -133,7 +130,7 @@ namespace MAES{
 *          UArg arg0, arg1: Arguments to be passed to the behaviour
 *          Agent_AID &aid: Return the aid of the Agent.
 **********************************************************************************************/
-    void Agent_Platform::agent_init(Agent &a, Task_FuncPtr behaviour,UArg arg0, UArg arg1,Agent_AID &aid){
+    void Agent_Platform::agent_init(Agent &a, Task_FuncPtr behaviour,UArg arg0, UArg arg1){
         if (Task_self()==NULL){
             Task_Params taskParams;
             Mailbox_Params mbxParams;
@@ -152,12 +149,7 @@ namespace MAES{
             taskParams.arg0= arg0;
             taskParams.arg1= arg1;
             a.agent.aid = Task_create(behaviour, &taskParams, NULL);
-
-            if (a.agent.aid!=NULL) aid=a.agent.aid;
-            else aid=NULL;
         }
-
-        else aid=NULL;
 
     }
 /**********************************************************************************************
@@ -498,7 +490,7 @@ namespace MAES{
                         }//finish resume
 
                         else if(strcmp(msg.get_msg_content(),"RESTART")==0){
-                            if(cond->modify_cond()) services->restart(msg.get_target_agent());
+                            if(cond->restart_cond()) services->restart(msg.get_target_agent());
 
                             else msg.set_msg_type(REFUSE);
 

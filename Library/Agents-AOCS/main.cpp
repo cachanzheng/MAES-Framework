@@ -19,10 +19,12 @@ int main(void){
     GPIO_write(Board_LED0, Board_LED_ON);
 
   //  BMI=BMI_Agent.create(matrix_func, 2);
-    AP.agent_init(UART_Agent, uartFxn, UART_AID);
-    AP.agent_init(Sensor_Agent, sensor, Sensor_AID);
-    AP.agent_init(Kalman_Agent, kalman, Kalman_AID);
-
+    AP.agent_init(UART_Agent, uartFxn);
+    AP.agent_init(Sensor_Agent, sensor);
+    AP.agent_init(Kalman_Agent, kalman);
+    Kalman_AID=Kalman_Agent.AID();
+    Sensor_AID=Sensor_Agent.AID();
+    UART_AID=UART_Agent.AID();
 
     AP.boot();
     System_flush();

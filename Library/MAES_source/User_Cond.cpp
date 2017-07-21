@@ -24,12 +24,7 @@ namespace MAES{
     bool USER_DEF_COND::resume_cond(){
         return true;
     }
-    bool USER_DEF_COND::restart(){
+    bool USER_DEF_COND::restart_cond(){
         return true;
     }
-    bool USER_DEF_COND::create(){
-        return true;
-    }
-
-
 }
