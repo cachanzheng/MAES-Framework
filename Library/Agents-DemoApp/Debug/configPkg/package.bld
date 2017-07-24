@@ -11,7 +11,7 @@ var makeAssembly = false;
 var Executable = xdc.module('xdc.bld.Executable');
 
 var exeOpts = new Executable.Attrs({
-        cfgScript: 'C:/Users/Carmen/workspace_v7/Agents-RefApp/empty_min.cfg',
+        cfgScript: 'C:/Users/Carmen/workspace_v7/Agents-DemoApp/empty_min.cfg',
         profile: 'release',
         cfgHome: 'configPkg',
 });
@@ -41,7 +41,7 @@ else {
 
 var thisObj = {
     cfg:        '../empty_min.cfg',
-    outputPath: 'C:/Users/Carmen/workspace_v7/Agents-RefApp/Debug/configPkg',
+    outputPath: 'C:/Users/Carmen/workspace_v7/Agents-DemoApp/Debug/configPkg',
     exeName:    'empty_min' + suffix,
     exeIntName: 'empty_min' + suffix.replace('.', '_'),
     targ:       targ,

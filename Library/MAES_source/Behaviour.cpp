@@ -19,7 +19,7 @@ namespace MAES{
         setup();
         do{
             action();
-            failure_detection();
+           // failure_detection();
             if(failure_detection()){
                 failure_identification();
                 failure_recovery();

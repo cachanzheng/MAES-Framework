@@ -10,7 +10,7 @@
 	<rts value="libc.a"/>
 	<createSlaveProjects value=""/>
 	<templateProperties value="id=com_ti_rtsc_tirtosmsp430_example_101.projectspec.empty_min_MSP_EXP432P401R_TI,type=rtsc,products=com.ti.rtsc.TIRTOSmsp430,xdcToolsVersion=3_32_00_06_core,target=ti.targets.arm.elf.M4F,platform=ti.platforms.msp432:MSP432P401R,buildProfile=release,isHybrid=true,configuroOptions= --compileOptions &quot;${COMPILER_FLAGS} &quot;,"/>
-	<origin value="C:/Users/Carmen/Dropbox/Thesis/Backup/Frameworkv13"/>
+	<origin value="C:/Users/Carmen/Documents/GitHub/MAES-Framework/Library/Agents-DemoApp"/>
 	<filesToOpen value=""/>
 	<connection value="common/targetdb/connections/TIXDS110_Connection.xml"/>
 	<isTargetManual value="false"/>

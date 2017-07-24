@@ -172,11 +172,11 @@ int main()
 
     /*Set Agents*/
     AP.agent_init(FDIRAgent, wrapperFDIR);
-    AP.agent_init(Supervisor, wrapperSupervisor);
-    AP.agent_init(Worker1, wrapperWorker);
-    AP.agent_init(Worker2, wrapperWorker);
-    AP.agent_init(Worker3, wrapperWorker);
-    AP.agent_init(Print, wrapperPrint);
+//    AP.agent_init(Supervisor, wrapperSupervisor);
+  //  AP.agent_init(Worker1, wrapperWorker);
+    //AP.agent_init(Worker2, wrapperWorker);
+    //AP.agent_init(Worker3, wrapperWorker);
+    //AP.agent_init(Print, wrapperPrint);
     AP.boot();
 
     BIOS_start();

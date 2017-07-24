@@ -16537,7 +16537,7 @@ __o = __obj[951]
     __o['cfgArgs'] = null
     __o['cfgArgsEncoded'] = true
     __o['cfgHome'] = String(java.net.URLDecoder.decode('configPkg', 'UTF-8'))
-    __o['cfgScript'] = String(java.net.URLDecoder.decode('C%3A%2FUsers%2FCarmen%2Fworkspace_v7%2FAgents-RefApp%2Fempty_min.cfg', 'UTF-8'))
+    __o['cfgScript'] = String(java.net.URLDecoder.decode('C%3A%2FUsers%2FCarmen%2Fworkspace_v7%2FAgents-DemoApp%2Fempty_min.cfg', 'UTF-8'))
     __o['prelink'] = false
     __o['profile'] = String(java.net.URLDecoder.decode('release', 'UTF-8'))
     __o['releases'] = __obj[952.0]
@@ -16648,7 +16648,7 @@ __o = __obj[964]  // ti.targets.arm.elf.M4F/ccConfigOpts
 __o = __obj[965]  // ti.targets.arm.elf.M4F/ccOpts
     __o['$category'] = String(java.net.URLDecoder.decode('Struct', 'UTF-8'))
     __o['$name'] = String(java.net.URLDecoder.decode('ti.targets.arm.elf.M4F%2FccOpts', 'UTF-8'))
-    __o['prefix'] = String(java.net.URLDecoder.decode('-mv7M4+--code_state%3D16+--float_support%3DFPv4SPD16+-me+--include_path%3D%22C%3A%2Fti%2Fccsv7%2Fccs_base%2Farm%2Finclude%22+--include_path%3D%22C%3A%2Fti%2Fccsv7%2Fccs_base%2Farm%2Finclude%2FCMSIS%22+--include_path%3D%22C%3A%2FUsers%2FCarmen%2Fworkspace_v7%2FAgents-RefApp%22+--include_path%3D%22C%3A%2FUsers%2FCarmen%2Fworkspace_v7%2FAgents-RefApp%22+--include_path%3D%22C%3A%2Fti%2Ftirtos_msp43x_2_20_00_06%2Fproducts%2Fmsp432_driverlib_3_21_00_05%2Finc%2FCMSIS%22+--include_path%3D%22C%3A%2Fti%2Ftirtos_msp43x_2_20_00_06%2Fproducts%2Fmsp432_driverlib_3_21_00_05%2Finc%22+--include_path%3D%22C%3A%2Fti%2Ftirtos_msp43x_2_20_00_06%2Fproducts%2Fmsp432_driverlib_3_21_00_05%2Fdriverlib%2FMSP432P4xx%22+--include_path%3D%22C%3A%2Fti%2Fccsv7%2Ftools%2Fcompiler%2Fti-cgt-arm_16.9.1.LTS%2Finclude%22+--advice%3Apower%3D%22all%22+--advice%3Apower_severity%3Dsuppress+--define%3D__MSP432P401R__+--define%3DTARGET_IS_MSP432P4XX+--define%3Dccs+--define%3DMSP432WARE+-g+--gcc+--diag_warning%3D225+--diag_warning%3D255+--diag_wrap%3Doff+--display_error_number+--gen_func_subsections%3Don+--abi%3Deabi+++-qq+-pdsw225', 'UTF-8'))
+    __o['prefix'] = String(java.net.URLDecoder.decode('-mv7M4+--code_state%3D16+--float_support%3DFPv4SPD16+-me+--include_path%3D%22C%3A%2Fti%2Fccsv7%2Fccs_base%2Farm%2Finclude%22+--include_path%3D%22C%3A%2Fti%2Fccsv7%2Fccs_base%2Farm%2Finclude%2FCMSIS%22+--include_path%3D%22C%3A%2FUsers%2FCarmen%2Fworkspace_v7%2FAgents-DemoApp%22+--include_path%3D%22C%3A%2FUsers%2FCarmen%2Fworkspace_v7%2FAgents-DemoApp%22+--include_path%3D%22C%3A%2Fti%2Ftirtos_msp43x_2_20_00_06%2Fproducts%2Fmsp432_driverlib_3_21_00_05%2Finc%2FCMSIS%22+--include_path%3D%22C%3A%2Fti%2Ftirtos_msp43x_2_20_00_06%2Fproducts%2Fmsp432_driverlib_3_21_00_05%2Finc%22+--include_path%3D%22C%3A%2Fti%2Ftirtos_msp43x_2_20_00_06%2Fproducts%2Fmsp432_driverlib_3_21_00_05%2Fdriverlib%2FMSP432P4xx%22+--include_path%3D%22C%3A%2Fti%2Fccsv7%2Ftools%2Fcompiler%2Fti-cgt-arm_16.9.1.LTS%2Finclude%22+--advice%3Apower%3D%22all%22+--advice%3Apower_severity%3Dsuppress+--define%3D__MSP432P401R__+--define%3DTARGET_IS_MSP432P4XX+--define%3Dccs+--define%3DMSP432WARE+-g+--gcc+--diag_warning%3D225+--diag_warning%3D255+--diag_wrap%3Doff+--display_error_number+--gen_func_subsections%3Don+--abi%3Deabi+++-qq+-pdsw225', 'UTF-8'))
     __o['suffix'] = String(java.net.URLDecoder.decode('', 'UTF-8'))
 
 __o = __obj[966]  // ti.targets.arm.elf.M4F/compatibleSuffixes

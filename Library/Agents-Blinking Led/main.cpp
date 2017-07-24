@@ -32,6 +32,7 @@ public:
     void setup(){
        // msg.add_receiver(Reading.AID());
         //msg.add_receiver(Reading2.AID());
+        System_printf("size %d\n");
     }
 
     void action(){

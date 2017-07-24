@@ -107,7 +107,7 @@ namespace MAES{
             Mailbox_Params_init(&mbxParams);
             a.agent.mailbox_handle= Mailbox_create(20,8,&mbxParams,NULL);
 
-            /*Creating task*/
+             /*Creating task*/
             Task_Params_init(&taskParams);
             taskParams.stack=a.resources.stack;
             taskParams.stackSize =a.resources.stackSize;

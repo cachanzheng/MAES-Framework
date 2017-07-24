@@ -15,7 +15,7 @@ ORDERED_OBJS += \
 "../MAES_lib.lib" \
 "../MSP_EXP432P401R.cmd" \
 $(GEN_CMDS__FLAG) \
--l"C:/Users/Carmen/workspace_v7/Agents-RefApp/MAES_lib.lib" \
+-l"C:/Users/Carmen/workspace_v7/Agents-DemoApp/MAES_lib.lib" \
 -l"C:/ti/tirtos_msp43x_2_20_00_06/products/msp432_driverlib_3_21_00_05/driverlib/MSP432P4xx/ccs/msp432p4xx_driverlib.lib" \
 -llibc.a \
 
@@ -124,33 +124,33 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXE_OUTPUTS += \
-Agents-RefApp.out \
+Agents-DemoApp.out \
 
 EXE_OUTPUTS__QUOTED += \
-"Agents-RefApp.out" \
+"Agents-DemoApp.out" \
 
 BIN_OUTPUTS += \
-Agents-RefApp.hex \
+Agents-DemoApp.hex \
 
 BIN_OUTPUTS__QUOTED += \
-"Agents-RefApp.hex" \
+"Agents-DemoApp.hex" \
 
 
 # All Target
 all: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
-	@$(MAKE) --no-print-directory -Onone "Agents-RefApp.out"
+	@$(MAKE) --no-print-directory -Onone "Agents-DemoApp.out"
 
 # Tool invocations
-Agents-RefApp.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
+Agents-DemoApp.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MSP432 Linker'
-	"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.1.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --advice:power="all" --advice:power_severity=suppress --define=__MSP432P401R__ --define=TARGET_IS_MSP432P4XX --define=ccs --define=MSP432WARE -g --gcc --diag_warning=225 --diag_warning=255 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi -z -m"Agents-RefApp.map" --heap_size=1024 --stack_size=512 -i"C:/ti/ccsv7/ccs_base/arm/include" -i"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.1.LTS/lib" -i"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.1.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="Agents-RefApp_linkInfo.xml" --rom_model -o "Agents-RefApp.out" $(ORDERED_OBJS)
+	"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.1.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --advice:power="all" --advice:power_severity=suppress --define=__MSP432P401R__ --define=TARGET_IS_MSP432P4XX --define=ccs --define=MSP432WARE -g --gcc --diag_warning=225 --diag_warning=255 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi -z -m"Agents-DemoApp.map" --heap_size=1024 --stack_size=512 -i"C:/ti/ccsv7/ccs_base/arm/include" -i"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.1.LTS/lib" -i"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.1.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="Agents-DemoApp_linkInfo.xml" --rom_model -o "Agents-DemoApp.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
-Agents-RefApp.hex: $(EXE_OUTPUTS)
+Agents-DemoApp.hex: $(EXE_OUTPUTS)
 	@echo 'Invoking: MSP432 Hex Utility'
-	"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.1.LTS/bin/armhex" --memwidth=8 --romwidth=8 -o "Agents-RefApp.hex" $(EXE_OUTPUTS__QUOTED)
+	"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.1.LTS/bin/armhex" --memwidth=8 --romwidth=8 -o "Agents-DemoApp.hex" $(EXE_OUTPUTS__QUOTED)
 	@echo 'Finished building: $@'
 	@echo ' '
 
