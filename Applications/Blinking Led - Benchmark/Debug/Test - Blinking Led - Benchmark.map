@@ -1,0 +1,2013 @@
+******************************************************************************
+                  TI ARM Linker PC v16.9.1                     
+******************************************************************************
+>> Linked Fri Aug 04 14:18:46 2017
+
+OUTPUT FILE NAME:   <Test - Blinking Led - Benchmark.out>
+ENTRY POINT SYMBOL: "_c_int00"  address: 00003859
+
+
+MEMORY CONFIGURATION
+
+         name            origin    length      used     unused   attr    fill
+----------------------  --------  ---------  --------  --------  ----  --------
+  MAIN                  00000000   00040000  0000798f  00038671  R  X
+  INFO                  00200000   00004000  00000000  00004000  R  X
+  SRAM_CODE             01000000   00010000  00000000  00010000  RW X
+  SRAM_DATA             20000000   00010000  00001ecd  0000e133  RW  
+
+
+SEGMENT ALLOCATION MAP
+
+run origin  load origin   length   init length attrs members
+----------  ----------- ---------- ----------- ----- -------
+00000000    00000000    00007998   00007998    r-x
+  00000000    00000000    0000003c   0000003c    r-- .resetVecs
+  00000040    00000040    00005a52   00005a52    r-x .text
+  00005a94    00005a94    00001c81   00001c81    r-- .const
+  00007718    00007718    00000280   00000280    r-- .cinit
+20000000    20000000    00001bcd   00000000    rw-
+  20000000    20000000    00000140   00000000    rw- .vecs
+  20000140    20000140    00001530   00000000    rw- .bss
+  20001670    20001670    0000055d   00000000    rw- .data
+2000fd00    2000fd00    00000300   00000000    rw-
+  2000fd00    2000fd00    00000300   00000000    rw- .stack
+
+
+SECTION ALLOCATION MAP
+
+ output                                  attributes/
+section   page    origin      length       input sections
+--------  ----  ----------  ----------   ----------------
+.text      0    00000040    00005a52     
+                  00000040    00000430     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_excDumpRegs__I)
+                  00000470    0000034c     ti.targets.arm.rtsarm.aem4f : System.oem4f (.text:xdc_runtime_System_doPrint__I)
+                  000007bc    00000324     rtsv7M4_T_le_v4SPD16_eabi.lib : trgdrv.obj (.text)
+                  00000ae0    00000264     drivers_MSP432P401R.aem4f : PowerMSP432.oem4f (.text:Power_sleep)
+                  00000d44    000001a0     msp432p4xx_driverlib.lib : pcm.o (.text:__PCM_setPowerStateAdvanced)
+                  00000ee4    00000004                              : cpu.o (.text:CPU_wfi)
+                  00000ee8    00000174     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_excBusFault__I)
+                  0000105c    00000004     tirtosport.aem4f : HwiP_tirtos.oem4f (.text:HwiP_disable)
+                  00001060    00000164     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_excUsageFault__I)
+                  000011c4    00000004     drivers_MSP432P401R.aem4f : List.oem4f (.text:List_head)
+                  000011c8    00000158     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Semaphore_pend__E)
+                  00001320    00000148                   : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_excMemFault__I)
+                  00001468    00000140     drivers_MSP432P401R.aem4f : GPIOMSP432.oem4f (.text:GPIO_setConfig)
+                  000015a8    00000118     ti.targets.arm.rtsarm.aem4f : Error.oem4f (.text:xdc_runtime_Error_policyDefault__E)
+                  000016c0    0000010c     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_excFillContext__I)
+                  000017cc    00000004     drivers_MSP432P401R.aem4f : List.oem4f (.text:List_next)
+                  000017d0    0000010c     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_excHandlerMax__I)
+                  000018dc    00000100     ti.targets.arm.rtsarm.aem4f : Core-mem.oem4f (.text:xdc_runtime_Core_createObject__I)
+                  000019dc    000000f8                                 : Startup.oem4f (.text:xdc_runtime_Startup_startMods__I)
+                  00001ad4    000000f8     empty_min_pem4f.oem4f (.text:xdc_runtime_System_printfExtend__I)
+                  00001bcc    000000f0     drivers_MSP432P401R.aem4f : PowerMSP432.oem4f (.text:initPerfControl)
+                  00001cbc    000000ec     sysbios.aem4f : m3_Hwi_asm.obj (.text:ti_sysbios_family_arm_m3_Hwi_dispatch__I)
+                  00001da8    000000e0     msp432p4xx_driverlib.lib : cs.o (.text:CS_initClockSignal)
+                  00001e88    000000dc                              : pcm.o (.text:__PCM_setPowerModeAdvanced)
+                  00001f64    000000d8     empty_min.obj (.text:main)
+                  0000203c    00000004     empty_min_pem4f.oem4f (.text:ti_sysbios_BIOS_RtsGateProxy_enter__E)
+                  00002040    000000d4     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Mailbox_Instance_init__E)
+                  00002114    00000004     empty_min_pem4f.oem4f (.text:ti_sysbios_BIOS_RtsGateProxy_leave__E)
+                  00002118    000000cc     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_heaps_HeapMem_alloc__E)
+                  000021e4    00000004     empty_min_pem4f.oem4f (.text:ti_sysbios_family_arm_m3_TaskSupport_Module__startupDone__S)
+                  000021e8    000000cc     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Task_Instance_init__E)
+                  000022b4    000000cc     ti.targets.arm.rtsarm.aem4f : Core-smem.oem4f (.text:xdc_runtime_Core_constructObject__I)
+                  00002380    000000c0     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Task_sleep__E)
+                  00002440    000000bc                   : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_excDebugMon__I)
+                  000024fc    00000004     empty_min_pem4f.oem4f (.text:ti_sysbios_heaps_HeapMem_Module_GateProxy_enter__E)
+                  00002500    000000bc     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_excHardFault__I)
+                  000025bc    00000004     empty_min_pem4f.oem4f (.text:ti_sysbios_heaps_HeapMem_Module_GateProxy_leave__E)
+                  000025c0    000000b4     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Task_Instance_finalize__E)
+                  00002674    000000b0     msp432p4xx_driverlib.lib : pcm.o (.text:__PCM_setCoreVoltageLevelAdvanced)
+                  00002724    00000004     empty_min_pem4f.oem4f (.text:ti_sysbios_knl_Clock_TimerProxy_getMaxTicks__E)
+                  00002728    000000a8     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_msp432_Timer_periodicStub__E)
+                  000027d0    000000a0     auto_init.aem4f : auto_init.oem4f (.text)
+                  00002870    000000a0     ti.targets.arm.rtsarm.aem4f : Text.oem4f (.text:xdc_runtime_Text_putMod__E)
+                  00002910    0000009c     rtsv7M4_T_le_v4SPD16_eabi.lib : memcpy_t2.obj (.text)
+                  000029ac    0000009a     ti.targets.arm.rtsarm.aem4f : Text.oem4f (.text:xdc_runtime_Text_putSite__E)
+                  00002a46    00000002     power_tirtos_MSP432P401R.aem4f : PowerMSP432_tirtos.oem4f (.text:PowerMSP432_initPolicy)
+                  00002a48    00000094     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_Instance_init__E)
+                  00002adc    00000004     empty_min_pem4f.oem4f (.text:ti_sysbios_knl_Queue_destruct)
+                  00002ae0    00000094     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_initNVIC__E)
+                  00002b74    0000008c                   : m3_TaskSupport_asm.obj (.text:ti_sysbios_family_arm_m3_TaskSupport_buildTaskStack)
+                  00002c00    0000008c                   : BIOS.obj (.text:ti_sysbios_knl_Task_postInit__I)
+                  00002c8c    00000004     empty_min_pem4f.oem4f (.text:ti_sysbios_knl_Semaphore_destruct)
+                  00002c90    00000088     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Mailbox_post__E)
+                  00002d18    00000084                   : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_postInit__I)
+                  00002d9c    0000007c     msp432p4xx_driverlib.lib : pcm.o (.text:PCM_gotoLPM3)
+                  00002e18    0000007c     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_heaps_HeapMem_free__E)
+                  00002e94    0000007a     rtsv7M4_T_le_v4SPD16_eabi.lib : memset_t2.obj (.text)
+                  00002f0e    00000002                                   : i_div0.obj (.text)
+                  00002f10    00000074     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Mailbox_pend__E)
+                  00002f84    00000004     ti.targets.arm.rtsarm.aem4f : Error.oem4f (.text:xdc_runtime_Error_getSite__E)
+                  00002f88    00000070     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Mailbox_Instance_finalize__E)
+                  00002ff8    00000070                   : BIOS.obj (.text:ti_sysbios_knl_Semaphore_post__E)
+                  00003068    00000070                   : BIOS.obj (.text:ti_sysbios_knl_Task_exit__E)
+                  000030d8    0000006d     ti.targets.arm.rtsarm.aem4f : System.oem4f (.text:xdc_runtime_System_formatNum__I)
+                  00003145    00000001     --HOLE-- [fill = 0]
+                  00003146    00000002     empty_min_pem4f.oem4f (.text:ti_sysbios_BIOS_nullFunc__I)
+                  00003148    0000006c     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Clock_workFunc__E)
+                  000031b4    00000004     empty_min_pem4f.oem4f (.text:xdc_runtime_System_Module_GateProxy_enter__E)
+                  000031b8    0000006c     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Swi_restoreHwi__E)
+                  00003224    0000006c     ti.targets.arm.rtsarm.aem4f : Error.oem4f (.text:xdc_runtime_Error_print__E)
+                  00003290    0000006c                                 : Memory.oem4f (.text:xdc_runtime_Memory_alloc__E)
+                  000032fc    00000068     rtsv7M4_T_le_v4SPD16_eabi.lib : copy_decompress_lzss.obj (.text:decompress:lzss)
+                  00003364    00000068                                   : trgmsg.obj (.text)
+                  000033cc    00000066     ti.targets.arm.rtsarm.aem4f : Core-mem.oem4f (.text:xdc_runtime_Core_deleteObject__I)
+                  00003432    00000006                                 : System.oem4f (.text:xdc_runtime_System_Module_startup__E)
+                  00003438    00000064     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_dispatchC__I)
+                  0000349c    00000064     empty_min_pem4f.oem4f (.text:ti_sysbios_knl_Mailbox_create)
+                  00003500    00000062     tirtosport.aem4f : HwiP_tirtos.oem4f (.text:HwiP_create)
+                  00003562    00000004     empty_min_pem4f.oem4f (.text:xdc_runtime_System_Module_GateProxy_leave__E)
+                  00003566    00000002     --HOLE-- [fill = 0]
+                  00003568    00000060     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_m3_TimestampProvider_get32__E)
+                  000035c8    0000005c     drivers_MSP432P401R.aem4f : GPIOMSP432.oem4f (.text:GPIO_init)
+                  00003624    00000004     ti.targets.arm.rtsarm.aem4f : System.oem4f (.text:xdc_runtime_System_aprintf_va__F)
+                  00003628    0000005c     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Swi_run__I)
+                  00003684    00000004     ti.targets.arm.rtsarm.aem4f : System.oem4f (.text:xdc_runtime_System_printf_va__F)
+                  00003688    0000005c     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Swi_schedule__I)
+                  000036e4    00000004     --HOLE-- [fill = 0]
+                  000036e8    0000005c                   : BIOS.obj (.text:ti_sysbios_knl_Task_Module_startup__E)
+                  00003744    0000005c     empty_min_pem4f.oem4f (.text:ti_sysbios_knl_Task_create)
+                  000037a0    0000005c     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Task_startCore__E)
+                  000037fc    0000005b     ti.targets.arm.rtsarm.aem4f : Text.oem4f (.text:xdc_runtime_Text_putLab__E)
+                  00003857    00000001     --HOLE-- [fill = 0]
+                  00003858    00000058     boot.aem4f : boot.oem4f (.text)
+                  000038b0    00000058     empty_min_pem4f.oem4f (.text:ti_sysbios_family_arm_m3_Hwi_construct)
+                  00003908    00000058     sysbios.aem4f : m3_Hwi_asm_switch.obj (.text:ti_sysbios_family_arm_m3_Hwi_initStacks__E)
+                  00003960    00000054     drivers_MSP432P401R.aem4f : GPIOMSP432.oem4f (.text:GPIO_hwiIntFxn)
+                  000039b4    00000054                               : GPIOMSP432.oem4f (.text:GPIO_setCallback)
+                  00003a08    00000054     empty_min.obj (.text:reading)
+                  00003a5c    00000054     rtsv7M4_T_le_v4SPD16_eabi.lib : exit.obj (.text)
+                  00003ab0    00000054     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_m3_Timer_start__E)
+                  00003b04    00000004     --HOLE-- [fill = 0]
+                  00003b08    00000054                   : BIOS.obj (.text:ti_sysbios_family_arm_msp432_Timer_initDevice__I)
+                  00003b5c    00000004     --HOLE-- [fill = 0]
+                  00003b60    00000054                   : BIOS.obj (.text:ti_sysbios_family_arm_msp432_init_Boot_configureClocksHigh)
+                  00003bb4    00000054     ti.targets.arm.rtsarm.aem4f : Assert.oem4f (.text:xdc_runtime_Assert_raise__I)
+                  00003c08    00000050     drivers_MSP432P401R.aem4f : GPIOMSP432.oem4f (.text:GPIO_write)
+                  00003c58    00000050     msp432p4xx_driverlib.lib : pcm.o (.text:PCM_shutdownDevice)
+                  00003ca8    00000050     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_Module_startup__E)
+                  00003cf8    00000050     ti.targets.arm.rtsarm.aem4f : Startup.oem4f (.text:xdc_runtime_Startup_exec__E)
+                  00003d48    00000050                                 : Text.oem4f (.text:xdc_runtime_Text_visitRope2__I)
+                  00003d98    0000004c     rtsv7M4_T_le_v4SPD16_eabi.lib : cpy_tbl.obj (.text)
+                  00003de4    00000004     --HOLE-- [fill = 0]
+                  00003de8    0000004c     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_msp432_Timer_start__E)
+                  00003e34    00000004     --HOLE-- [fill = 0]
+                  00003e38    0000004c                   : BIOS.obj (.text:ti_sysbios_heaps_HeapMem_getStats__E)
+                  00003e84    00000004     --HOLE-- [fill = 0]
+                  00003e88    0000004c                   : BIOS.obj (.text:ti_sysbios_knl_Swi_runLoop__I)
+                  00003ed4    00000004     --HOLE-- [fill = 0]
+                  00003ed8    0000004c                   : BIOS.obj (.text:ti_sysbios_knl_Task_allBlockedFunction__I)
+                  00003f24    00000004     --HOLE-- [fill = 0]
+                  00003f28    0000004c                   : BIOS.obj (.text:ti_sysbios_knl_Task_schedule__I)
+                  00003f74    00000004     --HOLE-- [fill = 0]
+                  00003f78    00000048                   : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_disableInterrupt__E)
+                  00003fc0    00000048                   : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_enableInterrupt__E)
+                  00004008    00000048                   : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_excReserved__I)
+                  00004050    00000048                   : BIOS.obj (.text:ti_sysbios_family_arm_m3_Timer_initDevice__I)
+                  00004098    00000048                   : BIOS.obj (.text:ti_sysbios_family_arm_m3_Timer_setPeriod__E)
+                  000040e0    00000048                   : BIOS.obj (.text:ti_sysbios_knl_Mailbox_Module_startup__E)
+                  00004128    00000046     ti.targets.arm.rtsarm.aem4f : Core-params.oem4f (.text:xdc_runtime_Core_assignParams__I)
+                  0000416e    00000002     --HOLE-- [fill = 0]
+                  00004170    00000044     drivers_MSP432P401R.aem4f : PowerMSP432.oem4f (.text:Power_init)
+                  000041b4    00000004     --HOLE-- [fill = 0]
+                  000041b8    00000044     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_getStackInfo__E)
+                  000041fc    00000004     --HOLE-- [fill = 0]
+                  00004200    00000044                   : BIOS.obj (.text:ti_sysbios_knl_Swi_post__E)
+                  00004244    00000044     ti.targets.arm.rtsarm.aem4f : Error.oem4f (.text:xdc_runtime_Error_setX__E)
+                  00004288    00000044                                 : SysMin.oem4f (.text:xdc_runtime_SysMin_flush__E)
+                  000042cc    00000044                                 : Text.oem4f (.text:xdc_runtime_Text_xprintf__I)
+                  00004310    00000040     msp432p4xx_driverlib.lib : flash.o (.text:FlashCtl_disableReadBuffering)
+                  00004350    00000040     drivers_MSP432P401R.aem4f : PowerMSP432.oem4f (.text:notify)
+                  00004390    00000040     rtsv7M4_T_le_v4SPD16_eabi.lib : u_divt2.obj (.text)
+                  000043d0    00000040     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_msp432_Timer_Module_startup__E)
+                  00004410    00000040                   : BIOS.obj (.text:ti_sysbios_family_arm_msp432_Timer_startup__E)
+                  00004450    00000040                   : BIOS.obj (.text:ti_sysbios_heaps_HeapMem_Instance_init__E)
+                  00004490    0000003c     power_tirtos_MSP432P401R.aem4f : PowerMSP432_tirtos.oem4f (.text:PowerMSP432_sleepPolicy)
+                  000044cc    00000004     --HOLE-- [fill = 0]
+                  000044d0    0000003c     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_excSvCall__I)
+                  0000450c    00000004     --HOLE-- [fill = 0]
+                  00004510    0000003c                   : BIOS.obj (.text:ti_sysbios_heaps_HeapMem_init__I)
+                  0000454c    00000004     --HOLE-- [fill = 0]
+                  00004550    0000003c                   : BIOS.obj (.text:ti_sysbios_knl_Swi_restore__E)
+                  0000458c    00000004     --HOLE-- [fill = 0]
+                  00004590    00000038                   : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_excNoIsr__I)
+                  000045c8    00000038     ti.targets.arm.rtsarm.aem4f : SysMin.oem4f (.text:xdc_runtime_SysMin_putch__E)
+                  00004600    00000038                                 : System.oem4f (.text:xdc_runtime_System_atexit__E)
+                  00004638    00000034     msp432p4xx_driverlib.lib : flash.o (.text:FlashCtl_enableReadBuffering)
+                  0000466c    00000034     empty_min_pem4f.oem4f (.text:ti_sysbios_BIOS_startFunc__I)
+                  000046a0    00000034     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_Instance_finalize__E)
+                  000046d4    00000004     --HOLE-- [fill = 0]
+                  000046d8    00000034                   : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_excNmi__I)
+                  0000470c    00000004     --HOLE-- [fill = 0]
+                  00004710    00000034                   : BIOS.obj (.text:ti_sysbios_family_arm_m3_Timer_periodicStub__I)
+                  00004744    00000004     --HOLE-- [fill = 0]
+                  00004748    00000034                   : BIOS.obj (.text:ti_sysbios_hal_Hwi_checkStack)
+                  0000477c    00000034     empty_min_pem4f.oem4f (.text:ti_sysbios_knl_Semaphore_create)
+                  000047b0    00000034     ti.targets.arm.rtsarm.aem4f : Core-label.oem4f (.text:xdc_runtime_Core_assignLabel__I)
+                  000047e4    00000033                                 : Text.oem4f (.text:xdc_runtime_Text_printVisFxn__I)
+                  00004817    00000001     --HOLE-- [fill = 0]
+                  00004818    00000032     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_hal_Hwi_initStack)
+                  0000484a    00000002     --HOLE-- [fill = 0]
+                  0000484c    00000030     msp432p4xx_driverlib.lib : gpio.o (.text:GPIO_getEnabledInterruptStatus)
+                  0000487c    00000030                              : gpio.o (.text:GPIO_setAsInputPinWithPullDownResistor)
+                  000048ac    00000030                              : gpio.o (.text:GPIO_setAsInputPinWithPullUpResistor)
+                  000048dc    00000030     drivers_MSP432P401R.aem4f : GPIOMSP432.oem4f (.text:GPIO_toggle)
+                  0000490c    00000030     empty_min_pem4f.oem4f (.text:ti_sysbios_BIOS_atExitFunc__I)
+                  0000493c    00000004     --HOLE-- [fill = 0]
+                  00004940    00000030     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_m3_TaskSupport_start__E)
+                  00004970    00000030                   : BIOS.obj (.text:ti_sysbios_family_arm_msp432_Timer_setPeriod__E)
+                  000049a0    00000030     empty_min_pem4f.oem4f (.text:ti_sysbios_gates_GateHwi_Object__create__S)
+                  000049d0    00000030     empty_min_pem4f.oem4f (.text:ti_sysbios_gates_GateMutex_Object__create__S)
+                  00004a00    00000030     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_gates_GateMutex_enter__E)
+                  00004a30    00000030     empty_min_pem4f.oem4f (.text:ti_sysbios_heaps_HeapMem_Object__create__S)
+                  00004a60    00000030     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Mailbox_postInit__I)
+                  00004a90    00000030     empty_min_pem4f.oem4f (.text:ti_sysbios_knl_Semaphore_construct)
+                  00004ac0    00000030     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Semaphore_pendTimeout__I)
+                  00004af0    00000030                   : BIOS.obj (.text:ti_sysbios_knl_Task_processVitalTaskFlag__I)
+                  00004b20    00000030                   : BIOS.obj (.text:ti_sysbios_knl_Task_unblockI__E)
+                  00004b50    00000030     ti.targets.arm.rtsarm.aem4f : SysMin.oem4f (.text:xdc_runtime_SysMin_abort__E)
+                  00004b80    00000030                                 : System.oem4f (.text:xdc_runtime_System_processAtExit__E)
+                  00004bb0    0000002c     msp432p4xx_driverlib.lib : gpio.o (.text:GPIO_setAsInputPin)
+                  00004bdc    0000002c                              : pcm.o (.text:PCM_getCoreVoltageLevel)
+                  00004c08    0000002c     power_tirtos_MSP432P401R.aem4f : PowerMSP432_tirtos.oem4f (.text:PowerMSP432_updateFreqs)
+                  00004c34    0000002c     empty_min_pem4f.oem4f (.text:ti_sysbios_knl_Clock_doTick__I)
+                  00004c60    0000002c     empty_min_pem4f.oem4f (.text:ti_sysbios_knl_Queue_construct)
+                  00004c8c    00000004     --HOLE-- [fill = 0]
+                  00004c90    0000002c     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Task_restore__E)
+                  00004cbc    0000002c     empty_min.obj (.text:writing)
+                  00004ce8    0000002c     ti.targets.arm.rtsarm.aem4f : Text.oem4f (.text:xdc_runtime_Text_cordText__E)
+                  00004d14    0000002a     msp432p4xx_driverlib.lib : pcm.o (.text:PCM_getPowerMode)
+                  00004d3e    0000002a     ti.targets.arm.rtsarm.aem4f : System.oem4f (.text:xdc_runtime_System_putchar__I)
+                  00004d68    00000028     msp432p4xx_driverlib.lib : flash.o (.text:FlashCtl_setWaitState)
+                  00004d90    00000028                              : pcm.o (.text:PCM_gotoLPM0)
+                  00004db8    00000028     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Clock_addI__E)
+                  00004de0    00000028                   : BIOS.obj (.text:ti_sysbios_knl_Swi_Module_startup__E)
+                  00004e08    00000026                   : m3_Hwi_asm.obj (.text:ti_sysbios_family_arm_m3_Hwi_pendSV__I)
+                  00004e2e    00000026     ti.targets.arm.rtsarm.aem4f : System.oem4f (.text:xdc_runtime_System_avprintf__E)
+                  00004e54    00000024     msp432p4xx_driverlib.lib : cs.o (.text:CS_setDCOCenteredFrequency)
+                  00004e78    00000024                              : gpio.o (.text:GPIO_setAsOutputPin)
+                  00004e9c    00000024                              : rtc_c.o (.text:RTC_C_holdClock)
+                  00004ec0    00000024                              : rtc_c.o (.text:RTC_C_startClock)
+                  00004ee4    00000024     empty_min_pem4f.oem4f (.text:ti_sysbios_BIOS_errorRaiseHook__I)
+                  00004f08    00000024     empty_min_pem4f.oem4f (.text:ti_sysbios_BIOS_registerRTSLock__I)
+                  00004f2c    00000024     empty_min_pem4f.oem4f (.text:ti_sysbios_BIOS_removeRTSLock__I)
+                  00004f50    00000024     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_m3_Timer_Module_startup__E)
+                  00004f74    00000004     --HOLE-- [fill = 0]
+                  00004f78    00000024                   : BIOS.obj (.text:ti_sysbios_family_arm_m3_Timer_postInit__I)
+                  00004f9c    00000004     --HOLE-- [fill = 0]
+                  00004fa0    00000024                   : BIOS.obj (.text:ti_sysbios_family_arm_m3_Timer_startup__E)
+                  00004fc4    00000004     --HOLE-- [fill = 0]
+                  00004fc8    00000024                   : BIOS.obj (.text:ti_sysbios_family_arm_msp432_ClockFreqs_setFrequency__E)
+                  00004fec    00000004     --HOLE-- [fill = 0]
+                  00004ff0    00000024                   : BIOS.obj (.text:ti_sysbios_family_arm_msp432_Timer_postInit__I)
+                  00005014    00000024     empty_min_pem4f.oem4f (.text:ti_sysbios_gates_GateMutex_Object__delete__S)
+                  00005038    00000024     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Clock_Module_startup__E)
+                  0000505c    00000004     --HOLE-- [fill = 0]
+                  00005060    00000024                   : BIOS.obj (.text:ti_sysbios_knl_Semaphore_Instance_init__E)
+                  00005084    00000004     --HOLE-- [fill = 0]
+                  00005088    00000024                   : BIOS.obj (.text:ti_sysbios_knl_Task_restoreHwi__E)
+                  000050ac    00000024     ti.targets.arm.rtsarm.aem4f : System.oem4f (.text:xdc_runtime_System_vprintf__E)
+                  000050d0    00000022     empty_min_pem4f.oem4f (.text:xdc_runtime_SysMin_output__I)
+                  000050f2    00000002     --HOLE-- [fill = 0]
+                  000050f4    00000020     msp432p4xx_driverlib.lib : gpio.o (.text:GPIO_interruptEdgeSelect)
+                  00005114    00000020     empty_min_pem4f.oem4f (.text:ti_sysbios_BIOS_rtsLock__I)
+                  00005134    00000020     sysbios.aem4f : m3_Hwi_asm.obj (.text:ti_sysbios_family_arm_m3_Hwi_excHandlerAsm__I)
+                  00005154    00000004     --HOLE-- [fill = 0]
+                  00005158    00000020                   : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_excHandler__I)
+                  00005178    00000020                   : BIOS.obj (.text:ti_sysbios_family_arm_m3_TimestampProvider_Module_startup__E)
+                  00005198    00000020     empty_min_pem4f.oem4f (.text:ti_sysbios_gates_GateHwi_Object__delete__S)
+                  000051b8    00000020     empty_min_pem4f.oem4f (.text:ti_sysbios_heaps_HeapMem_Object__delete__S)
+                  000051d8    00000020     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Idle_run__E)
+                  000051f8    00000020     empty_min_pem4f.oem4f (.text:ti_sysbios_knl_Semaphore_Object__destruct__S)
+                  00005218    00000020     ti.targets.arm.rtsarm.aem4f : Registry.oem4f (.text:xdc_runtime_Registry_findById__E)
+                  00005238    00000020                                 : SysMin.oem4f (.text:xdc_runtime_SysMin_Module_startup__E)
+                  00005258    0000001e     sysbios.aem4f : m3_Hwi_asm_switch.obj (.text:ti_sysbios_family_xxx_Hwi_switchAndRunFunc)
+                  00005276    00000002     --HOLE-- [fill = 0]
+                  00005278    0000001c     msp432p4xx_driverlib.lib : pcm.o (.text:PCM_enableRudeMode)
+                  00005294    00000004     --HOLE-- [fill = 0]
+                  00005298    0000001c     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_m3_Timer_stop__E)
+                  000052b4    00000004     --HOLE-- [fill = 0]
+                  000052b8    0000001c                   : BIOS.obj (.text:ti_sysbios_gates_GateMutex_Instance_init__E)
+                  000052d4    0000001c     empty_min_pem4f.oem4f (.text:ti_sysbios_knl_Queue_Object__destruct__S)
+                  000052f0    0000001c     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Queue_get__E)
+                  0000530c    00000004     --HOLE-- [fill = 0]
+                  00005310    0000001c                   : BIOS.obj (.text:ti_sysbios_knl_Queue_put__E)
+                  0000532c    00000004     --HOLE-- [fill = 0]
+                  00005330    0000001c                   : BIOS.obj (.text:ti_sysbios_knl_Task_enter__I)
+                  0000534c    0000001c     ti.targets.arm.rtsarm.aem4f : Error.oem4f (.text:xdc_runtime_Error_raiseX__E)
+                  00005368    0000001c                                 : Memory.oem4f (.text:xdc_runtime_Memory_valloc__E)
+                  00005384    0000001c                                 : SysMin.oem4f (.text:xdc_runtime_SysMin_exit__E)
+                  000053a0    0000001c                                 : System.oem4f (.text:xdc_runtime_System_abort__E)
+                  000053bc    0000001a     empty_min_pem4f.oem4f (.text:xdc_runtime_System_aprintf__E)
+                  000053d6    0000001a     empty_min_pem4f.oem4f (.text:xdc_runtime_System_printf__E)
+                  000053f0    00000018     msp432p4xx_driverlib.lib : gpio.o (.text:GPIO_clearInterruptFlag)
+                  00005408    00000018                              : gpio.o (.text:GPIO_setDriveStrengthLow)
+                  00005420    00000018                              : gpio.o (.text:GPIO_setOutputLowOnPin)
+                  00005438    00000018                              : wdt_a.o (.text:WDT_A_holdTimer)
+                  00005450    00000018     rtsv7M4_T_le_v4SPD16_eabi.lib : args_main.obj (.text)
+                  00005468    00000018     empty_min_pem4f.oem4f (.text:ti_sysbios_BIOS_rtsUnlock__I)
+                  00005480    00000018     empty_min_pem4f.oem4f (.text:ti_sysbios_family_arm_m3_Hwi_Handle__label__S)
+                  00005498    00000018     empty_min_pem4f.oem4f (.text:ti_sysbios_family_arm_m3_Hwi_Module__startupDone__F)
+                  000054b0    00000018     sysbios.aem4f : m3_TaskSupport_asm.obj (.text:ti_sysbios_family_arm_m3_TaskSupport_swap__E)
+                  000054c8    00000018     empty_min_pem4f.oem4f (.text:ti_sysbios_family_arm_msp432_Timer_Module__startupDone__F)
+                  000054e0    00000018     empty_min_pem4f.oem4f (.text:ti_sysbios_gates_GateHwi_Handle__label__S)
+                  000054f8    00000018     empty_min_pem4f.oem4f (.text:ti_sysbios_gates_GateMutex_Handle__label__S)
+                  00005510    00000018     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_gates_GateMutex_leave__E)
+                  00005528    00000018     empty_min_pem4f.oem4f (.text:ti_sysbios_heaps_HeapMem_Handle__label__S)
+                  00005540    00000018     empty_min_pem4f.oem4f (.text:ti_sysbios_knl_Swi_Handle__label__S)
+                  00005558    00000018     empty_min_pem4f.oem4f (.text:ti_sysbios_knl_Task_Handle__label__S)
+                  00005570    00000018     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Task_sleepTimeout__I)
+                  00005588    00000018     ti.targets.arm.rtsarm.aem4f : Error.oem4f (.text:xdc_runtime_Error_check__E)
+                  000055a0    00000018                                 : System.oem4f (.text:xdc_runtime_System_exit__E)
+                  000055b8    00000018                                 : Text.oem4f (.text:xdc_runtime_Text_ropeText__E)
+                  000055d0    00000016     empty_min_pem4f.oem4f (.text:ti_sysbios_BIOS_exitFunc__I)
+                  000055e6    00000016     empty_min.obj (.text:ti_sysbios_knl_Mailbox_Params_init)
+                  000055fc    00000016     empty_min.obj (.text:ti_sysbios_knl_Task_Params_init)
+                  00005612    00000006     --HOLE-- [fill = 0]
+                  00005618    00000016     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Task_unblock__E)
+                  0000562e    00000002     --HOLE-- [fill = 0]
+                  00005630    00000014     msp432p4xx_driverlib.lib : gpio.o (.text:GPIO_setDriveStrengthHigh)
+                  00005644    00000014                              : gpio.o (.text:GPIO_setOutputHighOnPin)
+                  00005658    00000014                              : gpio.o (.text:GPIO_toggleOutputOnPin)
+                  0000566c    00000014     drivers_MSP432P401R.aem4f : PowerMSP432.oem4f (.text:Power_idleFunc)
+                  00005680    00000014     msp432p4xx_driverlib.lib : wdt_a.o (.text:WDT_A_startTimer)
+                  00005694    00000014     rtsv7M4_T_le_v4SPD16_eabi.lib : _lock.obj (.text)
+                  000056a8    00000014                                   : strcpy.obj (.text)
+                  000056bc    00000014                                   : strlen.obj (.text)
+                  000056d0    00000014     empty_min_pem4f.oem4f (.text:ti_sysbios_family_arm_m3_Hwi_Object__get__S)
+                  000056e4    00000004     --HOLE-- [fill = 0]
+                  000056e8    00000014     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_switchFromBootStack__E)
+                  000056fc    00000014     empty_min_pem4f.oem4f (.text:ti_sysbios_heaps_HeapMem_Object__get__S)
+                  00005710    00000014     empty_min_pem4f.oem4f (.text:ti_sysbios_knl_Swi_Object__get__S)
+                  00005724    00000004     --HOLE-- [fill = 0]
+                  00005728    00000012     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_hal_Hwi_Module_startup__E)
+                  0000573a    00000012     empty_min_pem4f.oem4f (.text:xdc_runtime_Startup_exec__I)
+                  0000574c    00000010     msp432p4xx_driverlib.lib : gpio.o (.text:GPIO_getInterruptStatus)
+                  0000575c    00000010                              : pcm.o (.text:PCM_gotoLPM4)
+                  0000576c    00000004     --HOLE-- [fill = 0]
+                  00005770    00000010     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_BIOS_exit__E)
+                  00005780    00000010                   : BIOS.obj (.text:ti_sysbios_BIOS_setCpuFreq__E)
+                  00005790    00000010                   : BIOS.obj (.text:ti_sysbios_BIOS_setThreadType__E)
+                  000057a0    00000010                   : BIOS.obj (.text:ti_sysbios_BIOS_start__E)
+                  000057b0    00000010                   : m3_TaskSupport_asm.obj (.text:ti_sysbios_family_arm_m3_TaskSupport_glue)
+                  000057c0    00000010                   : BIOS.obj (.text:ti_sysbios_family_arm_msp432_init_Boot_disableWatchdog)
+                  000057d0    00000010                   : BIOS.obj (.text:ti_sysbios_gates_GateMutex_Instance_finalize__E)
+                  000057e0    00000010     empty_min_pem4f.oem4f (.text:ti_sysbios_knl_Mailbox_Object__get__S)
+                  000057f0    00000010     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Semaphore_Instance_finalize__E)
+                  00005800    00000010                   : BIOS.obj (.text:ti_sysbios_knl_Swi_disable__E)
+                  00005810    00000010     empty_min_pem4f.oem4f (.text:ti_sysbios_knl_Task_Object__get__S)
+                  00005820    00000010     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Task_disable__E)
+                  00005830    00000010     ti.targets.arm.rtsarm.aem4f : Gate.oem4f (.text:xdc_runtime_Gate_leaveSystem__E)
+                  00005840    00000010                                 : Memory.oem4f (.text:xdc_runtime_Memory_free__E)
+                  00005850    00000010                                 : SysMin.oem4f (.text:xdc_runtime_SysMin_ready__E)
+                  00005860    00000010                                 : System.oem4f (.text:xdc_runtime_System_vsnprintf__E)
+                  00005870    0000000e     tirtosport.aem4f : HwiP_tirtos.oem4f (.text:HwiP_Params_init)
+                  0000587e    0000000e     rtsv7M4_T_le_v4SPD16_eabi.lib : copy_decompress_none.obj (.text:decompress:none)
+                  0000588c    00000004     --HOLE-- [fill = 0]
+                  00005890    0000000e     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Clock_removeI__E)
+                  0000589e    00000002     --HOLE-- [fill = 0]
+                  000058a0    0000000e                   : BIOS.obj (.text:ti_sysbios_knl_Idle_loop__E)
+                  000058ae    00000002     --HOLE-- [fill = 0]
+                  000058b0    0000000e                   : BIOS.obj (.text:ti_sysbios_knl_Queue_empty__E)
+                  000058be    0000000c     empty_min_pem4f.oem4f (.text:.bootCodeSection:ti_sysbios_family_arm_msp432_init_Boot_init__I)
+                  000058ca    0000000c     msp432p4xx_driverlib.lib : cpu.o (.text:CPU_cpsid)
+                  000058d6    0000000c                              : cpu.o (.text:CPU_cpsie)
+                  000058e2    00000002     --HOLE-- [fill = 0]
+                  000058e4    0000000c                              : pcm.o (.text:PCM_getPowerState)
+                  000058f0    0000000c     drivers_MSP432P401R.aem4f : PowerMSP432.oem4f (.text:Power_getConstraintMask)
+                  000058fc    0000000c     rtsv7M4_T_le_v4SPD16_eabi.lib : copy_zero_init.obj (.text:decompress:ZI)
+                  00005908    0000000c     empty_min_pem4f.oem4f (.text:ti_sysbios_family_arm_m3_Hwi_Params__init__S)
+                  00005914    00000004     --HOLE-- [fill = 0]
+                  00005918    0000000c     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_disableFxn__E)
+                  00005924    00000004     --HOLE-- [fill = 0]
+                  00005928    0000000c                   : BIOS.obj (.text:ti_sysbios_family_arm_m3_TaskSupport_getStackAlignment__E)
+                  00005934    00000004     --HOLE-- [fill = 0]
+                  00005938    0000000c                   : BIOS.obj (.text:ti_sysbios_family_arm_m3_TimestampProvider_startTimer__E)
+                  00005944    00000004     --HOLE-- [fill = 0]
+                  00005948    0000000c                   : BIOS.obj (.text:ti_sysbios_family_arm_msp432_Timer_getMaxTicks__E)
+                  00005954    00000004     --HOLE-- [fill = 0]
+                  00005958    0000000c                   : BIOS.obj (.text:ti_sysbios_gates_GateHwi_enter__E)
+                  00005964    0000000c     empty_min_pem4f.oem4f (.text:ti_sysbios_knl_Mailbox_Params__init__S)
+                  00005970    0000000c     empty_min_pem4f.oem4f (.text:ti_sysbios_knl_Queue_Object__get__S)
+                  0000597c    00000004     --HOLE-- [fill = 0]
+                  00005980    0000000c     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_knl_Queue_insert__E)
+                  0000598c    0000000c     empty_min_pem4f.oem4f (.text:ti_sysbios_knl_Semaphore_Params__init__S)
+                  00005998    0000000c     empty_min_pem4f.oem4f (.text:ti_sysbios_knl_Task_Params__init__S)
+                  000059a4    0000000c     ti.targets.arm.rtsarm.aem4f : Error.oem4f (.text:xdc_runtime_Error_init__E)
+                  000059b0    0000000c                                 : Gate.oem4f (.text:xdc_runtime_Gate_enterSystem__E)
+                  000059bc    0000000c                                 : Memory.oem4f (.text:xdc_runtime_Memory_calloc__E)
+                  000059c8    0000000c                                 : Memory.oem4f (.text:xdc_runtime_Memory_getMaxDefaultTypeAlign__E)
+                  000059d4    0000000c                                 : Startup.oem4f (.text:xdc_runtime_Startup_rtsDone__E)
+                  000059e0    0000000a     empty_min_pem4f.oem4f (.text:xdc_runtime_IHeap_alloc)
+                  000059ea    0000000a     empty_min_pem4f.oem4f (.text:xdc_runtime_IHeap_free)
+                  000059f4    0000000a     empty_min_pem4f.oem4f (.text:xdc_runtime_Text_visitRope__I)
+                  000059fe    00000008     MSP_EXP432P401R.obj (.text:MSP_EXP432P401R_initGPIO)
+                  00005a06    00000008     MSP_EXP432P401R.obj (.text:MSP_EXP432P401R_initGeneral)
+                  00005a0e    00000008     msp432p4xx_driverlib.lib : pcm.o (.text:PCM_setPowerMode)
+                  00005a16    00000008                              : pcm.o (.text:PCM_setPowerState)
+                  00005a1e    00000002     --HOLE-- [fill = 0]
+                  00005a20    00000008     sysbios.aem4f : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_doSwiRestore__I)
+                  00005a28    00000008                   : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_startup__E)
+                  00005a30    00000006                   : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_doTaskRestore__I)
+                  00005a36    00000002     --HOLE-- [fill = 0]
+                  00005a38    00000006                   : BIOS.obj (.text:ti_sysbios_family_arm_m3_Hwi_restoreFxn__E)
+                  00005a3e    00000002     --HOLE-- [fill = 0]
+                  00005a40    00000006                   : BIOS.obj (.text:ti_sysbios_gates_GateHwi_leave__E)
+                  00005a46    00000002     --HOLE-- [fill = 0]
+                  00005a48    00000006                   : BIOS.obj (.text:ti_sysbios_heaps_HeapMem_isBlocking__E)
+                  00005a4e    00000002     --HOLE-- [fill = 0]
+                  00005a50    00000006                   : BIOS.obj (.text:ti_sysbios_knl_Queue_Instance_init__E)
+                  00005a56    00000002     --HOLE-- [fill = 0]
+                  00005a58    00000006                   : BIOS.obj (.text:ti_sysbios_knl_Swi_startup__E)
+                  00005a5e    00000002     --HOLE-- [fill = 0]
+                  00005a60    00000004                   : BIOS.obj (.text:ti_sysbios_gates_GateHwi_query__E)
+                  00005a64    00000004     --HOLE-- [fill = 0]
+                  00005a68    00000004                   : BIOS.obj (.text:ti_sysbios_gates_GateMutex_query__E)
+                  00005a6c    00000004     --HOLE-- [fill = 0]
+                  00005a70    00000004                   : BIOS.obj (.text:ti_sysbios_knl_Task_startup__E)
+                  00005a74    00000004     --HOLE-- [fill = 0]
+                  00005a78    00000002                   : BIOS.obj (.text:ti_sysbios_BIOS_linkedWithIncorrectBootLibrary__E)
+                  00005a7a    00000006     --HOLE-- [fill = 0]
+                  00005a80    00000002                   : BIOS.obj (.text:ti_sysbios_family_arm_m3_TimestampProvider_rolloverFunc__E)
+                  00005a82    00000006     --HOLE-- [fill = 0]
+                  00005a88    00000002                   : BIOS.obj (.text:ti_sysbios_gates_GateHwi_Instance_init__E)
+                  00005a8a    00000006     --HOLE-- [fill = 0]
+                  00005a90    00000002                   : BIOS.obj (.text:ti_sysbios_knl_Clock_logTick__E)
+
+.const     0    00005a94    00001c81     
+                  00005a94    0000178a     empty_min_pem4f.oem4f (.const:xdc_runtime_Text_charTab__A)
+                  0000721e    00000002     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Hwi_Module__id__C)
+                  00007220    00000048     empty_min_pem4f.oem4f (.const:.string)
+                  00007268    0000003c     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Task_Object__PARAMS__C)
+                  000072a4    00000034     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Mailbox_Object__PARAMS__C)
+                  000072d8    00000030     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Hwi_Object__PARAMS__C)
+                  00007308    0000002c     empty_min_pem4f.oem4f (.const:xdc_runtime_Startup_sfxnTab__A)
+                  00007334    00000028     empty_min_pem4f.oem4f (.const:ti_sysbios_heaps_HeapMem_Module__FXNS__C)
+                  0000735c    00000024     empty_min_pem4f.oem4f (.const:ti_sysbios_gates_GateHwi_Module__FXNS__C)
+                  00007380    00000024     empty_min_pem4f.oem4f (.const:ti_sysbios_gates_GateMutex_Module__FXNS__C)
+                  000073a4    00000024     empty_min_pem4f.oem4f (.const:ti_sysbios_heaps_HeapMem_Object__PARAMS__C)
+                  000073c8    00000024     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Semaphore_Object__PARAMS__C)
+                  000073ec    00000020     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Hwi_Object__DESC__C)
+                  0000740c    00000020     empty_min_pem4f.oem4f (.const:ti_sysbios_gates_GateHwi_Object__DESC__C)
+                  0000742c    00000020     empty_min_pem4f.oem4f (.const:ti_sysbios_gates_GateMutex_Object__DESC__C)
+                  0000744c    00000020     empty_min_pem4f.oem4f (.const:ti_sysbios_heaps_HeapMem_Object__DESC__C)
+                  0000746c    00000020     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Mailbox_Object__DESC__C)
+                  0000748c    00000020     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Queue_Object__DESC__C)
+                  000074ac    00000020     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Semaphore_Object__DESC__C)
+                  000074cc    00000020     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Task_Object__DESC__C)
+                  000074ec    00000018     empty_min_pem4f.oem4f (.const:ti_sysbios_gates_GateHwi_Object__PARAMS__C)
+                  00007504    00000018     empty_min_pem4f.oem4f (.const:ti_sysbios_gates_GateMutex_Object__PARAMS__C)
+                  0000751c    00000018     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Queue_Object__PARAMS__C)
+                  00007534    00000016     empty_min_pem4f.oem4f (.const:xdc_runtime_Startup_sfxnRts__A)
+                  0000754a    00000002     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Timer_Module__id__C)
+                  0000754c    00000014     MSP_EXP432P401R.obj (.const:GPIOMSP432_config)
+                  00007560    00000010     MSP_EXP432P401R.obj (.const:PowerMSP432_config)
+                  00007570    00000010     empty_min_pem4f.oem4f (.const:xdc_runtime_Text_nodeTab__A)
+                  00007580    0000000c     drivers_MSP432P401R.aem4f : GPIOMSP432.oem4f (.const:.string)
+                  0000758c    0000000c     empty_min_pem4f.oem4f (.const:xdc_runtime_Startup_firstFxns__A)
+                  00007598    00000008     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Hwi_excHookFuncs__A)
+                  000075a0    00000008     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Idle_funcList__A)
+                  000075a8    00000008     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Idle_funcList__C)
+                  000075b0    00000008     empty_min_pem4f.oem4f (.const:xdc_runtime_Startup_firstFxns__C)
+                  000075b8    00000008     empty_min_pem4f.oem4f (.const:xdc_runtime_Startup_lastFxns__C)
+                  000075c0    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Hwi_E_NMI__C)
+                  000075c4    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Hwi_E_alreadyDefined__C)
+                  000075c8    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Hwi_E_busFault__C)
+                  000075cc    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Hwi_E_debugMon__C)
+                  000075d0    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Hwi_E_hardFault__C)
+                  000075d4    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Hwi_E_memFault__C)
+                  000075d8    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Hwi_E_noIsr__C)
+                  000075dc    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Hwi_E_reserved__C)
+                  000075e0    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Hwi_E_svCall__C)
+                  000075e4    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Hwi_E_usageFault__C)
+                  000075e8    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Hwi_NUM_INTERRUPTS__C)
+                  000075ec    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Hwi_Object__count__C)
+                  000075f0    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Hwi_ccr__C)
+                  000075f4    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Hwi_excHandlerFunc__C)
+                  000075f8    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Hwi_excHookFuncs__C)
+                  000075fc    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Hwi_nullIsrFunc__C)
+                  00007600    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Hwi_priGroup__C)
+                  00007604    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_TaskSupport_stackAlignment__C)
+                  00007608    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Timer_E_cannotSupport__C)
+                  0000760c    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_Timer_startupNeeded__C)
+                  00007610    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_msp432_Timer_numTimerDevices__C)
+                  00007614    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_msp432_Timer_startupNeeded__C)
+                  00007618    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_gates_GateMutex_Instance_State_sem__O)
+                  0000761c    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_hal_Hwi_E_stackOverflow__C)
+                  00007620    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_heaps_HeapMem_E_memory__C)
+                  00007624    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_heaps_HeapMem_Module__gateObj__C)
+                  00007628    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_heaps_HeapMem_Object__count__C)
+                  0000762c    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_heaps_HeapMem_reqAlign__C)
+                  00007630    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Clock_Module_State_clockQ__O)
+                  00007634    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Mailbox_Instance_State_dataQue__O)
+                  00007638    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Mailbox_Instance_State_dataSem__O)
+                  0000763c    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Mailbox_Instance_State_freeQue__O)
+                  00007640    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Mailbox_Instance_State_freeSem__O)
+                  00007644    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Mailbox_Object__count__C)
+                  00007648    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Mailbox_maxTypeAlign__C)
+                  0000764c    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Semaphore_Instance_State_pendQ__O)
+                  00007650    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Swi_Object__count__C)
+                  00007654    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Task_Module_State_inactiveQ__O)
+                  00007658    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Task_Object__count__C)
+                  0000765c    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Task_allBlockedFunc__C)
+                  00007660    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Task_defaultStackHeap__C)
+                  00007664    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Task_defaultStackSize__C)
+                  00007668    00000004     empty_min_pem4f.oem4f (.const:ti_sysbios_knl_Task_numConstructedTasks__C)
+                  0000766c    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Assert_E_assertFailed__C)
+                  00007670    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Core_A_initializedParams__C)
+                  00007674    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Core_Module__diagsEnabled__C)
+                  00007678    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Core_Module__diagsIncluded__C)
+                  0000767c    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Core_Module__diagsMask__C)
+                  00007680    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Error_E_memory__C)
+                  00007684    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Error_Module__diagsEnabled__C)
+                  00007688    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Error_Module__diagsIncluded__C)
+                  0000768c    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Error_Module__diagsMask__C)
+                  00007690    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Error_Module__loggerFxn8__C)
+                  00007694    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Error_Module__loggerObj__C)
+                  00007698    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Error_policyFxn__C)
+                  0000769c    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Error_raiseHook__C)
+                  000076a0    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_IGateProvider_Interface__BASE__C)
+                  000076a4    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_IHeap_Interface__BASE__C)
+                  000076a8    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_IModule_Interface__BASE__C)
+                  000076ac    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Log_L_error__C)
+                  000076b0    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Memory_defaultHeapInstance__C)
+                  000076b4    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Startup_execImpl__C)
+                  000076b8    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Startup_lastFxns__A)
+                  000076bc    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Startup_maxPasses__C)
+                  000076c0    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Startup_sfxnRts__C)
+                  000076c4    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Startup_sfxnTab__C)
+                  000076c8    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_SysMin_bufSize__C)
+                  000076cc    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_SysMin_outputFunc__C)
+                  000076d0    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_System_Module__gateObj__C)
+                  000076d4    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_System_abortFxn__C)
+                  000076d8    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_System_exitFxn__C)
+                  000076dc    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_System_extendFxn__C)
+                  000076e0    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_System_maxAtexitHandlers__C)
+                  000076e4    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Text_charTab__C)
+                  000076e8    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Text_nameEmpty__C)
+                  000076ec    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Text_nameStatic__C)
+                  000076f0    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Text_nameUnknown__C)
+                  000076f4    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Text_nodeTab__C)
+                  000076f8    00000004     empty_min_pem4f.oem4f (.const:xdc_runtime_Text_visitRopeFxn__C)
+                  000076fc    00000002     empty_min_pem4f.oem4f (.const:ti_sysbios_family_arm_m3_TimestampProvider_configTimer__C)
+                  000076fe    00000002     empty_min_pem4f.oem4f (.const:ti_sysbios_hal_Hwi_Module__id__C)
+                  00007700    00000002     empty_min_pem4f.oem4f (.const:ti_sysbios_heaps_HeapMem_Module__id__C)
+                  00007702    00000002     empty_min_pem4f.oem4f (.const:xdc_runtime_Core_Module__id__C)
+                  00007704    00000002     empty_min_pem4f.oem4f (.const:xdc_runtime_Error_Module__loggerDefined__C)
+                  00007706    00000002     empty_min_pem4f.oem4f (.const:xdc_runtime_Error_maxDepth__C)
+                  00007708    00000002     empty_min_pem4f.oem4f (.const:xdc_runtime_Memory_Module__id__C)
+                  0000770a    00000002     empty_min_pem4f.oem4f (.const:xdc_runtime_SysMin_flushAtExit__C)
+                  0000770c    00000002     empty_min_pem4f.oem4f (.const:xdc_runtime_Text_charCnt__C)
+                  0000770e    00000002     empty_min_pem4f.oem4f (.const:xdc_runtime_Text_isLoaded__C)
+                  00007710    00000002     empty_min_pem4f.oem4f (.const:xdc_runtime_Text_registryModsLastId__C)
+                  00007712    00000002     empty_min_pem4f.oem4f (.const:xdc_runtime_Text_unnamedModsLastId__C)
+                  00007714    00000001     empty_min_pem4f.oem4f (.const:xdc_runtime_Error_policy__C)
+
+.cinit     0    00007718    00000280     
+                  00007718    00000249     (.cinit..data.load) [load image, compression = lzss]
+                  00007961    00000003     --HOLE-- [fill = 0]
+                  00007964    0000000c     (__TI_handler_table)
+                  00007970    00000008     (.cinit..bss.load) [load image, compression = zero_init]
+                  00007978    00000008     (.cinit..vecs.load) [load image, compression = zero_init]
+                  00007980    00000018     (__TI_cinit_table)
+
+.init_array 
+*          0    00000000    00000000     UNINITIALIZED
+
+.resetVecs 
+*          0    00000000    0000003c     
+                  00000000    0000003c     empty_min_pem4f.oem4f (.resetVecs)
+
+.binit     0    00000000    00000000     
+
+.vecs      0    20000000    00000140     UNINITIALIZED
+                  20000000    00000140     empty_min_pem4f.oem4f (.vecs)
+
+.bss       0    20000140    00001530     UNINITIALIZED
+                  20000140    00000800     (.common:ti_sysbios_heaps_HeapMem_Instance_State_0_buf__A)
+                  20000940    00000400     (.common:reading_stack)
+                  20000d40    00000400     (.common:writing_stack)
+                  20001140    00000200     empty_min_pem4f.oem4f (.bss:taskStackSection)
+                  20001340    00000140     (.common:ti_sysbios_family_arm_m3_Hwi_dispatchTable)
+                  20001480    00000120     rtsv7M4_T_le_v4SPD16_eabi.lib : trgmsg.obj (.bss:_CIOBUF_)
+                  200015a0    00000080     (.common:xdc_runtime_SysMin_Module_State_0_outbuf__A)
+                  20001620    00000030     drivers_MSP432P401R.aem4f : GPIOMSP432.oem4f (.bss:gpioCallbackInfo)
+                  20001650    00000008     rtsv7M4_T_le_v4SPD16_eabi.lib : trgdrv.obj (.bss:parmbuf)
+                  20001658    00000004     (.common:S1)
+                  2000165c    00000004     (.common:init)
+                  20001660    00000004     (.common:m1)
+                  20001664    00000004     (.common:r1)
+                  20001668    00000004     (.common:stop)
+                  2000166c    00000004     (.common:w1)
+
+.data      0    20001670    0000055d     UNINITIALIZED
+                  20001670    0000009c     drivers_MSP432P401R.aem4f : PowerMSP432.oem4f (.data:PowerMSP432_perfLevels)
+                  2000170c    00000080     empty_min_pem4f.oem4f (.data:ti_sysbios_knl_Swi_Module_State_0_readyQ__A)
+                  2000178c    00000080     empty_min_pem4f.oem4f (.data:ti_sysbios_knl_Task_Module_State_0_readyQ__A)
+                  2000180c    0000004c     empty_min_pem4f.oem4f (.data:ti_sysbios_family_arm_msp432_Timer_Object__table__V)
+                  20001858    0000004c     empty_min_pem4f.oem4f (.data:ti_sysbios_knl_Task_Object__table__V)
+                  200018a4    00000044     empty_min_pem4f.oem4f (.data:ti_sysbios_knl_Task_Module__state__V)
+                  200018e8    00000038     empty_min_pem4f.oem4f (.data:ti_sysbios_gates_GateMutex_Object__table__V)
+                  20001920    00000034     empty_min_pem4f.oem4f (.data:ti_sysbios_family_arm_m3_Hwi_Module__state__V)
+                  20001954    00000030     msp432p4xx_driverlib.lib : gpio.o (.data:GPIO_PORT_TO_BASE)
+                  20001984    00000030     empty_min_pem4f.oem4f (.data:ti_sysbios_family_arm_m3_Hwi_Object__table__V)
+                  200019b4    00000030     empty_min_pem4f.oem4f (.data:ti_sysbios_family_arm_m3_Timer_Object__table__V)
+                  200019e4    00000030     empty_min_pem4f.oem4f (.data:ti_sysbios_knl_Swi_Object__table__V)
+                  20001a14    0000002c     empty_min_pem4f.oem4f (.data:ti_sysbios_knl_Clock_Module__state__V)
+                  20001a40    00000028     drivers_MSP432P401R.aem4f : PowerMSP432.oem4f (.data:PowerMSP432_module)
+                  20001a68    00000024     empty_min_pem4f.oem4f (.data:ti_sysbios_BIOS_Module__state__V)
+                  20001a8c    00000020     empty_min_pem4f.oem4f (.data:ti_sysbios_family_arm_msp432_Timer_Module_State_0_device__A)
+                  20001aac    0000001c     empty_min_pem4f.oem4f (.data:ti_sysbios_knl_Swi_Module__state__V)
+                  20001ac8    00000018     empty_min_pem4f.oem4f (.data:ti_sysbios_heaps_HeapMem_Object__table__V)
+                  20001ae0    00000010     MSP_EXP432P401R.obj (.data:gpioPinConfigs)
+                  20001af0    00000010     empty_min_pem4f.oem4f (.data:ti_sysbios_family_arm_msp432_Timer_Module_State_0_handles__A)
+                  20001b00    0000000c     rtsv7M4_T_le_v4SPD16_eabi.lib : exit.obj (.data:$O1$$)
+                  20001b0c    0000000c     empty_min_pem4f.oem4f (.data:ti_sysbios_family_arm_m3_Timer_Module__state__V)
+                  20001b18    0000000c     empty_min_pem4f.oem4f (.data:ti_sysbios_family_arm_msp432_ClockFreqs_Module__state__V)
+                  20001b24    0000000c     empty_min_pem4f.oem4f (.data:ti_sysbios_family_arm_msp432_Timer_Module__state__V)
+                  20001b30    0000000c     empty_min_pem4f.oem4f (.data:xdc_runtime_SysMin_Module__state__V)
+                  20001b3c    00000008     rtsv7M4_T_le_v4SPD16_eabi.lib : _lock.obj (.data:$O1$$)
+                  20001b44    00000008     MSP_EXP432P401R.obj (.data:gpioCallbackFunctions)
+                  20001b4c    00000008     empty_min_pem4f.oem4f (.data:ti_sysbios_family_arm_m3_Hwi_Module__root__V)
+                  20001b54    00000008     empty_min_pem4f.oem4f (.data:ti_sysbios_gates_GateHwi_Module__root__V)
+                  20001b5c    00000008     empty_min_pem4f.oem4f (.data:ti_sysbios_gates_GateMutex_Module__root__V)
+                  20001b64    00000008     empty_min_pem4f.oem4f (.data:ti_sysbios_heaps_HeapMem_Module__root__V)
+                  20001b6c    00000008     empty_min_pem4f.oem4f (.data:ti_sysbios_knl_Mailbox_Module__root__V)
+                  20001b74    00000008     empty_min_pem4f.oem4f (.data:ti_sysbios_knl_Queue_Module__root__V)
+                  20001b7c    00000008     empty_min_pem4f.oem4f (.data:ti_sysbios_knl_Semaphore_Module__root__V)
+                  20001b84    00000008     empty_min_pem4f.oem4f (.data:ti_sysbios_knl_Task_Module__root__V)
+                  20001b8c    00000008     empty_min_pem4f.oem4f (.data:xdc_runtime_Registry_Module__state__V)
+                  20001b94    00000008     empty_min_pem4f.oem4f (.data:xdc_runtime_Startup_Module__state__V)
+                  20001b9c    00000008     empty_min_pem4f.oem4f (.data:xdc_runtime_System_Module_State_0_atexitHandlers__A)
+                  20001ba4    00000008     empty_min_pem4f.oem4f (.data:xdc_runtime_System_Module__state__V)
+                  20001bac    00000004     rtsv7M4_T_le_v4SPD16_eabi.lib : stkdepth_vars.obj (.data)
+                  20001bb0    00000004     empty_min_pem4f.oem4f (.data:ti_sysbios_family_arm_m3_Hwi_Module_State_0_excContext__A)
+                  20001bb4    00000004     empty_min_pem4f.oem4f (.data:ti_sysbios_family_arm_m3_Hwi_Module_State_0_excStack__A)
+                  20001bb8    00000004     empty_min_pem4f.oem4f (.data:ti_sysbios_family_arm_m3_TimestampProvider_Module__state__V)
+                  20001bbc    00000004     empty_min_pem4f.oem4f (.data:ti_sysbios_gates_GateHwi_Object__table__V)
+                  20001bc0    00000004     empty_min_pem4f.oem4f (.data:ti_sysbios_knl_Task_Module_State_0_idleTask__A)
+                  20001bc4    00000004     empty_min_pem4f.oem4f (.data:xdc_runtime_Memory_Module__state__V)
+                  20001bc8    00000002     empty_min_pem4f.oem4f (.data:ti_sysbios_family_arm_m3_Hwi_Module_State_0_excActive__A)
+                  20001bca    00000002     empty_min_pem4f.oem4f (.data:xdc_runtime_Error_Module__state__V)
+                  20001bcc    00000001     drivers_MSP432P401R.aem4f : GPIOMSP432.oem4f (.data)
+
+.stack     0    2000fd00    00000300     UNINITIALIZED
+                  2000fd00    00000300     --HOLE--
+
+.bootVecs 
+*          0    00000000    00000008     DSECT
+                  00000000    00000008     boot.aem4f : boot.oem4f (.bootVecs)
+
+xdc.meta   0    00000000    000000fb     COPY SECTION
+                  00000000    000000fb     empty_min_pem4f.oem4f (xdc.meta)
+
+MODULE SUMMARY
+
+       Module                     code    ro data   rw data
+       ------                     ----    -------   -------
+    .\
+       empty_min.obj              388     0         2072   
+       MSP_EXP432P401R.obj        16      36        24     
+    +--+--------------------------+-------+---------+---------+
+       Total:                     404     36        2096   
+                                                           
+    C:\Users\Carmen\workspace_v7\Test - Blinking Led - Benchmark\Debug\configPkg\package\cfg\
+       empty_min_pem4f.oem4f      1838    7309      4408   
+    +--+--------------------------+-------+---------+---------+
+       Total:                     1838    7309      4408   
+                                                           
+    C:/ti/tirtos_msp43x_2_20_00_06/products/msp432_driverlib_3_21_00_05/driverlib/MSP432P4xx/ccs/msp432p4xx_driverlib.lib
+       pcm.o                      1214    0         0      
+       gpio.o                     404     0         48     
+       cs.o                       260     0         0      
+       flash.o                    156     0         0      
+       rtc_c.o                    72      0         0      
+       wdt_a.o                    44      0         0      
+       cpu.o                      28      0         0      
+    +--+--------------------------+-------+---------+---------+
+       Total:                     2178    0         48     
+                                                           
+    C:/ti/tirtos_msp43x_2_20_00_06/products/tidrivers_msp43x_2_20_00_08/packages/ti/drivers/lib/drivers_MSP432P401R.aem4f
+       PowerMSP432.oem4f          1016    0         196    
+       GPIOMSP432.oem4f           708     12        49     
+       List.oem4f                 8       0         0      
+    +--+--------------------------+-------+---------+---------+
+       Total:                     1732    12        245    
+                                                           
+    C:/ti/tirtos_msp43x_2_20_00_06/products/tidrivers_msp43x_2_20_00_08/packages/ti/drivers/lib/power_tirtos_MSP432P401R.aem4f
+       PowerMSP432_tirtos.oem4f   106     0         0      
+    +--+--------------------------+-------+---------+---------+
+       Total:                     106     0         0      
+                                                           
+    C:/ti/tirtos_msp43x_2_20_00_06/products/tidrivers_msp43x_2_20_00_08/packages/ti/drivers/ports/lib/tirtosport.aem4f
+       HwiP_tirtos.oem4f          116     0         0      
+    +--+--------------------------+-------+---------+---------+
+       Total:                     116     0         0      
+                                                           
+    C:\Users\Carmen\workspace_v7\Test - Blinking Led - Benchmark\src\sysbios\sysbios.aem4f
+       BIOS.obj                   9992    0         0      
+       m3_Hwi_asm.obj             306     0         0      
+       m3_TaskSupport_asm.obj     180     0         0      
+       m3_Hwi_asm_switch.obj      118     0         0      
+    +--+--------------------------+-------+---------+---------+
+       Total:                     10596   0         0      
+                                                           
+    C:\ti\ccsv7\tools\compiler\ti-cgt-arm_16.9.1.LTS\lib\rtsv7M4_T_le_v4SPD16_eabi.lib
+       trgdrv.obj                 804     0         8      
+       trgmsg.obj                 104     0         288    
+       memcpy_t2.obj              156     0         0      
+       memset_t2.obj              122     0         0      
+       copy_decompress_lzss.obj   104     0         0      
+       exit.obj                   84      0         12     
+       cpy_tbl.obj                76      0         0      
+       u_divt2.obj                64      0         0      
+       _lock.obj                  20      0         8      
+       args_main.obj              24      0         0      
+       strcpy.obj                 20      0         0      
+       strlen.obj                 20      0         0      
+       copy_decompress_none.obj   14      0         0      
+       copy_zero_init.obj         12      0         0      
+       stkdepth_vars.obj          0       0         4      
+       i_div0.obj                 2       0         0      
+    +--+--------------------------+-------+---------+---------+
+       Total:                     1626    0         320    
+                                                           
+    C:\ti\tirtos_msp43x_2_20_00_06\products\bios_6_46_00_23\packages\ti\targets\arm\rtsarm\lib\auto_init.aem4f
+       auto_init.oem4f            160     0         0      
+    +--+--------------------------+-------+---------+---------+
+       Total:                     160     0         0      
+                                                           
+    C:\ti\tirtos_msp43x_2_20_00_06\products\bios_6_46_00_23\packages\ti\targets\arm\rtsarm\lib\boot.aem4f
+       boot.oem4f                 88      0         0      
+    +--+--------------------------+-------+---------+---------+
+       Total:                     88      0         0      
+                                                           
+    C:\ti\tirtos_msp43x_2_20_00_06\products\bios_6_46_00_23\packages\ti\targets\arm\rtsarm\lib\ti.targets.arm.rtsarm.aem4f
+       System.oem4f               1255    0         0      
+       Text.oem4f                 672     0         0      
+       Error.oem4f                524     0         0      
+       Core-mem.oem4f             358     0         0      
+       Startup.oem4f              340     0         0      
+       SysMin.oem4f               248     0         0      
+       Core-smem.oem4f            204     0         0      
+       Memory.oem4f               176     0         0      
+       Assert.oem4f               84      0         0      
+       Core-params.oem4f          70      0         0      
+       Core-label.oem4f           52      0         0      
+       Registry.oem4f             32      0         0      
+       Gate.oem4f                 28      0         0      
+    +--+--------------------------+-------+---------+---------+
+       Total:                     4043    0         0      
+                                                           
+       Stack:                     0       0         768    
+       Linker Generated:          0       637       0      
+    +--+--------------------------+-------+---------+---------+
+       Grand Total:               22887   7994      7885   
+
+
+LINKER GENERATED COPY TABLES
+
+__TI_cinit_table @ 00007980 records: 3, size/record: 8, table size: 24
+	.data: load addr=00007718, load size=00000249 bytes, run addr=20001670, run size=0000055d bytes, compression=lzss
+	.bss: load addr=00007970, load size=00000008 bytes, run addr=20000140, run size=00001530 bytes, compression=zero_init
+	.vecs: load addr=00007978, load size=00000008 bytes, run addr=20000000, run size=00000140 bytes, compression=zero_init
+
+
+LINKER GENERATED HANDLER TABLE
+
+__TI_handler_table @ 00007964 records: 3, size/record: 4, table size: 12
+	index: 0, handler: __TI_decompress_lzss
+	index: 1, handler: __TI_decompress_none
+	index: 2, handler: __TI_zero_init
+
+
+GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name 
+
+address   name                                                        
+-------   ----                                                        
+00003a5d  C$$EXIT                                                     
+00003393  C$$IO$$                                                     
+000058cb  CPU_cpsid                                                   
+000058d7  CPU_cpsie                                                   
+00000ee5  CPU_wfi                                                     
+00001da9  CS_initClockSignal                                          
+00004e55  CS_setDCOCenteredFrequency                                  
+00004311  FlashCtl_disableReadBuffering                               
+00004639  FlashCtl_enableReadBuffering                                
+00004d69  FlashCtl_setWaitState                                       
+0000754c  GPIOMSP432_config                                           
+000053f1  GPIO_clearInterruptFlag                                     
+0000484d  GPIO_getEnabledInterruptStatus                              
+0000574d  GPIO_getInterruptStatus                                     
+00003961  GPIO_hwiIntFxn                                              
+000035c9  GPIO_init                                                   
+000050f5  GPIO_interruptEdgeSelect                                    
+00004bb1  GPIO_setAsInputPin                                          
+0000487d  GPIO_setAsInputPinWithPullDownResistor                      
+000048ad  GPIO_setAsInputPinWithPullUpResistor                        
+00004e79  GPIO_setAsOutputPin                                         
+000039b5  GPIO_setCallback                                            
+00001469  GPIO_setConfig                                              
+00005631  GPIO_setDriveStrengthHigh                                   
+00005409  GPIO_setDriveStrengthLow                                    
+00005645  GPIO_setOutputHighOnPin                                     
+00005421  GPIO_setOutputLowOnPin                                      
+000048dd  GPIO_toggle                                                 
+00005659  GPIO_toggleOutputOnPin                                      
+00003c09  GPIO_write                                                  
+00000a97  HOSTclock                                                   
+00000a5f  HOSTclose                                                   
+00000a21  HOSTgetenv                                                  
+000009c5  HOSTlseek                                                   
+00000973  HOSTopen                                                    
+00000927  HOSTread                                                    
+000008c9  HOSTrename                                                  
+0000088f  HOSTtime                                                    
+00000841  HOSTtime64                                                  
+00000809  HOSTunlink                                                  
+000007bd  HOSTwrite                                                   
+00005871  HwiP_Params_init                                            
+00003501  HwiP_create                                                 
+0000105d  HwiP_disable                                                
+00005a39  HwiP_restore                                                
+000011c5  List_head                                                   
+000017cd  List_next                                                   
+000059ff  MSP_EXP432P401R_initGPIO                                    
+00005a07  MSP_EXP432P401R_initGeneral                                 
+00005279  PCM_enableRudeMode                                          
+00004bdd  PCM_getCoreVoltageLevel                                     
+00004d15  PCM_getPowerMode                                            
+000058e5  PCM_getPowerState                                           
+00004d91  PCM_gotoLPM0                                                
+00002d9d  PCM_gotoLPM3                                                
+0000575d  PCM_gotoLPM4                                                
+00005a0f  PCM_setPowerMode                                            
+00005a17  PCM_setPowerState                                           
+00003c59  PCM_shutdownDevice                                          
+00007560  PowerMSP432_config                                          
+00002a47  PowerMSP432_initPolicy                                      
+20001a40  PowerMSP432_module                                          
+20001670  PowerMSP432_perfLevels                                      
+00004491  PowerMSP432_sleepPolicy                                     
+00004c09  PowerMSP432_updateFreqs                                     
+000058f1  Power_getConstraintMask                                     
+0000566d  Power_idleFunc                                              
+00004171  Power_init                                                  
+00000ae1  Power_sleep                                                 
+00004e9d  RTC_C_holdClock                                             
+00004ec1  RTC_C_startClock                                            
+20001658  S1                                                          
+UNDEFED   SHT$$INIT_ARRAY$$Base                                       
+UNDEFED   SHT$$INIT_ARRAY$$Limit                                      
+4000480c  WDTCTL_SYM                                                  
+00005439  WDT_A_holdTimer                                             
+00005681  WDT_A_startTimer                                            
+00000000  __ASM__                                                     
+20001480  __CIOBUF_                                                   
+00000077  __ISA__                                                     
+0000008a  __PLAT__                                                    
+20010000  __STACK_END                                                 
+00000300  __STACK_SIZE                                                
+000000ad  __TARG__                                                    
+00007980  __TI_CINIT_Base                                             
+00007998  __TI_CINIT_Limit                                            
+00007964  __TI_Handler_Table_Base                                     
+00007970  __TI_Handler_Table_Limit                                    
+000027d1  __TI_auto_init                                              
+20001b00  __TI_cleanup_ptr                                            
+000032fd  __TI_decompress_lzss                                        
+0000587f  __TI_decompress_none                                        
+20001b04  __TI_dtors_ptr                                              
+20001b08  __TI_enable_exit_profile_output                             
+ffffffff  __TI_pprof_out_hndl                                         
+ffffffff  __TI_prof_data_size                                         
+ffffffff  __TI_prof_data_start                                        
+00003397  __TI_readmsg                                                
+00007718  __TI_static_base__                                          
+00003365  __TI_writemsg                                               
+000058fd  __TI_zero_init                                              
+000000d3  __TRDR__                                                    
+00002f0f  __aeabi_idiv0                                               
+00002e95  __aeabi_memclr                                              
+00002e95  __aeabi_memclr4                                             
+00002e95  __aeabi_memclr8                                             
+00002911  __aeabi_memcpy                                              
+00002911  __aeabi_memcpy4                                             
+00002911  __aeabi_memcpy8                                             
+00002e97  __aeabi_memset                                              
+00002e97  __aeabi_memset4                                             
+00002e97  __aeabi_memset8                                             
+00004391  __aeabi_uidiv                                               
+00004391  __aeabi_uidivmod                                            
+ffffffff  __binit__                                                   
+ffffffff  __c_args__                                                  
+2000fd00  __stack                                                     
+00005451  _args_main                                                  
+00003859  _c_int00                                                    
+20001b3c  _lock                                                       
+000056a3  _nop                                                        
+0000569b  _register_lock                                              
+00005695  _register_unlock                                            
+20001b40  _unlock                                                     
+00003a61  abort                                                       
+ffffffff  binit                                                       
+00003d99  copy_in                                                     
+00003a69  exit                                                        
+20001b44  gpioCallbackFunctions                                       
+20001ae0  gpioPinConfigs                                              
+2000165c  init                                                        
+20001660  m1                                                          
+00001f65  main                                                        
+20001bac  main_func_sp                                                
+00002911  memcpy                                                      
+00002e9d  memset                                                      
+00005821  osi_TaskDisable                                             
+000057a1  osi_start                                                   
+20001664  r1                                                          
+00003a09  reading                                                     
+20000940  reading_stack                                               
+20001668  stop                                                        
+000056a9  strcpy                                                      
+000056bd  strlen                                                      
+20001a68  ti_sysbios_BIOS_Module__state__V                            
+000054f9  ti_sysbios_BIOS_RtsGateProxy_Handle__label__S               
+00005015  ti_sysbios_BIOS_RtsGateProxy_Object__delete__S              
+0000203d  ti_sysbios_BIOS_RtsGateProxy_enter__E                       
+00002115  ti_sysbios_BIOS_RtsGateProxy_leave__E                       
+00005a69  ti_sysbios_BIOS_RtsGateProxy_query__E                       
+0000490d  ti_sysbios_BIOS_atExitFunc__I                               
+00004ee5  ti_sysbios_BIOS_errorRaiseHook__I                           
+000055d1  ti_sysbios_BIOS_exitFunc__I                                 
+00005771  ti_sysbios_BIOS_exit__E                                     
+00005a79  ti_sysbios_BIOS_linkedWithIncorrectBootLibrary__E           
+00003147  ti_sysbios_BIOS_nullFunc__I                                 
+00004f09  ti_sysbios_BIOS_registerRTSLock__I                          
+00004f2d  ti_sysbios_BIOS_removeRTSLock__I                            
+00005115  ti_sysbios_BIOS_rtsLock__I                                  
+00005469  ti_sysbios_BIOS_rtsUnlock__I                                
+00005781  ti_sysbios_BIOS_setCpuFreq__E                               
+00005791  ti_sysbios_BIOS_setThreadType__E                            
+0000466d  ti_sysbios_BIOS_startFunc__I                                
+000057a1  ti_sysbios_BIOS_start__E                                    
+000075c0  ti_sysbios_family_arm_m3_Hwi_E_NMI__C                       
+000075c4  ti_sysbios_family_arm_m3_Hwi_E_alreadyDefined__C            
+000075c8  ti_sysbios_family_arm_m3_Hwi_E_busFault__C                  
+000075cc  ti_sysbios_family_arm_m3_Hwi_E_debugMon__C                  
+000075d0  ti_sysbios_family_arm_m3_Hwi_E_hardFault__C                 
+000075d4  ti_sysbios_family_arm_m3_Hwi_E_memFault__C                  
+000075d8  ti_sysbios_family_arm_m3_Hwi_E_noIsr__C                     
+000075dc  ti_sysbios_family_arm_m3_Hwi_E_reserved__C                  
+000075e0  ti_sysbios_family_arm_m3_Hwi_E_svCall__C                    
+000075e4  ti_sysbios_family_arm_m3_Hwi_E_usageFault__C                
+00005481  ti_sysbios_family_arm_m3_Hwi_Handle__label__S               
+000046a1  ti_sysbios_family_arm_m3_Hwi_Instance_finalize__E           
+00002a49  ti_sysbios_family_arm_m3_Hwi_Instance_init__E               
+20001bc8  ti_sysbios_family_arm_m3_Hwi_Module_State_0_excActive__A    
+20001bb0  ti_sysbios_family_arm_m3_Hwi_Module_State_0_excContext__A   
+20001bb4  ti_sysbios_family_arm_m3_Hwi_Module_State_0_excStack__A     
+0000721e  ti_sysbios_family_arm_m3_Hwi_Module__id__C                  
+20001b4c  ti_sysbios_family_arm_m3_Hwi_Module__root__V                
+00005499  ti_sysbios_family_arm_m3_Hwi_Module__startupDone__F         
+00005499  ti_sysbios_family_arm_m3_Hwi_Module__startupDone__S         
+20001920  ti_sysbios_family_arm_m3_Hwi_Module__state__V               
+00003ca9  ti_sysbios_family_arm_m3_Hwi_Module_startup__E              
+000075e8  ti_sysbios_family_arm_m3_Hwi_NUM_INTERRUPTS__C              
+000073ec  ti_sysbios_family_arm_m3_Hwi_Object__DESC__C                
+000072d8  ti_sysbios_family_arm_m3_Hwi_Object__PARAMS__C              
+000075ec  ti_sysbios_family_arm_m3_Hwi_Object__count__C               
+000056d1  ti_sysbios_family_arm_m3_Hwi_Object__get__S                 
+20001984  ti_sysbios_family_arm_m3_Hwi_Object__table__V               
+00005909  ti_sysbios_family_arm_m3_Hwi_Params__init__S                
+000075f0  ti_sysbios_family_arm_m3_Hwi_ccr__C                         
+000038b1  ti_sysbios_family_arm_m3_Hwi_construct                      
+00005919  ti_sysbios_family_arm_m3_Hwi_disableFxn__E                  
+00003f79  ti_sysbios_family_arm_m3_Hwi_disableInterrupt__E            
+00003439  ti_sysbios_family_arm_m3_Hwi_dispatchC__I                   
+20001340  ti_sysbios_family_arm_m3_Hwi_dispatchTable                  
+00001cbd  ti_sysbios_family_arm_m3_Hwi_dispatch__I                    
+00005a21  ti_sysbios_family_arm_m3_Hwi_doSwiRestore__I                
+00005a31  ti_sysbios_family_arm_m3_Hwi_doTaskRestore__I               
+00003fc1  ti_sysbios_family_arm_m3_Hwi_enableInterrupt__E             
+00000ee9  ti_sysbios_family_arm_m3_Hwi_excBusFault__I                 
+00002441  ti_sysbios_family_arm_m3_Hwi_excDebugMon__I                 
+00000041  ti_sysbios_family_arm_m3_Hwi_excDumpRegs__I                 
+000016c1  ti_sysbios_family_arm_m3_Hwi_excFillContext__I              
+00005135  ti_sysbios_family_arm_m3_Hwi_excHandlerAsm__I               
+000075f4  ti_sysbios_family_arm_m3_Hwi_excHandlerFunc__C              
+000017d1  ti_sysbios_family_arm_m3_Hwi_excHandlerMax__I               
+00005159  ti_sysbios_family_arm_m3_Hwi_excHandler__I                  
+00002501  ti_sysbios_family_arm_m3_Hwi_excHardFault__I                
+00007598  ti_sysbios_family_arm_m3_Hwi_excHookFuncs__A                
+000075f8  ti_sysbios_family_arm_m3_Hwi_excHookFuncs__C                
+00001321  ti_sysbios_family_arm_m3_Hwi_excMemFault__I                 
+000046d9  ti_sysbios_family_arm_m3_Hwi_excNmi__I                      
+00004591  ti_sysbios_family_arm_m3_Hwi_excNoIsr__I                    
+00004009  ti_sysbios_family_arm_m3_Hwi_excReserved__I                 
+000044d1  ti_sysbios_family_arm_m3_Hwi_excSvCall__I                   
+00001061  ti_sysbios_family_arm_m3_Hwi_excUsageFault__I               
+000041b9  ti_sysbios_family_arm_m3_Hwi_getStackInfo__E                
+00002ae1  ti_sysbios_family_arm_m3_Hwi_initNVIC__E                    
+00003909  ti_sysbios_family_arm_m3_Hwi_initStacks__E                  
+000075fc  ti_sysbios_family_arm_m3_Hwi_nullIsrFunc__C                 
+e000e000  ti_sysbios_family_arm_m3_Hwi_nvic                           
+00004e09  ti_sysbios_family_arm_m3_Hwi_pendSV__I                      
+00002d19  ti_sysbios_family_arm_m3_Hwi_postInit__I                    
+00007600  ti_sysbios_family_arm_m3_Hwi_priGroup__C                    
+20000000  ti_sysbios_family_arm_m3_Hwi_ramVectors                     
+00000000  ti_sysbios_family_arm_m3_Hwi_resetVectors                   
+00005a39  ti_sysbios_family_arm_m3_Hwi_restoreFxn__E                  
+00004e2d  ti_sysbios_family_arm_m3_Hwi_return                         
+00005a29  ti_sysbios_family_arm_m3_Hwi_startup__E                     
+000056e9  ti_sysbios_family_arm_m3_Hwi_switchFromBootStack__E         
+000021e5  ti_sysbios_family_arm_m3_TaskSupport_Module__startupDone__S 
+00002b75  ti_sysbios_family_arm_m3_TaskSupport_buildTaskStack         
+00005929  ti_sysbios_family_arm_m3_TaskSupport_getStackAlignment__E   
+000057b1  ti_sysbios_family_arm_m3_TaskSupport_glue                   
+00007604  ti_sysbios_family_arm_m3_TaskSupport_stackAlignment__C      
+00004941  ti_sysbios_family_arm_m3_TaskSupport_start__E               
+000054b1  ti_sysbios_family_arm_m3_TaskSupport_swap__E                
+00007608  ti_sysbios_family_arm_m3_Timer_E_cannotSupport__C           
+0000754a  ti_sysbios_family_arm_m3_Timer_Module__id__C                
+20001b0c  ti_sysbios_family_arm_m3_Timer_Module__state__V             
+00004f51  ti_sysbios_family_arm_m3_Timer_Module_startup__E            
+200019b4  ti_sysbios_family_arm_m3_Timer_Object__table__V             
+00004051  ti_sysbios_family_arm_m3_Timer_initDevice__I                
+00004711  ti_sysbios_family_arm_m3_Timer_periodicStub__I              
+00004f79  ti_sysbios_family_arm_m3_Timer_postInit__I                  
+00004099  ti_sysbios_family_arm_m3_Timer_setPeriod__E                 
+00003ab1  ti_sysbios_family_arm_m3_Timer_start__E                     
+0000760c  ti_sysbios_family_arm_m3_Timer_startupNeeded__C             
+00004fa1  ti_sysbios_family_arm_m3_Timer_startup__E                   
+00005299  ti_sysbios_family_arm_m3_Timer_stop__E                      
+20001bb8  ti_sysbios_family_arm_m3_TimestampProvider_Module__state__V 
+00005179  ti_sysbios_family_arm_m3_TimestampProvider_Module_startup__E
+000076fc  ti_sysbios_family_arm_m3_TimestampProvider_configTimer__C   
+00003569  ti_sysbios_family_arm_m3_TimestampProvider_get32__E         
+00005a81  ti_sysbios_family_arm_m3_TimestampProvider_rolloverFunc__E  
+00005939  ti_sysbios_family_arm_m3_TimestampProvider_startTimer__E    
+20001b18  ti_sysbios_family_arm_msp432_ClockFreqs_Module__state__V    
+00004fc9  ti_sysbios_family_arm_msp432_ClockFreqs_setFrequency__E     
+20001a8c  ti_sysbios_family_arm_msp432_Timer_Module_State_0_device__A 
+20001af0  ti_sysbios_family_arm_msp432_Timer_Module_State_0_handles__A
+000054c9  ti_sysbios_family_arm_msp432_Timer_Module__startupDone__F   
+000054c9  ti_sysbios_family_arm_msp432_Timer_Module__startupDone__S   
+20001b24  ti_sysbios_family_arm_msp432_Timer_Module__state__V         
+000043d1  ti_sysbios_family_arm_msp432_Timer_Module_startup__E        
+2000180c  ti_sysbios_family_arm_msp432_Timer_Object__table__V         
+00005949  ti_sysbios_family_arm_msp432_Timer_getMaxTicks__E           
+00003b09  ti_sysbios_family_arm_msp432_Timer_initDevice__I            
+00007610  ti_sysbios_family_arm_msp432_Timer_numTimerDevices__C       
+00002729  ti_sysbios_family_arm_msp432_Timer_periodicStub__E          
+00004ff1  ti_sysbios_family_arm_msp432_Timer_postInit__I              
+00004971  ti_sysbios_family_arm_msp432_Timer_setPeriod__E             
+00003de9  ti_sysbios_family_arm_msp432_Timer_start__E                 
+00007614  ti_sysbios_family_arm_msp432_Timer_startupNeeded__C         
+00004411  ti_sysbios_family_arm_msp432_Timer_startup__E               
+00003b61  ti_sysbios_family_arm_msp432_init_Boot_configureClocksHigh  
+000057c1  ti_sysbios_family_arm_msp432_init_Boot_disableWatchdog      
+000058bf  ti_sysbios_family_arm_msp432_init_Boot_init__I              
+00005259  ti_sysbios_family_xxx_Hwi_switchAndRunFunc                  
+000054e1  ti_sysbios_gates_GateHwi_Handle__label__S                   
+00005a89  ti_sysbios_gates_GateHwi_Instance_init__E                   
+0000735c  ti_sysbios_gates_GateHwi_Module__FXNS__C                    
+20001b54  ti_sysbios_gates_GateHwi_Module__root__V                    
+0000740c  ti_sysbios_gates_GateHwi_Object__DESC__C                    
+000074ec  ti_sysbios_gates_GateHwi_Object__PARAMS__C                  
+000049a1  ti_sysbios_gates_GateHwi_Object__create__S                  
+00005199  ti_sysbios_gates_GateHwi_Object__delete__S                  
+20001bbc  ti_sysbios_gates_GateHwi_Object__table__V                   
+00005959  ti_sysbios_gates_GateHwi_enter__E                           
+00005a41  ti_sysbios_gates_GateHwi_leave__E                           
+00005a61  ti_sysbios_gates_GateHwi_query__E                           
+000054f9  ti_sysbios_gates_GateMutex_Handle__label__S                 
+00007618  ti_sysbios_gates_GateMutex_Instance_State_sem__O            
+000057d1  ti_sysbios_gates_GateMutex_Instance_finalize__E             
+000052b9  ti_sysbios_gates_GateMutex_Instance_init__E                 
+00007380  ti_sysbios_gates_GateMutex_Module__FXNS__C                  
+20001b5c  ti_sysbios_gates_GateMutex_Module__root__V                  
+0000742c  ti_sysbios_gates_GateMutex_Object__DESC__C                  
+00007504  ti_sysbios_gates_GateMutex_Object__PARAMS__C                
+000049d1  ti_sysbios_gates_GateMutex_Object__create__S                
+00005015  ti_sysbios_gates_GateMutex_Object__delete__S                
+200018e8  ti_sysbios_gates_GateMutex_Object__table__V                 
+00004a01  ti_sysbios_gates_GateMutex_enter__E                         
+00005511  ti_sysbios_gates_GateMutex_leave__E                         
+00005a69  ti_sysbios_gates_GateMutex_query__E                         
+0000761c  ti_sysbios_hal_Hwi_E_stackOverflow__C                       
+00005481  ti_sysbios_hal_Hwi_HwiProxy_Handle__label__S                
+00005499  ti_sysbios_hal_Hwi_HwiProxy_Module__startupDone__S          
+00005909  ti_sysbios_hal_Hwi_HwiProxy_Params__init__S                 
+00003f79  ti_sysbios_hal_Hwi_HwiProxy_disableInterrupt__E             
+00005919  ti_sysbios_hal_Hwi_HwiProxy_disable__E                      
+00003fc1  ti_sysbios_hal_Hwi_HwiProxy_enableInterrupt__E              
+000041b9  ti_sysbios_hal_Hwi_HwiProxy_getStackInfo__E                 
+00005a39  ti_sysbios_hal_Hwi_HwiProxy_restore__E                      
+00005a29  ti_sysbios_hal_Hwi_HwiProxy_startup__E                      
+000056e9  ti_sysbios_hal_Hwi_HwiProxy_switchFromBootStack__E          
+000076fe  ti_sysbios_hal_Hwi_Module__id__C                            
+00005729  ti_sysbios_hal_Hwi_Module_startup__E                        
+00004749  ti_sysbios_hal_Hwi_checkStack                               
+00004819  ti_sysbios_hal_Hwi_initStack                                
+00007620  ti_sysbios_heaps_HeapMem_E_memory__C                        
+00005529  ti_sysbios_heaps_HeapMem_Handle__label__S                   
+20000140  ti_sysbios_heaps_HeapMem_Instance_State_0_buf__A            
+00004451  ti_sysbios_heaps_HeapMem_Instance_init__E                   
+000054f9  ti_sysbios_heaps_HeapMem_Module_GateProxy_Handle__label__S  
+00005015  ti_sysbios_heaps_HeapMem_Module_GateProxy_Object__delete__S 
+000024fd  ti_sysbios_heaps_HeapMem_Module_GateProxy_enter__E          
+000025bd  ti_sysbios_heaps_HeapMem_Module_GateProxy_leave__E          
+00005a69  ti_sysbios_heaps_HeapMem_Module_GateProxy_query__E          
+00007334  ti_sysbios_heaps_HeapMem_Module__FXNS__C                    
+00007624  ti_sysbios_heaps_HeapMem_Module__gateObj__C                 
+00007700  ti_sysbios_heaps_HeapMem_Module__id__C                      
+20001b64  ti_sysbios_heaps_HeapMem_Module__root__V                    
+0000744c  ti_sysbios_heaps_HeapMem_Object__DESC__C                    
+000073a4  ti_sysbios_heaps_HeapMem_Object__PARAMS__C                  
+00007628  ti_sysbios_heaps_HeapMem_Object__count__C                   
+00004a31  ti_sysbios_heaps_HeapMem_Object__create__S                  
+000051b9  ti_sysbios_heaps_HeapMem_Object__delete__S                  
+000056fd  ti_sysbios_heaps_HeapMem_Object__get__S                     
+20001ac8  ti_sysbios_heaps_HeapMem_Object__table__V                   
+00002119  ti_sysbios_heaps_HeapMem_alloc__E                           
+00002e19  ti_sysbios_heaps_HeapMem_free__E                            
+00003e39  ti_sysbios_heaps_HeapMem_getStats__E                        
+00004511  ti_sysbios_heaps_HeapMem_init__I                            
+00005a49  ti_sysbios_heaps_HeapMem_isBlocking__E                      
+0000762c  ti_sysbios_heaps_HeapMem_reqAlign__C                        
+00007630  ti_sysbios_knl_Clock_Module_State_clockQ__O                 
+20001a14  ti_sysbios_knl_Clock_Module__state__V                       
+00005039  ti_sysbios_knl_Clock_Module_startup__E                      
+000054c9  ti_sysbios_knl_Clock_TimerProxy_Module__startupDone__S      
+00002725  ti_sysbios_knl_Clock_TimerProxy_getMaxTicks__E              
+00004411  ti_sysbios_knl_Clock_TimerProxy_startup__E                  
+00004db9  ti_sysbios_knl_Clock_addI__E                                
+00004c35  ti_sysbios_knl_Clock_doTick__I                              
+00005a91  ti_sysbios_knl_Clock_logTick__E                             
+00005891  ti_sysbios_knl_Clock_removeI__E                             
+00003149  ti_sysbios_knl_Clock_workFunc__E                            
+000075a0  ti_sysbios_knl_Idle_funcList__A                             
+000075a8  ti_sysbios_knl_Idle_funcList__C                             
+000058a1  ti_sysbios_knl_Idle_loop__E                                 
+000051d9  ti_sysbios_knl_Idle_run__E                                  
+00007634  ti_sysbios_knl_Mailbox_Instance_State_dataQue__O            
+00007638  ti_sysbios_knl_Mailbox_Instance_State_dataSem__O            
+0000763c  ti_sysbios_knl_Mailbox_Instance_State_freeQue__O            
+00007640  ti_sysbios_knl_Mailbox_Instance_State_freeSem__O            
+00002f89  ti_sysbios_knl_Mailbox_Instance_finalize__E                 
+00002041  ti_sysbios_knl_Mailbox_Instance_init__E                     
+20001b6c  ti_sysbios_knl_Mailbox_Module__root__V                      
+000040e1  ti_sysbios_knl_Mailbox_Module_startup__E                    
+0000746c  ti_sysbios_knl_Mailbox_Object__DESC__C                      
+000072a4  ti_sysbios_knl_Mailbox_Object__PARAMS__C                    
+00007644  ti_sysbios_knl_Mailbox_Object__count__C                     
+000057e1  ti_sysbios_knl_Mailbox_Object__get__S                       
+00005965  ti_sysbios_knl_Mailbox_Params__init__S                      
+0000349d  ti_sysbios_knl_Mailbox_create                               
+00007648  ti_sysbios_knl_Mailbox_maxTypeAlign__C                      
+00002f11  ti_sysbios_knl_Mailbox_pend__E                              
+00004a61  ti_sysbios_knl_Mailbox_postInit__I                          
+00002c91  ti_sysbios_knl_Mailbox_post__E                              
+00005a51  ti_sysbios_knl_Queue_Instance_init__E                       
+20001b74  ti_sysbios_knl_Queue_Module__root__V                        
+0000748c  ti_sysbios_knl_Queue_Object__DESC__C                        
+0000751c  ti_sysbios_knl_Queue_Object__PARAMS__C                      
+000052d5  ti_sysbios_knl_Queue_Object__destruct__S                    
+00005971  ti_sysbios_knl_Queue_Object__get__S                         
+00004c61  ti_sysbios_knl_Queue_construct                              
+00002add  ti_sysbios_knl_Queue_destruct                               
+000058b1  ti_sysbios_knl_Queue_empty__E                               
+000052f1  ti_sysbios_knl_Queue_get__E                                 
+00005981  ti_sysbios_knl_Queue_insert__E                              
+00005311  ti_sysbios_knl_Queue_put__E                                 
+0000764c  ti_sysbios_knl_Semaphore_Instance_State_pendQ__O            
+000057f1  ti_sysbios_knl_Semaphore_Instance_finalize__E               
+00005061  ti_sysbios_knl_Semaphore_Instance_init__E                   
+20001b7c  ti_sysbios_knl_Semaphore_Module__root__V                    
+000074ac  ti_sysbios_knl_Semaphore_Object__DESC__C                    
+000073c8  ti_sysbios_knl_Semaphore_Object__PARAMS__C                  
+000051f9  ti_sysbios_knl_Semaphore_Object__destruct__S                
+0000598d  ti_sysbios_knl_Semaphore_Params__init__S                    
+00004a91  ti_sysbios_knl_Semaphore_construct                          
+0000477d  ti_sysbios_knl_Semaphore_create                             
+00002c8d  ti_sysbios_knl_Semaphore_destruct                           
+00004ac1  ti_sysbios_knl_Semaphore_pendTimeout__I                     
+000011c9  ti_sysbios_knl_Semaphore_pend__E                            
+00002ff9  ti_sysbios_knl_Semaphore_post__E                            
+00005541  ti_sysbios_knl_Swi_Handle__label__S                         
+2000170c  ti_sysbios_knl_Swi_Module_State_0_readyQ__A                 
+20001aac  ti_sysbios_knl_Swi_Module__state__V                         
+00004de1  ti_sysbios_knl_Swi_Module_startup__E                        
+00007650  ti_sysbios_knl_Swi_Object__count__C                         
+00005711  ti_sysbios_knl_Swi_Object__get__S                           
+200019e4  ti_sysbios_knl_Swi_Object__table__V                         
+00005801  ti_sysbios_knl_Swi_disable__E                               
+00004201  ti_sysbios_knl_Swi_post__E                                  
+000031b9  ti_sysbios_knl_Swi_restoreHwi__E                            
+00004551  ti_sysbios_knl_Swi_restore__E                               
+00003e89  ti_sysbios_knl_Swi_runLoop__I                               
+00003629  ti_sysbios_knl_Swi_run__I                                   
+00003689  ti_sysbios_knl_Swi_schedule__I                              
+00005a59  ti_sysbios_knl_Swi_startup__E                               
+00005559  ti_sysbios_knl_Task_Handle__label__S                        
+20001140  ti_sysbios_knl_Task_Instance_State_0_stack__A               
+000025c1  ti_sysbios_knl_Task_Instance_finalize__E                    
+000021e9  ti_sysbios_knl_Task_Instance_init__E                        
+20001bc0  ti_sysbios_knl_Task_Module_State_0_idleTask__A              
+2000178c  ti_sysbios_knl_Task_Module_State_0_readyQ__A                
+00007654  ti_sysbios_knl_Task_Module_State_inactiveQ__O               
+20001b84  ti_sysbios_knl_Task_Module__root__V                         
+200018a4  ti_sysbios_knl_Task_Module__state__V                        
+000036e9  ti_sysbios_knl_Task_Module_startup__E                       
+000074cc  ti_sysbios_knl_Task_Object__DESC__C                         
+00007268  ti_sysbios_knl_Task_Object__PARAMS__C                       
+00007658  ti_sysbios_knl_Task_Object__count__C                        
+00005811  ti_sysbios_knl_Task_Object__get__S                          
+20001858  ti_sysbios_knl_Task_Object__table__V                        
+00005999  ti_sysbios_knl_Task_Params__init__S                         
+000021e5  ti_sysbios_knl_Task_SupportProxy_Module__startupDone__S     
+00005929  ti_sysbios_knl_Task_SupportProxy_getStackAlignment__E       
+00004941  ti_sysbios_knl_Task_SupportProxy_start__E                   
+000054b1  ti_sysbios_knl_Task_SupportProxy_swap__E                    
+0000765c  ti_sysbios_knl_Task_allBlockedFunc__C                       
+00003ed9  ti_sysbios_knl_Task_allBlockedFunction__I                   
+00003745  ti_sysbios_knl_Task_create                                  
+00007660  ti_sysbios_knl_Task_defaultStackHeap__C                     
+00007664  ti_sysbios_knl_Task_defaultStackSize__C                     
+00005821  ti_sysbios_knl_Task_disable__E                              
+00005331  ti_sysbios_knl_Task_enter__I                                
+00003069  ti_sysbios_knl_Task_exit__E                                 
+00007668  ti_sysbios_knl_Task_numConstructedTasks__C                  
+00002c01  ti_sysbios_knl_Task_postInit__I                             
+00004af1  ti_sysbios_knl_Task_processVitalTaskFlag__I                 
+00005089  ti_sysbios_knl_Task_restoreHwi__E                           
+00004c91  ti_sysbios_knl_Task_restore__E                              
+00003f29  ti_sysbios_knl_Task_schedule__I                             
+00005571  ti_sysbios_knl_Task_sleepTimeout__I                         
+00002381  ti_sysbios_knl_Task_sleep__E                                
+000037a1  ti_sysbios_knl_Task_startCore__E                            
+00005a71  ti_sysbios_knl_Task_startup__E                              
+000054bd  ti_sysbios_knl_Task_swapReturn                              
+00004b21  ti_sysbios_knl_Task_unblockI__E                             
+00005619  ti_sysbios_knl_Task_unblock__E                              
+2000166c  w1                                                          
+00004cbd  writing                                                     
+20000d40  writing_stack                                               
+0000766c  xdc_runtime_Assert_E_assertFailed__C                        
+00003bb5  xdc_runtime_Assert_raise__I                                 
+00007670  xdc_runtime_Core_A_initializedParams__C                     
+00007674  xdc_runtime_Core_Module__diagsEnabled__C                    
+00007678  xdc_runtime_Core_Module__diagsIncluded__C                   
+0000767c  xdc_runtime_Core_Module__diagsMask__C                       
+00007702  xdc_runtime_Core_Module__id__C                              
+000047b1  xdc_runtime_Core_assignLabel__I                             
+00004129  xdc_runtime_Core_assignParams__I                            
+000022b5  xdc_runtime_Core_constructObject__I                         
+000018dd  xdc_runtime_Core_createObject__I                            
+000033cd  xdc_runtime_Core_deleteObject__I                            
+00007680  xdc_runtime_Error_E_memory__C                               
+00007684  xdc_runtime_Error_Module__diagsEnabled__C                   
+00007688  xdc_runtime_Error_Module__diagsIncluded__C                  
+0000768c  xdc_runtime_Error_Module__diagsMask__C                      
+00007704  xdc_runtime_Error_Module__loggerDefined__C                  
+00007690  xdc_runtime_Error_Module__loggerFxn8__C                     
+00007694  xdc_runtime_Error_Module__loggerObj__C                      
+20001bca  xdc_runtime_Error_Module__state__V                          
+00005589  xdc_runtime_Error_check__E                                  
+00002f85  xdc_runtime_Error_getSite__E                                
+000059a5  xdc_runtime_Error_init__E                                   
+00007706  xdc_runtime_Error_maxDepth__C                               
+000015a9  xdc_runtime_Error_policyDefault__E                          
+00007698  xdc_runtime_Error_policyFxn__C                              
+00007714  xdc_runtime_Error_policy__C                                 
+00003225  xdc_runtime_Error_print__E                                  
+0000769c  xdc_runtime_Error_raiseHook__C                              
+0000534d  xdc_runtime_Error_raiseX__E                                 
+00004245  xdc_runtime_Error_setX__E                                   
+000059b1  xdc_runtime_Gate_enterSystem__E                             
+00005831  xdc_runtime_Gate_leaveSystem__E                             
+000076a0  xdc_runtime_IGateProvider_Interface__BASE__C                
+000076a4  xdc_runtime_IHeap_Interface__BASE__C                        
+000076a8  xdc_runtime_IModule_Interface__BASE__C                      
+000076ac  xdc_runtime_Log_L_error__C                                  
+000054e1  xdc_runtime_Main_Module_GateProxy_Handle__label__S          
+00005199  xdc_runtime_Main_Module_GateProxy_Object__delete__S         
+00005a61  xdc_runtime_Main_Module_GateProxy_query__E                  
+00005529  xdc_runtime_Memory_HeapProxy_Handle__label__S               
+000051b9  xdc_runtime_Memory_HeapProxy_Object__delete__S              
+000059e1  xdc_runtime_Memory_HeapProxy_alloc__E                       
+000059eb  xdc_runtime_Memory_HeapProxy_free__E                        
+00007708  xdc_runtime_Memory_Module__id__C                            
+20001bc4  xdc_runtime_Memory_Module__state__V                         
+00003291  xdc_runtime_Memory_alloc__E                                 
+000059bd  xdc_runtime_Memory_calloc__E                                
+000076b0  xdc_runtime_Memory_defaultHeapInstance__C                   
+00005841  xdc_runtime_Memory_free__E                                  
+000059c9  xdc_runtime_Memory_getMaxDefaultTypeAlign__E                
+00005369  xdc_runtime_Memory_valloc__E                                
+20001b8c  xdc_runtime_Registry_Module__state__V                       
+00005219  xdc_runtime_Registry_findById__E                            
+20001b94  xdc_runtime_Startup_Module__state__V                        
+00000001  xdc_runtime_Startup__EXECFXN__C                             
+00000001  xdc_runtime_Startup__RESETFXN__C                            
+000076b4  xdc_runtime_Startup_execImpl__C                             
+00003cf9  xdc_runtime_Startup_exec__E                                 
+0000573b  xdc_runtime_Startup_exec__I                                 
+0000758c  xdc_runtime_Startup_firstFxns__A                            
+000075b0  xdc_runtime_Startup_firstFxns__C                            
+000076b8  xdc_runtime_Startup_lastFxns__A                             
+000075b8  xdc_runtime_Startup_lastFxns__C                             
+000076bc  xdc_runtime_Startup_maxPasses__C                            
+000058bf  xdc_runtime_Startup_reset__I                                
+000059d5  xdc_runtime_Startup_rtsDone__E                              
+00007534  xdc_runtime_Startup_sfxnRts__A                              
+000076c0  xdc_runtime_Startup_sfxnRts__C                              
+00007308  xdc_runtime_Startup_sfxnTab__A                              
+000076c4  xdc_runtime_Startup_sfxnTab__C                              
+000019dd  xdc_runtime_Startup_startMods__I                            
+200015a0  xdc_runtime_SysMin_Module_State_0_outbuf__A                 
+20001b30  xdc_runtime_SysMin_Module__state__V                         
+00005239  xdc_runtime_SysMin_Module_startup__E                        
+00004b51  xdc_runtime_SysMin_abort__E                                 
+000076c8  xdc_runtime_SysMin_bufSize__C                               
+00005385  xdc_runtime_SysMin_exit__E                                  
+0000770a  xdc_runtime_SysMin_flushAtExit__C                           
+00004289  xdc_runtime_SysMin_flush__E                                 
+000076cc  xdc_runtime_SysMin_outputFunc__C                            
+000050d1  xdc_runtime_SysMin_output__I                                
+000045c9  xdc_runtime_SysMin_putch__E                                 
+00005851  xdc_runtime_SysMin_ready__E                                 
+000054e1  xdc_runtime_System_Module_GateProxy_Handle__label__S        
+00005199  xdc_runtime_System_Module_GateProxy_Object__delete__S       
+000031b5  xdc_runtime_System_Module_GateProxy_enter__E                
+00003563  xdc_runtime_System_Module_GateProxy_leave__E                
+00005a61  xdc_runtime_System_Module_GateProxy_query__E                
+20001b9c  xdc_runtime_System_Module_State_0_atexitHandlers__A         
+000076d0  xdc_runtime_System_Module__gateObj__C                       
+20001ba4  xdc_runtime_System_Module__state__V                         
+00003433  xdc_runtime_System_Module_startup__E                        
+00004b51  xdc_runtime_System_SupportProxy_abort__E                    
+00005385  xdc_runtime_System_SupportProxy_exit__E                     
+00004289  xdc_runtime_System_SupportProxy_flush__E                    
+000045c9  xdc_runtime_System_SupportProxy_putch__E                    
+00005851  xdc_runtime_System_SupportProxy_ready__E                    
+000076d4  xdc_runtime_System_abortFxn__C                              
+00003a61  xdc_runtime_System_abortStd__E                              
+000053a1  xdc_runtime_System_abort__E                                 
+000053bd  xdc_runtime_System_aprintf__E                               
+00003625  xdc_runtime_System_aprintf_va__F                            
+00004601  xdc_runtime_System_atexit__E                                
+00004e2f  xdc_runtime_System_avprintf__E                              
+00000471  xdc_runtime_System_doPrint__I                               
+000076d8  xdc_runtime_System_exitFxn__C                               
+00003a69  xdc_runtime_System_exitStd__E                               
+000055a1  xdc_runtime_System_exit__E                                  
+000076dc  xdc_runtime_System_extendFxn__C                             
+000030d9  xdc_runtime_System_formatNum__I                             
+000076e0  xdc_runtime_System_maxAtexitHandlers__C                     
+00001ad5  xdc_runtime_System_printfExtend__I                          
+000053d7  xdc_runtime_System_printf__E                                
+00003685  xdc_runtime_System_printf_va__F                             
+00004b81  xdc_runtime_System_processAtExit__E                         
+00004d3f  xdc_runtime_System_putchar__I                               
+000050ad  xdc_runtime_System_vprintf__E                               
+00005861  xdc_runtime_System_vsnprintf__E                             
+0000770c  xdc_runtime_Text_charCnt__C                                 
+00005a94  xdc_runtime_Text_charTab__A                                 
+000076e4  xdc_runtime_Text_charTab__C                                 
+00004ce9  xdc_runtime_Text_cordText__E                                
+0000770e  xdc_runtime_Text_isLoaded__C                                
+000076e8  xdc_runtime_Text_nameEmpty__C                               
+000076ec  xdc_runtime_Text_nameStatic__C                              
+000076f0  xdc_runtime_Text_nameUnknown__C                             
+00007570  xdc_runtime_Text_nodeTab__A                                 
+000076f4  xdc_runtime_Text_nodeTab__C                                 
+000047e5  xdc_runtime_Text_printVisFxn__I                             
+000037fd  xdc_runtime_Text_putLab__E                                  
+00002871  xdc_runtime_Text_putMod__E                                  
+000029ad  xdc_runtime_Text_putSite__E                                 
+00007710  xdc_runtime_Text_registryModsLastId__C                      
+000055b9  xdc_runtime_Text_ropeText__E                                
+00007712  xdc_runtime_Text_unnamedModsLastId__C                       
+00003d49  xdc_runtime_Text_visitRope2__I                              
+000076f8  xdc_runtime_Text_visitRopeFxn__C                            
+000059f5  xdc_runtime_Text_visitRope__I                               
+000042cd  xdc_runtime_Text_xprintf__I                                 
+00003569  xdc_runtime_Timestamp_SupportProxy_get32__E                 
+
+
+GLOBAL SYMBOLS: SORTED BY Symbol Address 
+
+address   name                                                        
+-------   ----                                                        
+00000000  __ASM__                                                     
+00000000  ti_sysbios_family_arm_m3_Hwi_resetVectors                   
+00000001  xdc_runtime_Startup__EXECFXN__C                             
+00000001  xdc_runtime_Startup__RESETFXN__C                            
+00000041  ti_sysbios_family_arm_m3_Hwi_excDumpRegs__I                 
+00000077  __ISA__                                                     
+0000008a  __PLAT__                                                    
+000000ad  __TARG__                                                    
+000000d3  __TRDR__                                                    
+00000300  __STACK_SIZE                                                
+00000471  xdc_runtime_System_doPrint__I                               
+000007bd  HOSTwrite                                                   
+00000809  HOSTunlink                                                  
+00000841  HOSTtime64                                                  
+0000088f  HOSTtime                                                    
+000008c9  HOSTrename                                                  
+00000927  HOSTread                                                    
+00000973  HOSTopen                                                    
+000009c5  HOSTlseek                                                   
+00000a21  HOSTgetenv                                                  
+00000a5f  HOSTclose                                                   
+00000a97  HOSTclock                                                   
+00000ae1  Power_sleep                                                 
+00000ee5  CPU_wfi                                                     
+00000ee9  ti_sysbios_family_arm_m3_Hwi_excBusFault__I                 
+0000105d  HwiP_disable                                                
+00001061  ti_sysbios_family_arm_m3_Hwi_excUsageFault__I               
+000011c5  List_head                                                   
+000011c9  ti_sysbios_knl_Semaphore_pend__E                            
+00001321  ti_sysbios_family_arm_m3_Hwi_excMemFault__I                 
+00001469  GPIO_setConfig                                              
+000015a9  xdc_runtime_Error_policyDefault__E                          
+000016c1  ti_sysbios_family_arm_m3_Hwi_excFillContext__I              
+000017cd  List_next                                                   
+000017d1  ti_sysbios_family_arm_m3_Hwi_excHandlerMax__I               
+000018dd  xdc_runtime_Core_createObject__I                            
+000019dd  xdc_runtime_Startup_startMods__I                            
+00001ad5  xdc_runtime_System_printfExtend__I                          
+00001cbd  ti_sysbios_family_arm_m3_Hwi_dispatch__I                    
+00001da9  CS_initClockSignal                                          
+00001f65  main                                                        
+0000203d  ti_sysbios_BIOS_RtsGateProxy_enter__E                       
+00002041  ti_sysbios_knl_Mailbox_Instance_init__E                     
+00002115  ti_sysbios_BIOS_RtsGateProxy_leave__E                       
+00002119  ti_sysbios_heaps_HeapMem_alloc__E                           
+000021e5  ti_sysbios_family_arm_m3_TaskSupport_Module__startupDone__S 
+000021e5  ti_sysbios_knl_Task_SupportProxy_Module__startupDone__S     
+000021e9  ti_sysbios_knl_Task_Instance_init__E                        
+000022b5  xdc_runtime_Core_constructObject__I                         
+00002381  ti_sysbios_knl_Task_sleep__E                                
+00002441  ti_sysbios_family_arm_m3_Hwi_excDebugMon__I                 
+000024fd  ti_sysbios_heaps_HeapMem_Module_GateProxy_enter__E          
+00002501  ti_sysbios_family_arm_m3_Hwi_excHardFault__I                
+000025bd  ti_sysbios_heaps_HeapMem_Module_GateProxy_leave__E          
+000025c1  ti_sysbios_knl_Task_Instance_finalize__E                    
+00002725  ti_sysbios_knl_Clock_TimerProxy_getMaxTicks__E              
+00002729  ti_sysbios_family_arm_msp432_Timer_periodicStub__E          
+000027d1  __TI_auto_init                                              
+00002871  xdc_runtime_Text_putMod__E                                  
+00002911  __aeabi_memcpy                                              
+00002911  __aeabi_memcpy4                                             
+00002911  __aeabi_memcpy8                                             
+00002911  memcpy                                                      
+000029ad  xdc_runtime_Text_putSite__E                                 
+00002a47  PowerMSP432_initPolicy                                      
+00002a49  ti_sysbios_family_arm_m3_Hwi_Instance_init__E               
+00002add  ti_sysbios_knl_Queue_destruct                               
+00002ae1  ti_sysbios_family_arm_m3_Hwi_initNVIC__E                    
+00002b75  ti_sysbios_family_arm_m3_TaskSupport_buildTaskStack         
+00002c01  ti_sysbios_knl_Task_postInit__I                             
+00002c8d  ti_sysbios_knl_Semaphore_destruct                           
+00002c91  ti_sysbios_knl_Mailbox_post__E                              
+00002d19  ti_sysbios_family_arm_m3_Hwi_postInit__I                    
+00002d9d  PCM_gotoLPM3                                                
+00002e19  ti_sysbios_heaps_HeapMem_free__E                            
+00002e95  __aeabi_memclr                                              
+00002e95  __aeabi_memclr4                                             
+00002e95  __aeabi_memclr8                                             
+00002e97  __aeabi_memset                                              
+00002e97  __aeabi_memset4                                             
+00002e97  __aeabi_memset8                                             
+00002e9d  memset                                                      
+00002f0f  __aeabi_idiv0                                               
+00002f11  ti_sysbios_knl_Mailbox_pend__E                              
+00002f85  xdc_runtime_Error_getSite__E                                
+00002f89  ti_sysbios_knl_Mailbox_Instance_finalize__E                 
+00002ff9  ti_sysbios_knl_Semaphore_post__E                            
+00003069  ti_sysbios_knl_Task_exit__E                                 
+000030d9  xdc_runtime_System_formatNum__I                             
+00003147  ti_sysbios_BIOS_nullFunc__I                                 
+00003149  ti_sysbios_knl_Clock_workFunc__E                            
+000031b5  xdc_runtime_System_Module_GateProxy_enter__E                
+000031b9  ti_sysbios_knl_Swi_restoreHwi__E                            
+00003225  xdc_runtime_Error_print__E                                  
+00003291  xdc_runtime_Memory_alloc__E                                 
+000032fd  __TI_decompress_lzss                                        
+00003365  __TI_writemsg                                               
+00003393  C$$IO$$                                                     
+00003397  __TI_readmsg                                                
+000033cd  xdc_runtime_Core_deleteObject__I                            
+00003433  xdc_runtime_System_Module_startup__E                        
+00003439  ti_sysbios_family_arm_m3_Hwi_dispatchC__I                   
+0000349d  ti_sysbios_knl_Mailbox_create                               
+00003501  HwiP_create                                                 
+00003563  xdc_runtime_System_Module_GateProxy_leave__E                
+00003569  ti_sysbios_family_arm_m3_TimestampProvider_get32__E         
+00003569  xdc_runtime_Timestamp_SupportProxy_get32__E                 
+000035c9  GPIO_init                                                   
+00003625  xdc_runtime_System_aprintf_va__F                            
+00003629  ti_sysbios_knl_Swi_run__I                                   
+00003685  xdc_runtime_System_printf_va__F                             
+00003689  ti_sysbios_knl_Swi_schedule__I                              
+000036e9  ti_sysbios_knl_Task_Module_startup__E                       
+00003745  ti_sysbios_knl_Task_create                                  
+000037a1  ti_sysbios_knl_Task_startCore__E                            
+000037fd  xdc_runtime_Text_putLab__E                                  
+00003859  _c_int00                                                    
+000038b1  ti_sysbios_family_arm_m3_Hwi_construct                      
+00003909  ti_sysbios_family_arm_m3_Hwi_initStacks__E                  
+00003961  GPIO_hwiIntFxn                                              
+000039b5  GPIO_setCallback                                            
+00003a09  reading                                                     
+00003a5d  C$$EXIT                                                     
+00003a61  abort                                                       
+00003a61  xdc_runtime_System_abortStd__E                              
+00003a69  exit                                                        
+00003a69  xdc_runtime_System_exitStd__E                               
+00003ab1  ti_sysbios_family_arm_m3_Timer_start__E                     
+00003b09  ti_sysbios_family_arm_msp432_Timer_initDevice__I            
+00003b61  ti_sysbios_family_arm_msp432_init_Boot_configureClocksHigh  
+00003bb5  xdc_runtime_Assert_raise__I                                 
+00003c09  GPIO_write                                                  
+00003c59  PCM_shutdownDevice                                          
+00003ca9  ti_sysbios_family_arm_m3_Hwi_Module_startup__E              
+00003cf9  xdc_runtime_Startup_exec__E                                 
+00003d49  xdc_runtime_Text_visitRope2__I                              
+00003d99  copy_in                                                     
+00003de9  ti_sysbios_family_arm_msp432_Timer_start__E                 
+00003e39  ti_sysbios_heaps_HeapMem_getStats__E                        
+00003e89  ti_sysbios_knl_Swi_runLoop__I                               
+00003ed9  ti_sysbios_knl_Task_allBlockedFunction__I                   
+00003f29  ti_sysbios_knl_Task_schedule__I                             
+00003f79  ti_sysbios_family_arm_m3_Hwi_disableInterrupt__E            
+00003f79  ti_sysbios_hal_Hwi_HwiProxy_disableInterrupt__E             
+00003fc1  ti_sysbios_family_arm_m3_Hwi_enableInterrupt__E             
+00003fc1  ti_sysbios_hal_Hwi_HwiProxy_enableInterrupt__E              
+00004009  ti_sysbios_family_arm_m3_Hwi_excReserved__I                 
+00004051  ti_sysbios_family_arm_m3_Timer_initDevice__I                
+00004099  ti_sysbios_family_arm_m3_Timer_setPeriod__E                 
+000040e1  ti_sysbios_knl_Mailbox_Module_startup__E                    
+00004129  xdc_runtime_Core_assignParams__I                            
+00004171  Power_init                                                  
+000041b9  ti_sysbios_family_arm_m3_Hwi_getStackInfo__E                
+000041b9  ti_sysbios_hal_Hwi_HwiProxy_getStackInfo__E                 
+00004201  ti_sysbios_knl_Swi_post__E                                  
+00004245  xdc_runtime_Error_setX__E                                   
+00004289  xdc_runtime_SysMin_flush__E                                 
+00004289  xdc_runtime_System_SupportProxy_flush__E                    
+000042cd  xdc_runtime_Text_xprintf__I                                 
+00004311  FlashCtl_disableReadBuffering                               
+00004391  __aeabi_uidiv                                               
+00004391  __aeabi_uidivmod                                            
+000043d1  ti_sysbios_family_arm_msp432_Timer_Module_startup__E        
+00004411  ti_sysbios_family_arm_msp432_Timer_startup__E               
+00004411  ti_sysbios_knl_Clock_TimerProxy_startup__E                  
+00004451  ti_sysbios_heaps_HeapMem_Instance_init__E                   
+00004491  PowerMSP432_sleepPolicy                                     
+000044d1  ti_sysbios_family_arm_m3_Hwi_excSvCall__I                   
+00004511  ti_sysbios_heaps_HeapMem_init__I                            
+00004551  ti_sysbios_knl_Swi_restore__E                               
+00004591  ti_sysbios_family_arm_m3_Hwi_excNoIsr__I                    
+000045c9  xdc_runtime_SysMin_putch__E                                 
+000045c9  xdc_runtime_System_SupportProxy_putch__E                    
+00004601  xdc_runtime_System_atexit__E                                
+00004639  FlashCtl_enableReadBuffering                                
+0000466d  ti_sysbios_BIOS_startFunc__I                                
+000046a1  ti_sysbios_family_arm_m3_Hwi_Instance_finalize__E           
+000046d9  ti_sysbios_family_arm_m3_Hwi_excNmi__I                      
+00004711  ti_sysbios_family_arm_m3_Timer_periodicStub__I              
+00004749  ti_sysbios_hal_Hwi_checkStack                               
+0000477d  ti_sysbios_knl_Semaphore_create                             
+000047b1  xdc_runtime_Core_assignLabel__I                             
+000047e5  xdc_runtime_Text_printVisFxn__I                             
+00004819  ti_sysbios_hal_Hwi_initStack                                
+0000484d  GPIO_getEnabledInterruptStatus                              
+0000487d  GPIO_setAsInputPinWithPullDownResistor                      
+000048ad  GPIO_setAsInputPinWithPullUpResistor                        
+000048dd  GPIO_toggle                                                 
+0000490d  ti_sysbios_BIOS_atExitFunc__I                               
+00004941  ti_sysbios_family_arm_m3_TaskSupport_start__E               
+00004941  ti_sysbios_knl_Task_SupportProxy_start__E                   
+00004971  ti_sysbios_family_arm_msp432_Timer_setPeriod__E             
+000049a1  ti_sysbios_gates_GateHwi_Object__create__S                  
+000049d1  ti_sysbios_gates_GateMutex_Object__create__S                
+00004a01  ti_sysbios_gates_GateMutex_enter__E                         
+00004a31  ti_sysbios_heaps_HeapMem_Object__create__S                  
+00004a61  ti_sysbios_knl_Mailbox_postInit__I                          
+00004a91  ti_sysbios_knl_Semaphore_construct                          
+00004ac1  ti_sysbios_knl_Semaphore_pendTimeout__I                     
+00004af1  ti_sysbios_knl_Task_processVitalTaskFlag__I                 
+00004b21  ti_sysbios_knl_Task_unblockI__E                             
+00004b51  xdc_runtime_SysMin_abort__E                                 
+00004b51  xdc_runtime_System_SupportProxy_abort__E                    
+00004b81  xdc_runtime_System_processAtExit__E                         
+00004bb1  GPIO_setAsInputPin                                          
+00004bdd  PCM_getCoreVoltageLevel                                     
+00004c09  PowerMSP432_updateFreqs                                     
+00004c35  ti_sysbios_knl_Clock_doTick__I                              
+00004c61  ti_sysbios_knl_Queue_construct                              
+00004c91  ti_sysbios_knl_Task_restore__E                              
+00004cbd  writing                                                     
+00004ce9  xdc_runtime_Text_cordText__E                                
+00004d15  PCM_getPowerMode                                            
+00004d3f  xdc_runtime_System_putchar__I                               
+00004d69  FlashCtl_setWaitState                                       
+00004d91  PCM_gotoLPM0                                                
+00004db9  ti_sysbios_knl_Clock_addI__E                                
+00004de1  ti_sysbios_knl_Swi_Module_startup__E                        
+00004e09  ti_sysbios_family_arm_m3_Hwi_pendSV__I                      
+00004e2d  ti_sysbios_family_arm_m3_Hwi_return                         
+00004e2f  xdc_runtime_System_avprintf__E                              
+00004e55  CS_setDCOCenteredFrequency                                  
+00004e79  GPIO_setAsOutputPin                                         
+00004e9d  RTC_C_holdClock                                             
+00004ec1  RTC_C_startClock                                            
+00004ee5  ti_sysbios_BIOS_errorRaiseHook__I                           
+00004f09  ti_sysbios_BIOS_registerRTSLock__I                          
+00004f2d  ti_sysbios_BIOS_removeRTSLock__I                            
+00004f51  ti_sysbios_family_arm_m3_Timer_Module_startup__E            
+00004f79  ti_sysbios_family_arm_m3_Timer_postInit__I                  
+00004fa1  ti_sysbios_family_arm_m3_Timer_startup__E                   
+00004fc9  ti_sysbios_family_arm_msp432_ClockFreqs_setFrequency__E     
+00004ff1  ti_sysbios_family_arm_msp432_Timer_postInit__I              
+00005015  ti_sysbios_BIOS_RtsGateProxy_Object__delete__S              
+00005015  ti_sysbios_gates_GateMutex_Object__delete__S                
+00005015  ti_sysbios_heaps_HeapMem_Module_GateProxy_Object__delete__S 
+00005039  ti_sysbios_knl_Clock_Module_startup__E                      
+00005061  ti_sysbios_knl_Semaphore_Instance_init__E                   
+00005089  ti_sysbios_knl_Task_restoreHwi__E                           
+000050ad  xdc_runtime_System_vprintf__E                               
+000050d1  xdc_runtime_SysMin_output__I                                
+000050f5  GPIO_interruptEdgeSelect                                    
+00005115  ti_sysbios_BIOS_rtsLock__I                                  
+00005135  ti_sysbios_family_arm_m3_Hwi_excHandlerAsm__I               
+00005159  ti_sysbios_family_arm_m3_Hwi_excHandler__I                  
+00005179  ti_sysbios_family_arm_m3_TimestampProvider_Module_startup__E
+00005199  ti_sysbios_gates_GateHwi_Object__delete__S                  
+00005199  xdc_runtime_Main_Module_GateProxy_Object__delete__S         
+00005199  xdc_runtime_System_Module_GateProxy_Object__delete__S       
+000051b9  ti_sysbios_heaps_HeapMem_Object__delete__S                  
+000051b9  xdc_runtime_Memory_HeapProxy_Object__delete__S              
+000051d9  ti_sysbios_knl_Idle_run__E                                  
+000051f9  ti_sysbios_knl_Semaphore_Object__destruct__S                
+00005219  xdc_runtime_Registry_findById__E                            
+00005239  xdc_runtime_SysMin_Module_startup__E                        
+00005259  ti_sysbios_family_xxx_Hwi_switchAndRunFunc                  
+00005279  PCM_enableRudeMode                                          
+00005299  ti_sysbios_family_arm_m3_Timer_stop__E                      
+000052b9  ti_sysbios_gates_GateMutex_Instance_init__E                 
+000052d5  ti_sysbios_knl_Queue_Object__destruct__S                    
+000052f1  ti_sysbios_knl_Queue_get__E                                 
+00005311  ti_sysbios_knl_Queue_put__E                                 
+00005331  ti_sysbios_knl_Task_enter__I                                
+0000534d  xdc_runtime_Error_raiseX__E                                 
+00005369  xdc_runtime_Memory_valloc__E                                
+00005385  xdc_runtime_SysMin_exit__E                                  
+00005385  xdc_runtime_System_SupportProxy_exit__E                     
+000053a1  xdc_runtime_System_abort__E                                 
+000053bd  xdc_runtime_System_aprintf__E                               
+000053d7  xdc_runtime_System_printf__E                                
+000053f1  GPIO_clearInterruptFlag                                     
+00005409  GPIO_setDriveStrengthLow                                    
+00005421  GPIO_setOutputLowOnPin                                      
+00005439  WDT_A_holdTimer                                             
+00005451  _args_main                                                  
+00005469  ti_sysbios_BIOS_rtsUnlock__I                                
+00005481  ti_sysbios_family_arm_m3_Hwi_Handle__label__S               
+00005481  ti_sysbios_hal_Hwi_HwiProxy_Handle__label__S                
+00005499  ti_sysbios_family_arm_m3_Hwi_Module__startupDone__F         
+00005499  ti_sysbios_family_arm_m3_Hwi_Module__startupDone__S         
+00005499  ti_sysbios_hal_Hwi_HwiProxy_Module__startupDone__S          
+000054b1  ti_sysbios_family_arm_m3_TaskSupport_swap__E                
+000054b1  ti_sysbios_knl_Task_SupportProxy_swap__E                    
+000054bd  ti_sysbios_knl_Task_swapReturn                              
+000054c9  ti_sysbios_family_arm_msp432_Timer_Module__startupDone__F   
+000054c9  ti_sysbios_family_arm_msp432_Timer_Module__startupDone__S   
+000054c9  ti_sysbios_knl_Clock_TimerProxy_Module__startupDone__S      
+000054e1  ti_sysbios_gates_GateHwi_Handle__label__S                   
+000054e1  xdc_runtime_Main_Module_GateProxy_Handle__label__S          
+000054e1  xdc_runtime_System_Module_GateProxy_Handle__label__S        
+000054f9  ti_sysbios_BIOS_RtsGateProxy_Handle__label__S               
+000054f9  ti_sysbios_gates_GateMutex_Handle__label__S                 
+000054f9  ti_sysbios_heaps_HeapMem_Module_GateProxy_Handle__label__S  
+00005511  ti_sysbios_gates_GateMutex_leave__E                         
+00005529  ti_sysbios_heaps_HeapMem_Handle__label__S                   
+00005529  xdc_runtime_Memory_HeapProxy_Handle__label__S               
+00005541  ti_sysbios_knl_Swi_Handle__label__S                         
+00005559  ti_sysbios_knl_Task_Handle__label__S                        
+00005571  ti_sysbios_knl_Task_sleepTimeout__I                         
+00005589  xdc_runtime_Error_check__E                                  
+000055a1  xdc_runtime_System_exit__E                                  
+000055b9  xdc_runtime_Text_ropeText__E                                
+000055d1  ti_sysbios_BIOS_exitFunc__I                                 
+00005619  ti_sysbios_knl_Task_unblock__E                              
+00005631  GPIO_setDriveStrengthHigh                                   
+00005645  GPIO_setOutputHighOnPin                                     
+00005659  GPIO_toggleOutputOnPin                                      
+0000566d  Power_idleFunc                                              
+00005681  WDT_A_startTimer                                            
+00005695  _register_unlock                                            
+0000569b  _register_lock                                              
+000056a3  _nop                                                        
+000056a9  strcpy                                                      
+000056bd  strlen                                                      
+000056d1  ti_sysbios_family_arm_m3_Hwi_Object__get__S                 
+000056e9  ti_sysbios_family_arm_m3_Hwi_switchFromBootStack__E         
+000056e9  ti_sysbios_hal_Hwi_HwiProxy_switchFromBootStack__E          
+000056fd  ti_sysbios_heaps_HeapMem_Object__get__S                     
+00005711  ti_sysbios_knl_Swi_Object__get__S                           
+00005729  ti_sysbios_hal_Hwi_Module_startup__E                        
+0000573b  xdc_runtime_Startup_exec__I                                 
+0000574d  GPIO_getInterruptStatus                                     
+0000575d  PCM_gotoLPM4                                                
+00005771  ti_sysbios_BIOS_exit__E                                     
+00005781  ti_sysbios_BIOS_setCpuFreq__E                               
+00005791  ti_sysbios_BIOS_setThreadType__E                            
+000057a1  osi_start                                                   
+000057a1  ti_sysbios_BIOS_start__E                                    
+000057b1  ti_sysbios_family_arm_m3_TaskSupport_glue                   
+000057c1  ti_sysbios_family_arm_msp432_init_Boot_disableWatchdog      
+000057d1  ti_sysbios_gates_GateMutex_Instance_finalize__E             
+000057e1  ti_sysbios_knl_Mailbox_Object__get__S                       
+000057f1  ti_sysbios_knl_Semaphore_Instance_finalize__E               
+00005801  ti_sysbios_knl_Swi_disable__E                               
+00005811  ti_sysbios_knl_Task_Object__get__S                          
+00005821  osi_TaskDisable                                             
+00005821  ti_sysbios_knl_Task_disable__E                              
+00005831  xdc_runtime_Gate_leaveSystem__E                             
+00005841  xdc_runtime_Memory_free__E                                  
+00005851  xdc_runtime_SysMin_ready__E                                 
+00005851  xdc_runtime_System_SupportProxy_ready__E                    
+00005861  xdc_runtime_System_vsnprintf__E                             
+00005871  HwiP_Params_init                                            
+0000587f  __TI_decompress_none                                        
+00005891  ti_sysbios_knl_Clock_removeI__E                             
+000058a1  ti_sysbios_knl_Idle_loop__E                                 
+000058b1  ti_sysbios_knl_Queue_empty__E                               
+000058bf  ti_sysbios_family_arm_msp432_init_Boot_init__I              
+000058bf  xdc_runtime_Startup_reset__I                                
+000058cb  CPU_cpsid                                                   
+000058d7  CPU_cpsie                                                   
+000058e5  PCM_getPowerState                                           
+000058f1  Power_getConstraintMask                                     
+000058fd  __TI_zero_init                                              
+00005909  ti_sysbios_family_arm_m3_Hwi_Params__init__S                
+00005909  ti_sysbios_hal_Hwi_HwiProxy_Params__init__S                 
+00005919  ti_sysbios_family_arm_m3_Hwi_disableFxn__E                  
+00005919  ti_sysbios_hal_Hwi_HwiProxy_disable__E                      
+00005929  ti_sysbios_family_arm_m3_TaskSupport_getStackAlignment__E   
+00005929  ti_sysbios_knl_Task_SupportProxy_getStackAlignment__E       
+00005939  ti_sysbios_family_arm_m3_TimestampProvider_startTimer__E    
+00005949  ti_sysbios_family_arm_msp432_Timer_getMaxTicks__E           
+00005959  ti_sysbios_gates_GateHwi_enter__E                           
+00005965  ti_sysbios_knl_Mailbox_Params__init__S                      
+00005971  ti_sysbios_knl_Queue_Object__get__S                         
+00005981  ti_sysbios_knl_Queue_insert__E                              
+0000598d  ti_sysbios_knl_Semaphore_Params__init__S                    
+00005999  ti_sysbios_knl_Task_Params__init__S                         
+000059a5  xdc_runtime_Error_init__E                                   
+000059b1  xdc_runtime_Gate_enterSystem__E                             
+000059bd  xdc_runtime_Memory_calloc__E                                
+000059c9  xdc_runtime_Memory_getMaxDefaultTypeAlign__E                
+000059d5  xdc_runtime_Startup_rtsDone__E                              
+000059e1  xdc_runtime_Memory_HeapProxy_alloc__E                       
+000059eb  xdc_runtime_Memory_HeapProxy_free__E                        
+000059f5  xdc_runtime_Text_visitRope__I                               
+000059ff  MSP_EXP432P401R_initGPIO                                    
+00005a07  MSP_EXP432P401R_initGeneral                                 
+00005a0f  PCM_setPowerMode                                            
+00005a17  PCM_setPowerState                                           
+00005a21  ti_sysbios_family_arm_m3_Hwi_doSwiRestore__I                
+00005a29  ti_sysbios_family_arm_m3_Hwi_startup__E                     
+00005a29  ti_sysbios_hal_Hwi_HwiProxy_startup__E                      
+00005a31  ti_sysbios_family_arm_m3_Hwi_doTaskRestore__I               
+00005a39  HwiP_restore                                                
+00005a39  ti_sysbios_family_arm_m3_Hwi_restoreFxn__E                  
+00005a39  ti_sysbios_hal_Hwi_HwiProxy_restore__E                      
+00005a41  ti_sysbios_gates_GateHwi_leave__E                           
+00005a49  ti_sysbios_heaps_HeapMem_isBlocking__E                      
+00005a51  ti_sysbios_knl_Queue_Instance_init__E                       
+00005a59  ti_sysbios_knl_Swi_startup__E                               
+00005a61  ti_sysbios_gates_GateHwi_query__E                           
+00005a61  xdc_runtime_Main_Module_GateProxy_query__E                  
+00005a61  xdc_runtime_System_Module_GateProxy_query__E                
+00005a69  ti_sysbios_BIOS_RtsGateProxy_query__E                       
+00005a69  ti_sysbios_gates_GateMutex_query__E                         
+00005a69  ti_sysbios_heaps_HeapMem_Module_GateProxy_query__E          
+00005a71  ti_sysbios_knl_Task_startup__E                              
+00005a79  ti_sysbios_BIOS_linkedWithIncorrectBootLibrary__E           
+00005a81  ti_sysbios_family_arm_m3_TimestampProvider_rolloverFunc__E  
+00005a89  ti_sysbios_gates_GateHwi_Instance_init__E                   
+00005a91  ti_sysbios_knl_Clock_logTick__E                             
+00005a94  xdc_runtime_Text_charTab__A                                 
+0000721e  ti_sysbios_family_arm_m3_Hwi_Module__id__C                  
+00007268  ti_sysbios_knl_Task_Object__PARAMS__C                       
+000072a4  ti_sysbios_knl_Mailbox_Object__PARAMS__C                    
+000072d8  ti_sysbios_family_arm_m3_Hwi_Object__PARAMS__C              
+00007308  xdc_runtime_Startup_sfxnTab__A                              
+00007334  ti_sysbios_heaps_HeapMem_Module__FXNS__C                    
+0000735c  ti_sysbios_gates_GateHwi_Module__FXNS__C                    
+00007380  ti_sysbios_gates_GateMutex_Module__FXNS__C                  
+000073a4  ti_sysbios_heaps_HeapMem_Object__PARAMS__C                  
+000073c8  ti_sysbios_knl_Semaphore_Object__PARAMS__C                  
+000073ec  ti_sysbios_family_arm_m3_Hwi_Object__DESC__C                
+0000740c  ti_sysbios_gates_GateHwi_Object__DESC__C                    
+0000742c  ti_sysbios_gates_GateMutex_Object__DESC__C                  
+0000744c  ti_sysbios_heaps_HeapMem_Object__DESC__C                    
+0000746c  ti_sysbios_knl_Mailbox_Object__DESC__C                      
+0000748c  ti_sysbios_knl_Queue_Object__DESC__C                        
+000074ac  ti_sysbios_knl_Semaphore_Object__DESC__C                    
+000074cc  ti_sysbios_knl_Task_Object__DESC__C                         
+000074ec  ti_sysbios_gates_GateHwi_Object__PARAMS__C                  
+00007504  ti_sysbios_gates_GateMutex_Object__PARAMS__C                
+0000751c  ti_sysbios_knl_Queue_Object__PARAMS__C                      
+00007534  xdc_runtime_Startup_sfxnRts__A                              
+0000754a  ti_sysbios_family_arm_m3_Timer_Module__id__C                
+0000754c  GPIOMSP432_config                                           
+00007560  PowerMSP432_config                                          
+00007570  xdc_runtime_Text_nodeTab__A                                 
+0000758c  xdc_runtime_Startup_firstFxns__A                            
+00007598  ti_sysbios_family_arm_m3_Hwi_excHookFuncs__A                
+000075a0  ti_sysbios_knl_Idle_funcList__A                             
+000075a8  ti_sysbios_knl_Idle_funcList__C                             
+000075b0  xdc_runtime_Startup_firstFxns__C                            
+000075b8  xdc_runtime_Startup_lastFxns__C                             
+000075c0  ti_sysbios_family_arm_m3_Hwi_E_NMI__C                       
+000075c4  ti_sysbios_family_arm_m3_Hwi_E_alreadyDefined__C            
+000075c8  ti_sysbios_family_arm_m3_Hwi_E_busFault__C                  
+000075cc  ti_sysbios_family_arm_m3_Hwi_E_debugMon__C                  
+000075d0  ti_sysbios_family_arm_m3_Hwi_E_hardFault__C                 
+000075d4  ti_sysbios_family_arm_m3_Hwi_E_memFault__C                  
+000075d8  ti_sysbios_family_arm_m3_Hwi_E_noIsr__C                     
+000075dc  ti_sysbios_family_arm_m3_Hwi_E_reserved__C                  
+000075e0  ti_sysbios_family_arm_m3_Hwi_E_svCall__C                    
+000075e4  ti_sysbios_family_arm_m3_Hwi_E_usageFault__C                
+000075e8  ti_sysbios_family_arm_m3_Hwi_NUM_INTERRUPTS__C              
+000075ec  ti_sysbios_family_arm_m3_Hwi_Object__count__C               
+000075f0  ti_sysbios_family_arm_m3_Hwi_ccr__C                         
+000075f4  ti_sysbios_family_arm_m3_Hwi_excHandlerFunc__C              
+000075f8  ti_sysbios_family_arm_m3_Hwi_excHookFuncs__C                
+000075fc  ti_sysbios_family_arm_m3_Hwi_nullIsrFunc__C                 
+00007600  ti_sysbios_family_arm_m3_Hwi_priGroup__C                    
+00007604  ti_sysbios_family_arm_m3_TaskSupport_stackAlignment__C      
+00007608  ti_sysbios_family_arm_m3_Timer_E_cannotSupport__C           
+0000760c  ti_sysbios_family_arm_m3_Timer_startupNeeded__C             
+00007610  ti_sysbios_family_arm_msp432_Timer_numTimerDevices__C       
+00007614  ti_sysbios_family_arm_msp432_Timer_startupNeeded__C         
+00007618  ti_sysbios_gates_GateMutex_Instance_State_sem__O            
+0000761c  ti_sysbios_hal_Hwi_E_stackOverflow__C                       
+00007620  ti_sysbios_heaps_HeapMem_E_memory__C                        
+00007624  ti_sysbios_heaps_HeapMem_Module__gateObj__C                 
+00007628  ti_sysbios_heaps_HeapMem_Object__count__C                   
+0000762c  ti_sysbios_heaps_HeapMem_reqAlign__C                        
+00007630  ti_sysbios_knl_Clock_Module_State_clockQ__O                 
+00007634  ti_sysbios_knl_Mailbox_Instance_State_dataQue__O            
+00007638  ti_sysbios_knl_Mailbox_Instance_State_dataSem__O            
+0000763c  ti_sysbios_knl_Mailbox_Instance_State_freeQue__O            
+00007640  ti_sysbios_knl_Mailbox_Instance_State_freeSem__O            
+00007644  ti_sysbios_knl_Mailbox_Object__count__C                     
+00007648  ti_sysbios_knl_Mailbox_maxTypeAlign__C                      
+0000764c  ti_sysbios_knl_Semaphore_Instance_State_pendQ__O            
+00007650  ti_sysbios_knl_Swi_Object__count__C                         
+00007654  ti_sysbios_knl_Task_Module_State_inactiveQ__O               
+00007658  ti_sysbios_knl_Task_Object__count__C                        
+0000765c  ti_sysbios_knl_Task_allBlockedFunc__C                       
+00007660  ti_sysbios_knl_Task_defaultStackHeap__C                     
+00007664  ti_sysbios_knl_Task_defaultStackSize__C                     
+00007668  ti_sysbios_knl_Task_numConstructedTasks__C                  
+0000766c  xdc_runtime_Assert_E_assertFailed__C                        
+00007670  xdc_runtime_Core_A_initializedParams__C                     
+00007674  xdc_runtime_Core_Module__diagsEnabled__C                    
+00007678  xdc_runtime_Core_Module__diagsIncluded__C                   
+0000767c  xdc_runtime_Core_Module__diagsMask__C                       
+00007680  xdc_runtime_Error_E_memory__C                               
+00007684  xdc_runtime_Error_Module__diagsEnabled__C                   
+00007688  xdc_runtime_Error_Module__diagsIncluded__C                  
+0000768c  xdc_runtime_Error_Module__diagsMask__C                      
+00007690  xdc_runtime_Error_Module__loggerFxn8__C                     
+00007694  xdc_runtime_Error_Module__loggerObj__C                      
+00007698  xdc_runtime_Error_policyFxn__C                              
+0000769c  xdc_runtime_Error_raiseHook__C                              
+000076a0  xdc_runtime_IGateProvider_Interface__BASE__C                
+000076a4  xdc_runtime_IHeap_Interface__BASE__C                        
+000076a8  xdc_runtime_IModule_Interface__BASE__C                      
+000076ac  xdc_runtime_Log_L_error__C                                  
+000076b0  xdc_runtime_Memory_defaultHeapInstance__C                   
+000076b4  xdc_runtime_Startup_execImpl__C                             
+000076b8  xdc_runtime_Startup_lastFxns__A                             
+000076bc  xdc_runtime_Startup_maxPasses__C                            
+000076c0  xdc_runtime_Startup_sfxnRts__C                              
+000076c4  xdc_runtime_Startup_sfxnTab__C                              
+000076c8  xdc_runtime_SysMin_bufSize__C                               
+000076cc  xdc_runtime_SysMin_outputFunc__C                            
+000076d0  xdc_runtime_System_Module__gateObj__C                       
+000076d4  xdc_runtime_System_abortFxn__C                              
+000076d8  xdc_runtime_System_exitFxn__C                               
+000076dc  xdc_runtime_System_extendFxn__C                             
+000076e0  xdc_runtime_System_maxAtexitHandlers__C                     
+000076e4  xdc_runtime_Text_charTab__C                                 
+000076e8  xdc_runtime_Text_nameEmpty__C                               
+000076ec  xdc_runtime_Text_nameStatic__C                              
+000076f0  xdc_runtime_Text_nameUnknown__C                             
+000076f4  xdc_runtime_Text_nodeTab__C                                 
+000076f8  xdc_runtime_Text_visitRopeFxn__C                            
+000076fc  ti_sysbios_family_arm_m3_TimestampProvider_configTimer__C   
+000076fe  ti_sysbios_hal_Hwi_Module__id__C                            
+00007700  ti_sysbios_heaps_HeapMem_Module__id__C                      
+00007702  xdc_runtime_Core_Module__id__C                              
+00007704  xdc_runtime_Error_Module__loggerDefined__C                  
+00007706  xdc_runtime_Error_maxDepth__C                               
+00007708  xdc_runtime_Memory_Module__id__C                            
+0000770a  xdc_runtime_SysMin_flushAtExit__C                           
+0000770c  xdc_runtime_Text_charCnt__C                                 
+0000770e  xdc_runtime_Text_isLoaded__C                                
+00007710  xdc_runtime_Text_registryModsLastId__C                      
+00007712  xdc_runtime_Text_unnamedModsLastId__C                       
+00007714  xdc_runtime_Error_policy__C                                 
+00007718  __TI_static_base__                                          
+00007964  __TI_Handler_Table_Base                                     
+00007970  __TI_Handler_Table_Limit                                    
+00007980  __TI_CINIT_Base                                             
+00007998  __TI_CINIT_Limit                                            
+20000000  ti_sysbios_family_arm_m3_Hwi_ramVectors                     
+20000140  ti_sysbios_heaps_HeapMem_Instance_State_0_buf__A            
+20000940  reading_stack                                               
+20000d40  writing_stack                                               
+20001140  ti_sysbios_knl_Task_Instance_State_0_stack__A               
+20001340  ti_sysbios_family_arm_m3_Hwi_dispatchTable                  
+20001480  __CIOBUF_                                                   
+200015a0  xdc_runtime_SysMin_Module_State_0_outbuf__A                 
+20001658  S1                                                          
+2000165c  init                                                        
+20001660  m1                                                          
+20001664  r1                                                          
+20001668  stop                                                        
+2000166c  w1                                                          
+20001670  PowerMSP432_perfLevels                                      
+2000170c  ti_sysbios_knl_Swi_Module_State_0_readyQ__A                 
+2000178c  ti_sysbios_knl_Task_Module_State_0_readyQ__A                
+2000180c  ti_sysbios_family_arm_msp432_Timer_Object__table__V         
+20001858  ti_sysbios_knl_Task_Object__table__V                        
+200018a4  ti_sysbios_knl_Task_Module__state__V                        
+200018e8  ti_sysbios_gates_GateMutex_Object__table__V                 
+20001920  ti_sysbios_family_arm_m3_Hwi_Module__state__V               
+20001984  ti_sysbios_family_arm_m3_Hwi_Object__table__V               
+200019b4  ti_sysbios_family_arm_m3_Timer_Object__table__V             
+200019e4  ti_sysbios_knl_Swi_Object__table__V                         
+20001a14  ti_sysbios_knl_Clock_Module__state__V                       
+20001a40  PowerMSP432_module                                          
+20001a68  ti_sysbios_BIOS_Module__state__V                            
+20001a8c  ti_sysbios_family_arm_msp432_Timer_Module_State_0_device__A 
+20001aac  ti_sysbios_knl_Swi_Module__state__V                         
+20001ac8  ti_sysbios_heaps_HeapMem_Object__table__V                   
+20001ae0  gpioPinConfigs                                              
+20001af0  ti_sysbios_family_arm_msp432_Timer_Module_State_0_handles__A
+20001b00  __TI_cleanup_ptr                                            
+20001b04  __TI_dtors_ptr                                              
+20001b08  __TI_enable_exit_profile_output                             
+20001b0c  ti_sysbios_family_arm_m3_Timer_Module__state__V             
+20001b18  ti_sysbios_family_arm_msp432_ClockFreqs_Module__state__V    
+20001b24  ti_sysbios_family_arm_msp432_Timer_Module__state__V         
+20001b30  xdc_runtime_SysMin_Module__state__V                         
+20001b3c  _lock                                                       
+20001b40  _unlock                                                     
+20001b44  gpioCallbackFunctions                                       
+20001b4c  ti_sysbios_family_arm_m3_Hwi_Module__root__V                
+20001b54  ti_sysbios_gates_GateHwi_Module__root__V                    
+20001b5c  ti_sysbios_gates_GateMutex_Module__root__V                  
+20001b64  ti_sysbios_heaps_HeapMem_Module__root__V                    
+20001b6c  ti_sysbios_knl_Mailbox_Module__root__V                      
+20001b74  ti_sysbios_knl_Queue_Module__root__V                        
+20001b7c  ti_sysbios_knl_Semaphore_Module__root__V                    
+20001b84  ti_sysbios_knl_Task_Module__root__V                         
+20001b8c  xdc_runtime_Registry_Module__state__V                       
+20001b94  xdc_runtime_Startup_Module__state__V                        
+20001b9c  xdc_runtime_System_Module_State_0_atexitHandlers__A         
+20001ba4  xdc_runtime_System_Module__state__V                         
+20001bac  main_func_sp                                                
+20001bb0  ti_sysbios_family_arm_m3_Hwi_Module_State_0_excContext__A   
+20001bb4  ti_sysbios_family_arm_m3_Hwi_Module_State_0_excStack__A     
+20001bb8  ti_sysbios_family_arm_m3_TimestampProvider_Module__state__V 
+20001bbc  ti_sysbios_gates_GateHwi_Object__table__V                   
+20001bc0  ti_sysbios_knl_Task_Module_State_0_idleTask__A              
+20001bc4  xdc_runtime_Memory_Module__state__V                         
+20001bc8  ti_sysbios_family_arm_m3_Hwi_Module_State_0_excActive__A    
+20001bca  xdc_runtime_Error_Module__state__V                          
+2000fd00  __stack                                                     
+20010000  __STACK_END                                                 
+4000480c  WDTCTL_SYM                                                  
+e000e000  ti_sysbios_family_arm_m3_Hwi_nvic                           
+ffffffff  __TI_pprof_out_hndl                                         
+ffffffff  __TI_prof_data_size                                         
+ffffffff  __TI_prof_data_start                                        
+ffffffff  __binit__                                                   
+ffffffff  __c_args__                                                  
+ffffffff  binit                                                       
+UNDEFED   SHT$$INIT_ARRAY$$Base                                       
+UNDEFED   SHT$$INIT_ARRAY$$Limit                                      
+
+[608 symbols]
